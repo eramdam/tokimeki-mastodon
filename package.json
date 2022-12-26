@@ -11,8 +11,11 @@
     "typecheck:watch": "npm run typecheck -- --watch"
   },
   "dependencies": {
+    "@react-spring/web": "^9.6.1",
     "@types/lodash-es": "^4.17.6",
     "clsx": "^1.2.1",
+    "dompurify": "^2.4.1",
+    "html-react-parser": "^3.0.6",
     "localforage": "^1.10.0",
     "lodash-es": "^4.17.21",
     "masto": "^5.0.5",

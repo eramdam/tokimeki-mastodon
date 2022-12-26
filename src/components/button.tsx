@@ -7,7 +7,7 @@ import { useButton } from "react-aria";
 
 interface ButtonProps extends AriaButtonProps<"button"> {
   className?: string;
-  variant?: "primary" | "secondary";
+  variant: "primary" | "secondary";
 }
 
 export function Button(props: PropsWithChildren<ButtonProps>) {
@@ -19,24 +19,53 @@ export function Button(props: PropsWithChildren<ButtonProps>) {
   const mergedProps = mergeProps(buttonProps, hoverProps);
   const { disabled } = mergedProps;
 
+  const baseClassname = getBaseClassname({
+    isPressed,
+    isFocused,
+    isHovered,
+    disabled,
+  });
+
+  const variantClassnames: Record<ButtonProps["variant"], string> = {
+    primary: clsx(
+      "text-white shadow-violet-500/30",
+      isPressed ? "bg-violet-800  ring-violet-800 " : "bg-violet-500",
+      isHovered && "bg-violet-600 shadow-violet-600/30",
+      isFocused && "ring-violet-600"
+    ),
+    secondary: clsx(
+      "bg-white text-violet-800 ring-2 ring-inset ring-violet-800",
+      isHovered && "bg-neutral-100"
+    ),
+  };
+
   return (
     <button
       {...mergedProps}
       ref={ref}
-      className={clsx(
-        "inline-block rounded-md px-4 py-2 text-white shadow-lg shadow-violet-500/30",
-        isPressed
-          ? "bg-violet-800 ring-2 ring-violet-800 ring-offset-2"
-          : "bg-violet-500",
-        isHovered && "bg-violet-600 shadow-violet-600/30",
-        isFocused && "ring-2 ring-violet-600 ring-offset-2",
-        "outline-none",
-        "transition-colors duration-200 ease-in-out",
-        disabled && "cursor-not-allowed opacity-40",
-        className
-      )}
+      className={clsx(baseClassname, variantClassnames[variant], className)}
     >
       {children}
     </button>
+  );
+}
+
+function getBaseClassname({
+  isPressed,
+  isFocused,
+  isHovered,
+  disabled,
+}: {
+  isPressed?: boolean;
+  isFocused?: boolean;
+  isHovered?: boolean;
+  disabled?: boolean;
+}) {
+  return clsx(
+    "inline-block rounded-md px-4 py-2 shadow-lg outline-none",
+    (isPressed || isFocused) && "ring-2 ring-offset-2",
+    (isHovered || isFocused) && " -translate-y-0.5",
+    "transition-all duration-200 ease-in-out",
+    disabled && "cursor-not-allowed opacity-40"
   );
 }

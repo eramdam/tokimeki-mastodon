@@ -9,14 +9,6 @@
   h1 {
     @apply text-3xl font-bold text-gray-800;
   }
-
-  :any-link {
-    @apply text-violet-600 underline;
-
-    &:hover {
-      @apply text-violet-800 no-underline;
-    }
-  }
 }
 
 @layer utilities {

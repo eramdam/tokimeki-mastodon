@@ -43,6 +43,7 @@ const Review: NextPage = () => {
           you need to take a break. Progress will be saved as you go!
         </p>
         <Button
+          variant="primary"
           onPress={() => {
             setIsReviewing(true);
           }}

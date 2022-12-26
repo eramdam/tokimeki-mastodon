@@ -149,7 +149,11 @@ const Home: NextPage = () => {
           validationState={isInstanceValid || "valid"}
         ></TextInput>
         <div className="flex justify-center">
-          <Button type="submit" isDisabled={isInstanceValid === "invalid"}>
+          <Button
+            variant="primary"
+            type="submit"
+            isDisabled={isInstanceValid === "invalid"}
+          >
             Login
           </Button>
         </div>
