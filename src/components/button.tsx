@@ -5,9 +5,14 @@ import type { AriaButtonProps } from "react-aria";
 import { mergeProps, useFocusRing, useHover } from "react-aria";
 import { useButton } from "react-aria";
 
-export function Button(props: PropsWithChildren<AriaButtonProps<"button">>) {
+interface ButtonProps extends AriaButtonProps<"button"> {
+  className?: string;
+  variant?: "primary" | "secondary";
+}
+
+export function Button(props: PropsWithChildren<ButtonProps>) {
   const ref = useRef<HTMLButtonElement | null>(null);
-  const { children, ...ariaProps } = props;
+  const { children, className, variant, ...ariaProps } = props;
   const { buttonProps, isPressed } = useButton(ariaProps, ref);
   const { isFocused } = useFocusRing(ariaProps);
   const { isHovered, hoverProps } = useHover(ariaProps);
@@ -27,7 +32,8 @@ export function Button(props: PropsWithChildren<AriaButtonProps<"button">>) {
         isFocused && "ring-2 ring-violet-600 ring-offset-2",
         "outline-none",
         "transition-colors duration-200 ease-in-out",
-        disabled && "cursor-not-allowed opacity-50"
+        disabled && "cursor-not-allowed opacity-40",
+        className
       )}
     >
       {children}
