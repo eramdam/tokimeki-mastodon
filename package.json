@@ -8,7 +8,8 @@
     "lint": "next lint",
     "start": "next start",
     "typecheck": "tsc -p .",
-    "typecheck:watch": "npm run typecheck -- --watch"
+    "typecheck:watch": "npm run typecheck -- --watch",
+    "prepare": "husky install"
   },
   "dependencies": {
     "@github/relative-time-element": "^4.1.5",
@@ -21,6 +22,7 @@
     "lodash-es": "^4.17.21",
     "masto": "^5.0.5",
     "next": "13.0.2",
+    "organize-imports-cli": "^0.10.0",
     "react": "18.2.0",
     "react-aria": "^3.22.0",
     "react-blurhash": "^0.2.0",
@@ -37,6 +39,7 @@
     "autoprefixer": "^10.4.7",
     "eslint": "^8.26.0",
     "eslint-config-next": "13.0.2",
+    "husky": "^8.0.0",
     "postcss": "^8.4.14",
     "postcss-nesting": "^10.2.0",
     "prettier": "^2.7.1",
