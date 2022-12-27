@@ -1,4 +1,5 @@
 module.exports = {
   "*": "prettier --ignore-unknown --write",
-  "*.{ts,tsx,mjs}": ["organize-imports-cli", "eslint --fix"],
+  "*.{ts,tsx}": ["organize-imports-cli", "eslint --fix"],
+  "*.{js,mjs,cjs}": ["eslint --fix"],
 };
