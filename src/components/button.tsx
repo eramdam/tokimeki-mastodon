@@ -7,24 +7,26 @@ import { useButton } from "react-aria";
 
 interface ButtonProps extends AriaButtonProps<"button"> {
   className?: string;
-  variant: "primary" | "secondary";
+  variant: "primary" | "secondary" | "monochrome";
+  isStatic?: boolean;
 }
 
 export function Button(props: PropsWithChildren<ButtonProps>) {
   const ref = useRef<HTMLButtonElement | null>(null);
-  const { children, className, variant, ...ariaProps } = props;
+  const { children, className, isStatic, variant, ...ariaProps } = props;
   const { buttonProps, isPressed } = useButton(ariaProps, ref);
   const { isFocused } = useFocusRing(ariaProps);
   const { isHovered, hoverProps } = useHover(ariaProps);
   const mergedProps = mergeProps(buttonProps, hoverProps);
   const { disabled } = mergedProps;
 
-  const baseClassname = getBaseClassname({
-    isPressed,
-    isFocused,
-    isHovered,
-    disabled,
-  });
+  const baseClassname = clsx(
+    "inline-block rounded-md px-4 py-2 shadow-lg outline-none",
+    (isPressed || isFocused) && !isStatic && "ring-2 ring-offset-2",
+    (isHovered || isFocused) && !isStatic && " -translate-y-0.5",
+    !isStatic && "transition-all duration-200 ease-in-out",
+    disabled && "cursor-not-allowed opacity-40"
+  );
 
   const variantClassnames: Record<ButtonProps["variant"], string> = {
     primary: clsx(
@@ -35,7 +37,11 @@ export function Button(props: PropsWithChildren<ButtonProps>) {
     ),
     secondary: clsx(
       "bg-white text-violet-800 ring-2 ring-inset ring-violet-800",
-      isHovered && "bg-neutral-100"
+      isHovered && "bg-violet-200"
+    ),
+    monochrome: clsx(
+      "bg-black/40 text-white backdrop-blur-sm ",
+      isHovered && "bg-black/80"
     ),
   };
 
@@ -50,22 +56,12 @@ export function Button(props: PropsWithChildren<ButtonProps>) {
   );
 }
 
-function getBaseClassname({
-  isPressed,
-  isFocused,
-  isHovered,
-  disabled,
-}: {
-  isPressed?: boolean;
-  isFocused?: boolean;
-  isHovered?: boolean;
-  disabled?: boolean;
-}) {
-  return clsx(
-    "inline-block rounded-md px-4 py-2 shadow-lg outline-none",
-    (isPressed || isFocused) && "ring-2 ring-offset-2",
-    (isHovered || isFocused) && " -translate-y-0.5",
-    "transition-all duration-200 ease-in-out",
-    disabled && "cursor-not-allowed opacity-40"
+export function SmallButton(props: PropsWithChildren<ButtonProps>) {
+  return (
+    <Button
+      {...props}
+      isStatic
+      className={clsx("px-2 py-1 text-sm shadow-none", props.className)}
+    />
   );
 }

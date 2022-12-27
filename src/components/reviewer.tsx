@@ -5,6 +5,7 @@ import { useCallback, useEffect, useState } from "react";
 import { getFollowings } from "../helpers/mastodonHelpers";
 import { useItemFromLocalForage } from "../helpers/storageHelpers";
 import { Button } from "./button";
+import { renderWithEmoji } from "./emojify";
 import { FeedWidget } from "./feedWidget";
 import { FeedWidgetIframe } from "./feedWidgetIframe";
 import { Block } from "./main";
@@ -68,20 +69,14 @@ export function Reviewer() {
           )}
         >
           <FeedWidget accountId={currentAccount.id} client={masto}></FeedWidget>
-          {/* <FeedWidgetIframe
-            width={400}
-            height={800}
-            theme="light"
-            showBoosts={true}
-            showReplies={false}
-            showHeader={showBio}
-            url={currentAccount.url}
-          /> */}
         </Block>
       </div>
       <Block className="">
         <p>
-          Starting with <strong>{currentAccount.displayName}</strong>{" "}
+          {index === 0 ? "Starting with" : `#${index + 1}`}{" "}
+          <strong>
+            {renderWithEmoji(currentAccount.emojis, currentAccount.displayName)}
+          </strong>{" "}
           <span className="text-sm text-neutral-400">
             @{currentAccount.acct}!
           </span>
