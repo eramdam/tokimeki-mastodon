@@ -11,10 +11,7 @@ export function TextInput(props: PropsWithChildren<TextFieldProps>) {
   const { label } = props;
   const ref = useRef<HTMLInputElement>(null);
 
-  const { labelProps, inputProps, errorMessageProps } = useTextField(
-    props,
-    ref
-  );
+  const { labelProps, inputProps } = useTextField(props, ref);
 
   return (
     <div className={props.className}>

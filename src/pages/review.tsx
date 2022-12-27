@@ -1,7 +1,6 @@
 import localforage from "localforage";
 import type { mastodon } from "masto";
 import type { NextPage } from "next";
-import Head from "next/head";
 import { useEffect, useState } from "react";
 import { Button } from "../components/button";
 import { Block } from "../components/main";
