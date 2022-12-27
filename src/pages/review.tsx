@@ -33,7 +33,7 @@ const Review: NextPage = () => {
     }
 
     return (
-      <Block>
+      <Block className="inline-flex flex-col items-center justify-center gap-6">
         <h1 className="text-accentColor text-center">
           Hello @{account.username}! Let&apos;s go through those{" "}
           {account.followingCount} accounts you are following 😤
@@ -54,14 +54,7 @@ const Review: NextPage = () => {
     );
   }
 
-  return (
-    <>
-      <Head>
-        <title>Review</title>
-      </Head>
-      {renderContent()}
-    </>
-  );
+  return <>{renderContent()}</>;
 };
 
 export default Review;

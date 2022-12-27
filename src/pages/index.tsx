@@ -114,7 +114,7 @@ const Home: NextPage = () => {
   };
 
   return (
-    <Block>
+    <Block className="flex flex-col items-center justify-center">
       <Head>
         <title>Tokimeki Mastodon</title>
         <meta name="description" content="" />

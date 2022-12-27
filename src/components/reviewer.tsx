@@ -1,13 +1,14 @@
 import clsx from "clsx";
+import parse from "html-react-parser";
 import type { mastodon } from "masto";
 import { login } from "masto";
-import { useCallback, useEffect, useState } from "react";
+import { useCallback, useEffect, useMemo, useState } from "react";
 import { getFollowings } from "../helpers/mastodonHelpers";
 import { useItemFromLocalForage } from "../helpers/storageHelpers";
-import { Button } from "./button";
+import { Button, SmallButton } from "./button";
 import { renderWithEmoji } from "./emojify";
 import { FeedWidget } from "./feedWidget";
-import { FeedWidgetIframe } from "./feedWidgetIframe";
+import { getParserOptions } from "./htmlReactParserOptions";
 import { Block } from "./main";
 
 enum AnimationState {
@@ -39,6 +40,11 @@ export function Reviewer() {
   useEffect(() => {
     onMount();
   }, [masto, onMount]);
+  const currentAccount = accounts[index];
+  const parseOptions = useMemo(
+    () => getParserOptions(currentAccount?.emojis || []),
+    [currentAccount?.emojis]
+  );
 
   if (accounts.length === 0 || !masto) {
     return (
@@ -48,40 +54,63 @@ export function Reviewer() {
     );
   }
 
-  const currentAccount = accounts[index];
-
   if (!currentAccount) {
     return null;
   }
 
   return (
-    <>
-      <div className="flex flex-col items-center">
-        <Block
-          className={clsx(
-            "m-auto inline-flex p-0",
-            "min-h-[400px]",
-            "scale-1 transition-all duration-[250ms] ease-in-out",
-            animationState === AnimationState.Keep &&
-              "translate-x-[20%] translate-y-[200px] rotate-[10deg] scale-[0.5] opacity-0",
-            animationState === AnimationState.Unfollow &&
-              "translate-x-[-20%] translate-y-[200px] rotate-[-10deg] scale-[0.5] opacity-0"
-          )}
-        >
-          <FeedWidget accountId={currentAccount.id} client={masto}></FeedWidget>
-        </Block>
-      </div>
-      <Block className="">
-        <p>
-          {index === 0 ? "Starting with" : `#${index + 1}`}{" "}
-          <strong>
-            {renderWithEmoji(currentAccount.emojis, currentAccount.displayName)}
-          </strong>{" "}
-          <span className="text-sm text-neutral-400">
-            @{currentAccount.acct}!
-          </span>
+    <div className="flex max-h-full flex-1 flex-shrink flex-col items-center ">
+      <Block
+        className={clsx(
+          "m-auto inline-flex flex-1 flex-shrink overflow-hidden p-0",
+          "w-[400px]",
+          "scale-1 transition-all duration-[250ms] ease-in-out",
+          animationState === AnimationState.Keep &&
+            "translate-x-[20%] translate-y-[200px] rotate-[10deg] scale-[0.5] opacity-0",
+          animationState === AnimationState.Unfollow &&
+            "translate-x-[-20%] translate-y-[200px] rotate-[-10deg] scale-[0.5] opacity-0"
+        )}
+      >
+        <FeedWidget
+          key={currentAccount.id}
+          accountId={currentAccount.id}
+          client={masto}
+        ></FeedWidget>
+      </Block>
+      <Block className="mt-0 flex w-3/4 flex-shrink-0 flex-col items-start">
+        <div className="flex w-full items-center justify-between ">
+          <p className="prose break-words text-left leading-tight">
+            {index === 0 ? "Starting with" : `#${index + 1}:`}{" "}
+            <strong>
+              {renderWithEmoji(
+                currentAccount.emojis,
+                currentAccount.displayName
+              )}
+            </strong>{" "}
+            <a
+              href={currentAccount.url}
+              target="_blank"
+              className="text-sm text-neutral-400 hover:underline"
+              rel="noreferrer noopener"
+            >
+              @{currentAccount.acct}!
+            </a>
+          </p>
+          <SmallButton
+            variant="secondary"
+            onPress={() => setShowBio((p) => !p)}
+          >
+            {showBio ? "Hide bio" : "Show bio"}
+          </SmallButton>
+        </div>
+        {showBio && (
+          <div className="leading-tight">
+            {parse(currentAccount.note, parseOptions)}
+          </div>
+        )}
+        <p className="prose leading-tight">
+          Do their posts still spark joy or feel important to you?
         </p>
-        <p>Do their posts still spark joy or feel important to you?</p>
         <div className="mt-2 -mb-8 inline-flex gap-4">
           <Button
             variant="primary"
@@ -90,7 +119,7 @@ export function Reviewer() {
               setIndex((p) => p + 1);
               setTimeout(() => {
                 setAnimated(AnimationState.Idle);
-              }, 1000);
+              }, 500);
             }}
           >
             Unfollow
@@ -101,7 +130,7 @@ export function Reviewer() {
               setIndex((p) => p + 1);
               setTimeout(() => {
                 setAnimated(AnimationState.Idle);
-              }, 1000);
+              }, 500);
             }}
             variant="secondary"
           >
@@ -109,7 +138,7 @@ export function Reviewer() {
           </Button>
         </div>
       </Block>
-    </>
+    </div>
   );
 }
 
@@ -128,7 +157,6 @@ function useMastoClient() {
       accessToken: accessToken,
     }).then((mastoClient) => {
       setMasto(mastoClient);
-      console.log({ mastoClient });
     });
   }, [accessToken, instanceUrl]);
 

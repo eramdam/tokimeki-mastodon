@@ -9,19 +9,27 @@ interface FeedWidgetProps {
 
 export function FeedWidget(props: FeedWidgetProps) {
   const { client, accountId } = props;
+  const [isLoading, setIsLoading] = useState(true);
   const [statuses, setStatuses] = useState<mastodon.v1.Status[]>([]);
 
   useEffect(() => {
+    setIsLoading(true);
     client.v1.accounts
       .listStatuses(accountId, {
-        limit: 10,
+        limit: 30,
         excludeReplies: true,
         excludeReblogs: false,
       })
-      .then(setStatuses);
+      .then((res) => {
+        setStatuses(res);
+        setIsLoading(false);
+      });
   }, [accountId, client.v1.accounts]);
 
   function renderContent() {
+    if (isLoading) {
+      return <p className="prose p-3">Loading...</p>;
+    }
     if (statuses.length === 0) {
       return (
         <p className="prose p-3">
@@ -44,14 +52,6 @@ export function FeedWidget(props: FeedWidgetProps) {
   }
 
   return (
-    <div
-      style={{
-        height: 800,
-        width: 400,
-      }}
-      className="flex flex-col overflow-y-scroll"
-    >
-      {renderContent()}
-    </div>
+    <div className="flex flex-col overflow-y-scroll">{renderContent()}</div>
   );
 }

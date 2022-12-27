@@ -1,4 +1,5 @@
 import { type AppType } from "next/dist/shared/lib/utils";
+import Head from "next/head";
 import { useEffect } from "react";
 import { SSRProvider } from "react-aria";
 import { initLocalForage } from "../helpers/storageHelpers";
@@ -12,6 +13,9 @@ const MyApp: AppType = ({ Component, pageProps }) => {
 
   return (
     <SSRProvider>
+      <Head>
+        <title>Tokimeki Mastodon</title>
+      </Head>
       <Component {...pageProps} />
     </SSRProvider>
   );

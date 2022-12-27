@@ -1,21 +1,16 @@
-import { Node, Text } from "domhandler";
 /* eslint-disable @next/next/no-img-element */
 import "@github/relative-time-element";
-import type { HTMLReactParserOptions } from "html-react-parser";
-import parse, {
-  attributesToProps,
-  domToReact,
-  Element,
-} from "html-react-parser";
+import clsx from "clsx";
+import parse from "html-react-parser";
 import { compact } from "lodash-es";
 import type { mastodon } from "masto";
-import { useRef, useState } from "react";
-import { mergeProps, useButton } from "react-aria";
+import { useMemo, useRef, useState } from "react";
+import { useButton, usePress } from "react-aria";
+import { isElement } from "../helpers/domHelpers";
 import { BlurhashImage } from "./blurhashImage";
 import { SmallButton } from "./button";
 import { renderWithEmoji } from "./emojify";
-import clsx from "clsx";
-import { isElement } from "../helpers/domHelpers";
+import { getParserOptions } from "./htmlReactParserOptions";
 
 interface StatusProps {
   status: mastodon.v1.Status;
@@ -30,7 +25,7 @@ export function Status(props: StatusProps) {
   const [areMediaHidden, setAreMediaHidden] = useState(
     status.sensitive || initialIsCollapsed
   );
-  const mediaWrapperRef = useRef<HTMLButtonElement | null>(null);
+  const mediaWrapperRef = useRef<HTMLDivElement | null>(null);
   const { buttonProps } = useButton(
     {
       onPress: () => {
@@ -39,6 +34,15 @@ export function Status(props: StatusProps) {
     },
     mediaWrapperRef
   );
+
+  const { pressProps } = usePress({
+    onPress: () => {
+      if (!status.url) {
+        return;
+      }
+      window.open(status.url, "_blank", "noopener,noreferrer");
+    },
+  });
 
   const eligibleMedia = status.mediaAttachments.filter((m) => m.blurhash);
   const mediaRenders = compact(
@@ -50,7 +54,7 @@ export function Status(props: StatusProps) {
       return (
         <div
           key={m.id}
-          className="relative overflow-hidden rounded-md object-cover"
+          className="relative w-full overflow-hidden rounded-md object-cover"
         >
           <BlurhashImage
             isHidden={areMediaHidden}
@@ -67,52 +71,21 @@ export function Status(props: StatusProps) {
     })
   );
 
-  const parseOptions: HTMLReactParserOptions = {
-    replace: (domNode) => {
-      if (domNode instanceof Text) {
-        return renderWithEmoji(status.emojis, domNode.data);
-      }
-
-      if (domNode instanceof Element) {
-        if (domNode.tagName === "br") {
-          return <br />;
-        }
-        if (domNode.tagName === "a") {
-          const anchorProps = mergeProps(attributesToProps(domNode.attribs), {
-            className: "text-blue-500 hover:underline",
-            target: "_blank",
-            rel: "noreferrer noopener",
-          });
-          return (
-            <a {...anchorProps}>{domToReact(domNode.children, parseOptions)}</a>
-          );
-        }
-        if (domNode.tagName === "p") {
-          return (
-            <p className="mb-4 leading-normal last:mb-0">
-              {domToReact(domNode.children, parseOptions)}
-            </p>
-          );
-        }
-      }
-
-      return domNode;
-    },
-  };
+  const parseOptions = useMemo(
+    () => getParserOptions(status.emojis),
+    [status.emojis]
+  );
 
   return (
-    <a
+    <article
+      role="article"
+      {...pressProps}
       key={status.id}
-      className="border-b-[1px] border-neutral-300 p-2 font-sans no-underline hover:bg-neutral-100"
-      href={status.url || ""}
-      target="_blank"
-      rel="noreferrer noopener"
+      className="cursor-pointer border-b-[1px] border-neutral-300 p-2 font-sans no-underline hover:bg-neutral-100"
       onClickCapture={(e) => {
         if (isElement(e.target)) {
-          if (
-            e.target instanceof HTMLButtonElement ||
-            e.target.closest("button")
-          ) {
+          console.log(e.target);
+          if (e.target.closest("button, a")) {
             e.preventDefault();
             return;
           }
@@ -177,7 +150,7 @@ export function Status(props: StatusProps) {
       )) ||
         null}
       {(mediaRenders.length && (
-        <button
+        <div
           className="relative mt-4 mb-2 flex gap-1"
           {...buttonProps}
           ref={mediaWrapperRef}
@@ -197,9 +170,9 @@ export function Status(props: StatusProps) {
             {areMediaHidden ? "Sensitive content" : "Hide"}
           </SmallButton>
           {mediaRenders}
-        </button>
+        </div>
       )) ||
         null}
-    </a>
+    </article>
   );
 }

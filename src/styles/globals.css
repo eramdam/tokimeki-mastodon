@@ -9,6 +9,10 @@
   h1 {
     @apply text-3xl font-bold text-gray-800;
   }
+
+  #__next {
+    @apply flex h-screen flex-col;
+  }
 }
 
 @layer utilities {

@@ -32,7 +32,7 @@ export function renderWithEmoji(
           return (
             <img
               key={emoji.shortcode + index}
-              src={emoji.staticUrl}
+              src={emoji.url}
               alt={emoji.shortcode}
               className="inline h-[1em] w-[1em] align-middle"
             />
