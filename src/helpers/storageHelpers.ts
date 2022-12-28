@@ -14,3 +14,7 @@ export function useItemFromLocalForage<T>(key: string): T | null {
 
   return item;
 }
+
+export function clearStorage() {
+  localforage.clear();
+}

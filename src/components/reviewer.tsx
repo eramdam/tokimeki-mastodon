@@ -36,7 +36,6 @@ export function Reviewer() {
       revalidateOnFocus: false,
       revalidateOnReconnect: false,
       revalidateIfStale: false,
-      revalidateOnMount: true,
     }
   );
 
@@ -52,7 +51,7 @@ export function Reviewer() {
     }
     if (animationState === AnimationState.Keep) {
       return (
-        <p className="prose leading-tight">
+        <p className="prose leading-tight dark:prose-invert">
           Glad to hear{" "}
           <strong>
             {renderWithEmoji(currentAccount.emojis, currentAccount.displayName)}
@@ -64,7 +63,7 @@ export function Reviewer() {
 
     if (animationState === AnimationState.Unfollow) {
       return (
-        <p className="prose leading-tight">
+        <p className="prose leading-tight dark:prose-invert">
           Great, unfollowed! Let&apos;s thank{" "}
           <strong>
             {renderWithEmoji(currentAccount.emojis, currentAccount.displayName)}
@@ -75,11 +74,13 @@ export function Reviewer() {
     }
 
     if (animationState === AnimationState.Hidden) {
-      return <p className="prose leading-tight">Loading...</p>;
+      return (
+        <p className="prose leading-tight dark:prose-invert">Loading...</p>
+      );
     }
 
     return (
-      <p className="prose leading-tight">
+      <p className="prose leading-tight dark:prose-invert">
         Do their posts still spark joy or feel important to you?
       </p>
     );
@@ -141,7 +142,7 @@ export function Reviewer() {
   if (accounts?.length === 0 || !accounts) {
     return (
       <Block>
-        <div>Loading your followings...</div>
+        <p className="prose dark:prose-invert">Loading your followings...</p>
       </Block>
     );
   }
@@ -174,7 +175,7 @@ export function Reviewer() {
         {animationState === AnimationState.Idle && (
           <>
             <div className="flex w-full items-center justify-between ">
-              <p className="prose break-words text-left leading-tight">
+              <p className="prose break-words text-left leading-tight dark:prose-invert">
                 {index === 0 ? "Starting with" : `#${index + 1}:`}{" "}
                 <strong>
                   {renderWithEmoji(
@@ -199,13 +200,15 @@ export function Reviewer() {
               </SmallButton>
             </div>
             {showBio && (
-              <div className="leading-tight">
+              <p className="prose leading-tight dark:prose-invert">
                 {parse(currentAccount.note, parseOptions)}
-              </div>
+              </p>
             )}
           </>
         )}
-        <p className="prose leading-tight">{renderPrompt()}</p>
+        <p className="prose leading-tight dark:prose-invert">
+          {renderPrompt()}
+        </p>
         <div className="mt-2 -mb-8 inline-flex w-full justify-center gap-4">
           {renderFooter()}
         </div>

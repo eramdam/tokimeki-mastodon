@@ -81,7 +81,7 @@ export function Status(props: StatusProps) {
       role="article"
       {...pressProps}
       key={status.id}
-      className="cursor-pointer border-b-[1px] border-neutral-300 p-2 font-sans no-underline hover:bg-neutral-100"
+      className="cursor-pointer border-b-[1px] border-neutral-300 p-2 font-sans no-underline hover:bg-neutral-100 dark:border-neutral-700 dark:hover:bg-white/5"
       onClickCapture={(e) => {
         if (isElement(e.target)) {
           console.log(e.target);
@@ -93,7 +93,7 @@ export function Status(props: StatusProps) {
       }}
     >
       {booster && (
-        <div className="text-xs text-neutral-500">
+        <div className="text-xs text-neutral-500 dark:text-neutral-400">
           🔁 {booster.displayName} boosted
         </div>
       )}
@@ -108,12 +108,14 @@ export function Status(props: StatusProps) {
             <img
               alt={booster.displayName}
               src={booster.avatar}
-              className="absolute -bottom-2 -right-2 -mt-2 h-6 w-6 rounded-md border-2 border-white bg-white"
+              className="absolute -bottom-2 -right-2 -mt-2 h-6 w-6 rounded-md border-2 border-white bg-white dark:border-neutral-800 dark:bg-neutral-800
+              
+              "
             />
           )}
         </div>
 
-        <div className="mb-2 flex flex-col gap-1 truncate">
+        <div className="mb-2 flex flex-col gap-1 truncate dark:text-neutral-200">
           <span className="truncate text-base leading-tight">
             {renderWithEmoji(status.account.emojis, status.account.displayName)}
           </span>
@@ -127,7 +129,7 @@ export function Status(props: StatusProps) {
         <div className="self-start">
           <relative-time
             // @ts-expect-error - relative-time-element is not typed properly
-            class="text-xs leading-tight"
+            class="text-xs leading-tight dark:text-neutral-400"
             datetime={status.createdAt}
             tense="past"
             format="micro"
@@ -146,7 +148,9 @@ export function Status(props: StatusProps) {
         </SmallButton>
       )}
       {(!isCollapsed && (
-        <div className="text-sm">{parse(status.content, parseOptions)}</div>
+        <div className="text-sm dark:text-neutral-100">
+          {parse(status.content, parseOptions)}
+        </div>
       )) ||
         null}
       {(mediaRenders.length && (

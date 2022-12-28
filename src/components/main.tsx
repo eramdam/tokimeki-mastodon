@@ -6,7 +6,9 @@ export function Block(props: PropsWithHtmlProps<"div">) {
   return (
     <div
       className={clsx(
-        "my-10 mx-auto max-w-2xl gap-3 rounded-lg bg-white p-4 shadow-xl",
+        "my-10 mx-auto max-w-2xl gap-3 rounded-lg p-4 shadow-xl",
+        "bg-white",
+        "dark:bg-neutral-800",
         className
       )}
       {...rest}

@@ -2,8 +2,7 @@ import clsx from "clsx";
 import type { PropsWithChildren } from "react";
 import { useRef } from "react";
 import type { AriaButtonProps } from "react-aria";
-import { mergeProps, useFocusRing, useHover } from "react-aria";
-import { useButton } from "react-aria";
+import { mergeProps, useButton, useFocusRing, useHover } from "react-aria";
 
 interface ButtonProps extends AriaButtonProps<"button"> {
   className?: string;
@@ -36,8 +35,8 @@ export function Button(props: PropsWithChildren<ButtonProps>) {
       isFocused && "ring-violet-600"
     ),
     secondary: clsx(
-      "bg-white text-violet-800 ring-2 ring-inset ring-violet-800",
-      isHovered && "bg-violet-200"
+      "bg-white dark:bg-neutral-800 dark:text-violet-500 dark:ring-violet-500 text-violet-800 ring-2 ring-inset ring-violet-800",
+      isHovered && "bg-violet-200 dark:bg-violet-800"
     ),
     monochrome: clsx(
       "bg-black/40 text-white backdrop-blur-sm ",

@@ -1,3 +1,4 @@
+import clsx from "clsx";
 import type { PropsWithChildren } from "react";
 import { useRef } from "react";
 import type { AriaTextFieldOptions } from "react-aria";
@@ -15,13 +16,17 @@ export function TextInput(props: PropsWithChildren<TextFieldProps>) {
 
   return (
     <div className={props.className}>
-      <label {...labelProps} className="text-neutral-700">
+      <label {...labelProps} className="prose dark:prose-invert">
         {label}
       </label>
       <input
         {...inputProps}
         ref={ref}
-        className="rounded-md bg-neutral-200 px-2 py-1 text-base"
+        className={clsx(
+          "rounded-md bg-neutral-200 px-2 py-1 text-base dark:bg-neutral-700",
+          "border-2 border-transparent outline-none",
+          "focus:border-2 focus:border-violet-500"
+        )}
       />
       {/* {props.errorMessage && props.validationState === "invalid" && (
         <div {...errorMessageProps} style={{ color: "red", fontSize: 12 }}>

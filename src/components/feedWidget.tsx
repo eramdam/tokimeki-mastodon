@@ -33,11 +33,11 @@ export function FeedWidget(props: FeedWidgetProps) {
 
   function renderContent() {
     if (isLoading) {
-      return <p className="prose p-3">Loading...</p>;
+      return <p className="prose p-3 dark:prose-invert">Loading...</p>;
     }
     if (statuses.length === 0) {
       return (
-        <p className="prose p-3">
+        <p className="prose p-3 dark:prose-invert">
           It seems this user has not posted anything yet!
         </p>
       );

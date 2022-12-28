@@ -10,9 +10,9 @@ import { Button } from "../components/button";
 import { Block } from "../components/main";
 import { TextInput } from "../components/textField";
 import {
-  getAccessToken,
-  getAuthURL,
-  registerApplication,
+    getAccessToken,
+    getAuthURL,
+    registerApplication
 } from "../helpers/authHelpers";
 
 const Home: NextPage = () => {
@@ -123,10 +123,10 @@ const Home: NextPage = () => {
       <h1 className="text-accentColor text-center">
         ✨ Welcome to Tokimeki Mastodon ✨
       </h1>
-      <p className="prose">
+      <p className="prose dark:prose-invert">
         Following too many accounts? You&apos;re in the right place!
       </p>
-      <p>
+      <p className="prose dark:prose-invert">
         This tool is inspired by{" "}
         <a href="https://tokimeki-unfollow.glitch.me/">Tokimeki Unfollow</a>{" "}
         which has become my preferred way to clean my Twitter followings.
@@ -143,7 +143,7 @@ const Home: NextPage = () => {
           label="Instance URL"
           placeholder="https://"
           type={"url"}
-          className="flex flex-col gap-2 text-center "
+          className="prose flex flex-col gap-2 text-center dark:prose-invert"
           value={instanceUrl}
           onChange={setInstanceDomain}
           validationState={isInstanceValid || "valid"}
@@ -158,9 +158,6 @@ const Home: NextPage = () => {
           </Button>
         </div>
       </form>
-      {/* <main className="my-10 mx-auto flex max-w-2xl flex-col items-center gap-3 overflow-hidden rounded-lg bg-white p-4 shadow-xl">
-        
-      </main> */}
     </Block>
   );
 };
