@@ -1,11 +1,9 @@
 import clsx from "clsx";
 import parse from "html-react-parser";
-import type { mastodon } from "masto";
-import { login } from "masto";
-import { useCallback, useEffect, useMemo, useState } from "react";
+import { useMemo, useState } from "react";
+import useSWR from "swr";
 import { delayAsync } from "../helpers/asyncHelpers";
-import { getFollowings } from "../helpers/mastodonHelpers";
-import { useItemFromLocalForage } from "../helpers/storageHelpers";
+import { getFollowings, useMastoClient } from "../helpers/mastodonHelpers";
 import { Button, SmallButton } from "./button";
 import { renderWithEmoji } from "./emojify";
 import { FeedWidget } from "./feedWidget";
@@ -22,27 +20,27 @@ enum AnimationState {
 export function Reviewer() {
   const masto = useMastoClient();
   const [index, setIndex] = useState(0);
-  const [accounts, setAccounts] = useState<mastodon.v1.Account[]>([]);
   const [showBio, setShowBio] = useState(false);
   const [animationState, setAnimated] = useState(AnimationState.Idle);
 
-  const onMount = useCallback(async () => {
-    if (!masto) {
-      return;
+  const { data: accounts } = useSWR(
+    "accounts",
+    () => {
+      if (!masto) {
+        return undefined;
+      }
+
+      return getFollowings(masto);
+    },
+    {
+      revalidateOnFocus: false,
+      revalidateOnReconnect: false,
+      revalidateIfStale: false,
+      revalidateOnMount: true,
     }
+  );
 
-    if (accounts.length > 0) {
-      return;
-    }
-
-    const following = await getFollowings(masto);
-    setAccounts(following);
-  }, [accounts.length, masto]);
-
-  useEffect(() => {
-    onMount();
-  }, [masto, onMount]);
-  const currentAccount = accounts[index];
+  const currentAccount = accounts?.[index];
   const parseOptions = useMemo(
     () => getParserOptions(currentAccount?.emojis || []),
     [currentAccount?.emojis]
@@ -129,7 +127,7 @@ export function Reviewer() {
           onPress={async () => {
             setAnimated(AnimationState.Hidden);
             setIndex((p) => p + 1);
-            await delayAsync(600);
+            await delayAsync(1000);
             setAnimated(AnimationState.Idle);
           }}
           variant="secondary"
@@ -140,10 +138,10 @@ export function Reviewer() {
     );
   }
 
-  if (accounts.length === 0 || !masto) {
+  if (accounts?.length === 0 || !accounts) {
     return (
       <Block>
-        <div>Loading...</div>
+        <div>Loading your followings...</div>
       </Block>
     );
   }
@@ -170,7 +168,6 @@ export function Reviewer() {
         <FeedWidget
           key={currentAccount.id}
           accountId={currentAccount.id}
-          client={masto}
         ></FeedWidget>
       </Block>
       <Block className="mt-0 flex w-3/4 flex-shrink-0 flex-col items-start">
@@ -215,25 +212,4 @@ export function Reviewer() {
       </Block>
     </div>
   );
-}
-
-function useMastoClient() {
-  const accessToken = useItemFromLocalForage<string>("accessToken");
-  const instanceUrl = useItemFromLocalForage<string>("instanceUrl");
-  const [masto, setMasto] = useState<mastodon.Client | undefined>();
-
-  useEffect(() => {
-    if (!accessToken || !instanceUrl) {
-      return;
-    }
-
-    login({
-      url: instanceUrl,
-      accessToken: accessToken,
-    }).then((mastoClient) => {
-      setMasto(mastoClient);
-    });
-  }, [accessToken, instanceUrl]);
-
-  return masto;
 }

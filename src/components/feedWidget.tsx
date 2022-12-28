@@ -1,19 +1,24 @@
 import type { mastodon } from "masto";
 import { useEffect, useState } from "react";
+import { useMastoClient } from "../helpers/mastodonHelpers";
 import { Status } from "./status";
 
 interface FeedWidgetProps {
   accountId: string;
-  client: mastodon.Client;
 }
 
 export function FeedWidget(props: FeedWidgetProps) {
-  const { client, accountId } = props;
+  const { accountId } = props;
+  const client = useMastoClient();
   const [isLoading, setIsLoading] = useState(true);
   const [statuses, setStatuses] = useState<mastodon.v1.Status[]>([]);
 
   useEffect(() => {
     setIsLoading(true);
+    if (!client) {
+      return;
+    }
+
     client.v1.accounts
       .listStatuses(accountId, {
         limit: 30,
@@ -24,7 +29,7 @@ export function FeedWidget(props: FeedWidgetProps) {
         setStatuses(res);
         setIsLoading(false);
       });
-  }, [accountId, client.v1.accounts]);
+  }, [accountId, client]);
 
   function renderContent() {
     if (isLoading) {

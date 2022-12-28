@@ -102,13 +102,13 @@ export function Status(props: StatusProps) {
           <img
             alt={status.account.displayName}
             src={status.account.avatar}
-            className="-mt-2 h-8 w-8 rounded-md"
+            className="-mt-2 h-8 w-8 rounded-md bg-white"
           />
           {booster && (
             <img
               alt={booster.displayName}
               src={booster.avatar}
-              className="absolute -bottom-2 -right-2 -mt-2 h-6 w-6 rounded-md border-2 border-white"
+              className="absolute -bottom-2 -right-2 -mt-2 h-6 w-6 rounded-md border-2 border-white bg-white"
             />
           )}
         </div>

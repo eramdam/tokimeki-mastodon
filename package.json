@@ -27,6 +27,8 @@
     "react-aria": "^3.22.0",
     "react-blurhash": "^0.2.0",
     "react-dom": "18.2.0",
+    "swr": "^2.0.0",
+    "tsx": "^3.12.1",
     "zod": "^3.18.0"
   },
   "devDependencies": {
