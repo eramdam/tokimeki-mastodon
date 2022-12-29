@@ -200,15 +200,15 @@ export function Reviewer() {
               </SmallButton>
             </div>
             {showBio && (
-              <p className="prose leading-tight dark:prose-invert">
+              <div className="prose leading-tight dark:prose-invert">
                 {parse(currentAccount.note, parseOptions)}
-              </p>
+              </div>
             )}
           </>
         )}
-        <p className="prose leading-tight dark:prose-invert">
+        <div className="prose leading-tight dark:prose-invert">
           {renderPrompt()}
-        </p>
+        </div>
         <div className="mt-2 -mb-8 inline-flex w-full justify-center gap-4">
           {renderFooter()}
         </div>
