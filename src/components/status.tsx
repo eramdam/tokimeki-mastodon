@@ -80,7 +80,6 @@ export function Status(props: StatusProps) {
     <article
       role="article"
       {...pressProps}
-      key={status.id}
       className="cursor-pointer border-b-[1px] border-neutral-300 p-2 font-sans no-underline hover:bg-neutral-100 dark:border-neutral-700 dark:hover:bg-white/5"
       onClickCapture={(e) => {
         if (isElement(e.target)) {
