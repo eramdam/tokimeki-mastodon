@@ -17,6 +17,7 @@ import {
 
 const Home: NextPage = () => {
   const [instanceUrl, setInstanceDomain] = useState("");
+  const [isLoading, setIsLoading] = useState(false);
   const router = useRouter();
 
   const isInstanceValid: ValidationState | undefined = useMemo(() => {
@@ -30,6 +31,7 @@ const Home: NextPage = () => {
 
   const onCode = useCallback(
     async (code: string) => {
+      setIsLoading(true);
       const clientId = await localforage.getItem<string>("clientId");
       const clientSecret = await localforage.getItem<string>("clientSecret");
       const instanceUrl = await localforage.getItem<string>("instanceUrl");
@@ -92,6 +94,8 @@ const Home: NextPage = () => {
       return;
     }
 
+    setIsLoading(true);
+
     try {
       const { clientId, clientSecret } = await registerApplication(
         instanceUrl,
@@ -147,14 +151,15 @@ const Home: NextPage = () => {
           value={instanceUrl}
           onChange={setInstanceDomain}
           validationState={isInstanceValid || "valid"}
+          isDisabled={isLoading}
         ></TextInput>
         <div className="flex justify-center">
           <Button
             variant="primary"
             type="submit"
-            isDisabled={isInstanceValid === "invalid"}
+            isDisabled={isInstanceValid === "invalid" || isLoading}
           >
-            Login
+            {(isLoading && "Loading...") || "Login"}
           </Button>
         </div>
       </form>

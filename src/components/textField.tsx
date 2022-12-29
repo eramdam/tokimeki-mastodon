@@ -25,7 +25,8 @@ export function TextInput(props: PropsWithChildren<TextFieldProps>) {
         className={clsx(
           "rounded-md bg-neutral-200 px-2 py-1 text-base dark:bg-neutral-700",
           "border-2 border-transparent outline-none",
-          "focus:border-2 focus:border-violet-500"
+          "focus:border-2 focus:border-violet-500",
+          inputProps.disabled && "opacity-50"
         )}
       />
       {/* {props.errorMessage && props.validationState === "invalid" && (
