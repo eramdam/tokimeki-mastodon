@@ -1,6 +1,6 @@
 import type { mastodon } from "masto";
 import { useEffect, useState } from "react";
-import { useMastoClient } from "../helpers/mastodonHelpers";
+import { useMastodon } from "../helpers/mastodonContext";
 import { Status } from "./status";
 
 interface FeedWidgetProps {
@@ -9,7 +9,7 @@ interface FeedWidgetProps {
 
 export function FeedWidget(props: FeedWidgetProps) {
   const { accountId } = props;
-  const client = useMastoClient();
+  const { client } = useMastodon();
   const [isLoading, setIsLoading] = useState(true);
   const [statuses, setStatuses] = useState<mastodon.v1.Status[]>([]);
 

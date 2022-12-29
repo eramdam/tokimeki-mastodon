@@ -7,6 +7,7 @@ import { useButton } from "react-aria";
 import { Button } from "../components/button";
 import { Block } from "../components/main";
 import { Reviewer } from "../components/reviewer";
+import { MastodonProvider } from "../helpers/mastodonContext";
 import { clearStorage } from "../helpers/storageHelpers";
 
 const Review: NextPage = () => {
@@ -76,7 +77,7 @@ const Review: NextPage = () => {
     );
   }
 
-  return <>{renderContent()}</>;
+  return <MastodonProvider>{renderContent()}</MastodonProvider>;
 };
 
 export default Review;

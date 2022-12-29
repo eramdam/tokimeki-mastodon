@@ -1,9 +1,8 @@
 import clsx from "clsx";
 import parse from "html-react-parser";
 import { useMemo, useState } from "react";
-import useSWR from "swr";
 import { delayAsync } from "../helpers/asyncHelpers";
-import { getFollowings, useMastoClient } from "../helpers/mastodonHelpers";
+import { useMastoFollowingsList } from "../helpers/mastodonHelpers";
 import { Button, SmallButton } from "./button";
 import { renderWithEmoji } from "./emojify";
 import { FeedWidget } from "./feedWidget";
@@ -18,28 +17,12 @@ enum AnimationState {
 }
 
 export function Reviewer() {
-  const masto = useMastoClient();
-  const [index, setIndex] = useState(0);
   const [showBio, setShowBio] = useState(false);
   const [animationState, setAnimated] = useState(AnimationState.Idle);
 
-  const { data: accounts } = useSWR(
-    () => (masto ? "accounts" : "waiting"),
-    () => {
-      if (!masto) {
-        return undefined;
-      }
+  const { currentAccount, goToNextAccount, followingsPage, followingIndex } =
+    useMastoFollowingsList();
 
-      return getFollowings(masto);
-    },
-    {
-      revalidateOnFocus: false,
-      revalidateOnReconnect: false,
-      revalidateIfStale: false,
-    }
-  );
-
-  const currentAccount = accounts?.[index];
   const parseOptions = useMemo(
     () => getParserOptions(currentAccount?.emojis || []),
     [currentAccount?.emojis]
@@ -51,39 +34,33 @@ export function Reviewer() {
     }
     if (animationState === AnimationState.Keep) {
       return (
-        <p className="prose leading-tight dark:prose-invert">
+        <>
           Glad to hear{" "}
           <strong>
             {renderWithEmoji(currentAccount.emojis, currentAccount.displayName)}
           </strong>
           &apos;s toots are still important to you.
-        </p>
+        </>
       );
     }
 
     if (animationState === AnimationState.Unfollow) {
       return (
-        <p className="prose leading-tight dark:prose-invert">
+        <>
           Great, unfollowed! Let&apos;s thank{" "}
           <strong>
             {renderWithEmoji(currentAccount.emojis, currentAccount.displayName)}
           </strong>{" "}
           for all the posts you&apos;ve enjoyed before.{" "}
-        </p>
+        </>
       );
     }
 
     if (animationState === AnimationState.Hidden) {
-      return (
-        <p className="prose leading-tight dark:prose-invert">Loading...</p>
-      );
+      return <>Loading...</>;
     }
 
-    return (
-      <p className="prose leading-tight dark:prose-invert">
-        Do their posts still spark joy or feel important to you?
-      </p>
-    );
+    return <>Do their posts still spark joy or feel important to you?</>;
   }
 
   function renderFooter() {
@@ -127,7 +104,7 @@ export function Reviewer() {
         <Button
           onPress={async () => {
             setAnimated(AnimationState.Hidden);
-            setIndex((p) => p + 1);
+            await goToNextAccount();
             await delayAsync(1000);
             setAnimated(AnimationState.Idle);
           }}
@@ -139,7 +116,7 @@ export function Reviewer() {
     );
   }
 
-  if (accounts?.length === 0 || !accounts) {
+  if (followingsPage?.length === 0) {
     return (
       <Block>
         <p className="prose dark:prose-invert">Loading your followings...</p>
@@ -176,7 +153,9 @@ export function Reviewer() {
           <>
             <div className="flex w-full items-center justify-between ">
               <p className="prose break-words text-left leading-tight dark:prose-invert">
-                {index === 0 ? "Starting with" : `#${index + 1}:`}{" "}
+                {followingIndex === 0
+                  ? "Starting with"
+                  : `#${followingIndex + 1}:`}{" "}
                 <strong>
                   {renderWithEmoji(
                     currentAccount.emojis,
