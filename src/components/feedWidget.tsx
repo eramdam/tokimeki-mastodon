@@ -19,16 +19,16 @@ export function FeedWidget(props: FeedWidgetProps) {
       return;
     }
 
-    client.v1.accounts
-      .listStatuses(accountId, {
-        limit: 30,
-        excludeReplies: true,
-        excludeReblogs: false,
-      })
-      .then((res) => {
-        setStatuses(res);
-        setIsLoading(false);
-      });
+    const statusesPromise = client.v1.accounts.listStatuses(accountId, {
+      limit: 18,
+      excludeReplies: true,
+      excludeReblogs: false,
+    });
+
+    statusesPromise.then((res) => {
+      setStatuses(res);
+      setIsLoading(false);
+    });
   }, [accountId, client]);
 
   function renderContent() {
