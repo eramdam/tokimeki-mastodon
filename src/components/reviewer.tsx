@@ -24,7 +24,7 @@ export function Reviewer() {
   const [animationState, setAnimated] = useState(AnimationState.Idle);
 
   const { data: accounts } = useSWR(
-    "accounts",
+    () => (masto ? "accounts" : "waiting"),
     () => {
       if (!masto) {
         return undefined;
