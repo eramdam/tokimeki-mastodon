@@ -28,10 +28,14 @@ export function BlurhashImage(props: BlurhashImageProps) {
     <>
       <img
         ref={imgRef}
-        src={props.src}
-        className={clsx(props.imgClassname, {
-          "opacity-0": !isLoaded || props.isHidden,
-        })}
+        src={props.isHidden ? "" : props.src}
+        className={clsx(
+          props.imgClassname,
+          {
+            "opacity-0": !isLoaded || props.isHidden,
+          },
+          "text-[0px]"
+        )}
         onLoad={() => setIsLoaded(true)}
         width={props.width}
         height={props.height}
