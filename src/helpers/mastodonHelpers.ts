@@ -8,13 +8,14 @@ export function useMastoFollowingsList() {
     []
   );
   const accountId = useMemo(() => account?.id, [account]);
-  // eslint-disable-next-line @typescript-eslint/no-explicit-any
-  const [nextParams, setNextParams] = useState<any>(undefined);
   const [currentAccount, setCurrentAccount] = useState<
     mastodon.v1.Account | undefined
   >(undefined);
   const [followingIndex, setFollowingIndex] = useState(0);
   const [isFetching, setIsFetching] = useState(false);
+  const [currentPagePromise, setCurrentPagePromise] = useState<
+    ReturnType<mastodon.v1.AccountRepository["listFollowing"]> | undefined
+  >(undefined);
 
   const fetchFollowings = useCallback(async () => {
     if (!accountId || !client) {
@@ -22,19 +23,19 @@ export function useMastoFollowingsList() {
     }
     setIsFetching(true);
 
-    const followingsPromise = client.v1.accounts.listFollowing(
-      accountId,
-      nextParams ?? {
-        limit: 2,
-      }
-    );
+    const followingsPromise = client.v1.accounts.listFollowing(accountId, {
+      limit: 2,
+    });
 
-    const followings = await followingsPromise;
-    // @ts-expect-error committing a TS crime until https://github.com/neet/masto.js/issues/775 is fixed.
-    setNextParams(followingsPromise.nextParams);
+    const followings = currentPagePromise
+      ? await (
+          await currentPagePromise.next()
+        ).value
+      : await followingsPromise;
+    setCurrentPagePromise(followingsPromise);
 
     return followings;
-  }, [accountId, client, nextParams]);
+  }, [accountId, client, currentPagePromise]);
 
   const goToNextAccount = useCallback(async () => {
     setFollowingIndex((p) => p + 1);
