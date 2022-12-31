@@ -57,6 +57,8 @@ export function FeedWidget(props: FeedWidgetProps) {
   }
 
   return (
-    <div className="flex flex-col overflow-y-scroll">{renderContent()}</div>
+    <div className="flex min-h-[400px] min-w-full flex-col overflow-y-scroll">
+      {renderContent()}
+    </div>
   );
 }
