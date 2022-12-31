@@ -1,6 +1,4 @@
 import type { ValidationState } from "@react-types/shared";
-import localforage from "localforage";
-import type { mastodon } from "masto";
 import { login } from "masto";
 import { type NextPage } from "next";
 import Head from "next/head";
@@ -14,6 +12,7 @@ import {
     getAuthURL,
     registerApplication
 } from "../helpers/authHelpers";
+import { getStoredItem, setStoredItem } from "../helpers/storageHelpers";
 
 const Home: NextPage = () => {
   const [instanceUrl, setInstanceDomain] = useState("");
@@ -32,9 +31,9 @@ const Home: NextPage = () => {
   const onCode = useCallback(
     async (code: string) => {
       setIsLoading(true);
-      const clientId = await localforage.getItem<string>("clientId");
-      const clientSecret = await localforage.getItem<string>("clientSecret");
-      const instanceUrl = await localforage.getItem<string>("instanceUrl");
+      const clientId = await getStoredItem("clientId");
+      const clientSecret = await getStoredItem("clientSecret");
+      const instanceUrl = await getStoredItem("instanceUrl");
 
       if (!clientId || !clientSecret || !instanceUrl) {
         return;
@@ -57,22 +56,21 @@ const Home: NextPage = () => {
         return;
       }
 
-      await localforage.setItem("accessToken", access_token);
+      await setStoredItem("accessToken", access_token);
       const masto = await login({
         url: instanceUrl,
         accessToken: access_token,
         timeout: 30_000,
       });
       const account = await masto.v1.accounts.verifyCredentials();
-      await localforage.setItem("account", account);
+      await setStoredItem("account", account);
       router.push("/review");
     },
     [router]
   );
 
   useEffect(() => {
-    const accountPromise =
-      localforage.getItem<mastodon.v1.AccountCredentials>("account");
+    const accountPromise = getStoredItem("account");
 
     accountPromise.then((accessToken) => {
       if (accessToken) {
@@ -103,9 +101,9 @@ const Home: NextPage = () => {
       );
 
       if (clientId && clientSecret) {
-        await localforage.setItem("instanceUrl", instanceUrl);
-        await localforage.setItem("clientId", clientId);
-        await localforage.setItem("clientSecret", clientSecret);
+        await setStoredItem("instanceUrl", instanceUrl);
+        await setStoredItem("clientId", clientId);
+        await setStoredItem("clientSecret", clientSecret);
 
         location.href = getAuthURL({
           instanceUrl,

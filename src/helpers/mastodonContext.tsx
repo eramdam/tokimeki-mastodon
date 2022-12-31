@@ -10,9 +10,9 @@ const MastodonContext = createContext<{
 }>({ client: undefined, account: null });
 
 export const MastodonProvider = (props: PropsWithChildren<object>) => {
-  const accessToken = useItemFromLocalForage<string>("accessToken");
-  const account = useItemFromLocalForage<mastodon.v1.Account>("account");
-  const instanceUrl = useItemFromLocalForage<string>("instanceUrl");
+  const accessToken = useItemFromLocalForage("accessToken");
+  const account = useItemFromLocalForage("account");
+  const instanceUrl = useItemFromLocalForage("instanceUrl");
   const [masto, setMasto] = useState<mastodon.Client | undefined>();
 
   useEffect(() => {
