@@ -2,6 +2,7 @@ import clsx from "clsx";
 import parse from "html-react-parser";
 import { useMemo, useState } from "react";
 import { delayAsync } from "../helpers/asyncHelpers";
+import { useMastodon } from "../helpers/mastodonContext";
 import { useMastoFollowingsList } from "../helpers/mastodonHelpers";
 import { Button, SmallButton } from "./button";
 import { renderWithEmoji } from "./emojify";
@@ -17,6 +18,7 @@ enum AnimationState {
 }
 
 export function Reviewer() {
+  const { client } = useMastodon();
   const [showBio, setShowBio] = useState(false);
   const [animationState, setAnimated] = useState(AnimationState.Idle);
 
@@ -27,6 +29,19 @@ export function Reviewer() {
     () => getParserOptions(currentAccount?.emojis || []),
     [currentAccount?.emojis]
   );
+
+  const onNextClick = async () => {
+    const shouldUnfollow = animationState === AnimationState.Unfollow;
+
+    if (shouldUnfollow && client && currentAccount) {
+      console.log("Will unfollow", currentAccount.acct);
+      await client.v1.accounts.unfollow(currentAccount.id);
+    }
+    setAnimated(AnimationState.Hidden);
+    await goToNextAccount();
+    await delayAsync(500);
+    setAnimated(AnimationState.Idle);
+  };
 
   function renderPrompt() {
     if (!currentAccount) {
@@ -101,15 +116,7 @@ export function Reviewer() {
         >
           Undo
         </Button>
-        <Button
-          onPress={async () => {
-            setAnimated(AnimationState.Hidden);
-            await goToNextAccount();
-            await delayAsync(1000);
-            setAnimated(AnimationState.Idle);
-          }}
-          variant="secondary"
-        >
+        <Button onPress={onNextClick} variant="secondary">
           Next
         </Button>
       </>
