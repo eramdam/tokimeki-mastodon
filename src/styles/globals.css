@@ -7,7 +7,7 @@
     @apply bg-gray-200 font-mono accent-violet-800 dark:bg-gray-500;
   }
   h1 {
-    @apply text-3xl font-bold text-gray-800;
+    @apply text-2xl font-bold text-gray-800;
   }
 
   #__next {

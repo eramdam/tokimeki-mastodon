@@ -1,6 +1,7 @@
 import type { mastodon } from "masto";
 import { useCallback, useEffect, useMemo, useState } from "react";
 import { useMastodon } from "./mastodonContext";
+import { setStoredItem, useItemFromLocalForage } from "./storageHelpers";
 
 export function useMastoFollowingsList() {
   const { client, account } = useMastodon();
@@ -13,29 +14,8 @@ export function useMastoFollowingsList() {
   >(undefined);
   const [followingIndex, setFollowingIndex] = useState(0);
   const [isFetching, setIsFetching] = useState(false);
-  const [currentPagePromise, setCurrentPagePromise] = useState<
-    ReturnType<mastodon.v1.AccountRepository["listFollowing"]> | undefined
-  >(undefined);
-
-  const fetchFollowings = useCallback(async () => {
-    if (!accountId || !client) {
-      return [];
-    }
-    setIsFetching(true);
-
-    const followingsPromise = client.v1.accounts.listFollowing(accountId, {
-      limit: 2,
-    });
-
-    const followings = currentPagePromise
-      ? await (
-          await currentPagePromise.next()
-        ).value
-      : await followingsPromise;
-    setCurrentPagePromise(followingsPromise);
-
-    return followings;
-  }, [accountId, client, currentPagePromise]);
+  const keptIds = useItemFromLocalForage("keptIds");
+  const unfollowedIds = useItemFromLocalForage("unfollowedIds");
 
   const goToNextAccount = useCallback(async () => {
     setFollowingIndex((p) => p + 1);
@@ -48,27 +28,54 @@ export function useMastoFollowingsList() {
       return;
     }
 
-    if (currentIndex === followingsPage.length - 1) {
-      const nextFollowings = await fetchFollowings();
+    setCurrentAccount(followingsPage[currentIndex + 1]);
+  }, [currentAccount?.id, followingsPage]);
 
-      setFollowingsPage(nextFollowings);
-      setCurrentAccount(nextFollowings[0]);
+  useEffect(() => {
+    if (!client || isFetching || (!keptIds && !unfollowedIds)) {
       return;
     }
 
-    setCurrentAccount(followingsPage[currentIndex + 1]);
-  }, [currentAccount?.id, fetchFollowings, followingsPage]);
+    async function fetchFollowings() {
+      if (!accountId || !client) {
+        return [];
+      }
+      setIsFetching(true);
+      const accounts: mastodon.v1.Account[] =
+        process.env.NODE_ENV === "development"
+          ? safeJsonParse(sessionStorage.getItem("followings") || "") || []
+          : [];
 
-  useEffect(() => {
-    if (!client || isFetching) {
-      return;
+      if (accounts.length === 0) {
+        for await (const followings of client.v1.accounts.listFollowing(
+          accountId,
+          {
+            limit: 80,
+          }
+        )) {
+          accounts.push(...followings);
+        }
+      }
+
+      setStoredItem(
+        "followingIds",
+        accounts.map((a) => a.id)
+      );
+
+      if (process.env.NODE_ENV === "development") {
+        sessionStorage.setItem("followings", JSON.stringify(accounts));
+      }
+
+      return accounts.filter((a) => {
+        return !keptIds?.includes(a.id) && !unfollowedIds?.includes(a.id);
+      });
     }
 
     fetchFollowings().then((res) => {
       setFollowingsPage(res);
       setCurrentAccount(res[0]);
     });
-  }, [client, fetchFollowings, isFetching]);
+  }, [accountId, client, isFetching, keptIds, unfollowedIds]);
 
   return {
     currentAccount,
@@ -76,4 +83,12 @@ export function useMastoFollowingsList() {
     followingsPage,
     followingIndex,
   };
+}
+
+function safeJsonParse(str: string) {
+  try {
+    return JSON.parse(str);
+  } catch (e) {
+    return null;
+  }
 }

@@ -1,19 +1,17 @@
-import localforage from "localforage";
-import type { mastodon } from "masto";
 import type { NextPage } from "next";
 import { useRouter } from "next/router";
-import { useEffect, useRef, useState } from "react";
+import { useMemo, useRef, useState } from "react";
 import { useButton } from "react-aria";
 import { Button } from "../components/button";
 import { Block } from "../components/main";
 import { Reviewer } from "../components/reviewer";
 import { MastodonProvider } from "../helpers/mastodonContext";
-import { clearStorage } from "../helpers/storageHelpers";
+import {
+    clearStorage,
+    useItemFromLocalForage
+} from "../helpers/storageHelpers";
 
 const Review: NextPage = () => {
-  const [account, setAccount] = useState<mastodon.v1.AccountCredentials | null>(
-    null
-  );
   const [isReviewing, setIsReviewing] = useState(false);
   const router = useRouter();
   const buttonRef = useRef(null);
@@ -26,12 +24,18 @@ const Review: NextPage = () => {
     },
     buttonRef
   );
-
-  useEffect(() => {
-    localforage
-      .getItem<mastodon.v1.AccountCredentials>("account")
-      .then(setAccount);
-  }, []);
+  const account = useItemFromLocalForage("account");
+  const keptIds = useItemFromLocalForage("keptIds", { defaultValue: [] });
+  const unfollowedIds = useItemFromLocalForage("unfollowedIds", {
+    defaultValue: [],
+  });
+  const followingIds = useItemFromLocalForage("followingIds");
+  const filteredIds = useMemo(() => {
+    return (followingIds || []).filter((i) => {
+      return !unfollowedIds.includes(i) && !keptIds.includes(i);
+    });
+  }, [followingIds, keptIds, unfollowedIds]);
+  const hasProgress = Boolean(unfollowedIds.length || keptIds.length);
 
   function renderContent() {
     if (!account) {
@@ -57,13 +61,33 @@ const Review: NextPage = () => {
         </button>
         <Block className="inline-flex flex-col items-center justify-center gap-6">
           <h1 className="text-accentColor text-center">
-            Hello @{account.username}! Let&apos;s go through those{" "}
-            {account.followingCount} accounts you are following 😤
+            {hasProgress ? "Hello again," : "Hello"} @{account.username}!
+            Let&apos;s go through those {account.followingCount} accounts you
+            are following 😤
+            {hasProgress && (
+              <>
+                <br />
+                {filteredIds.length} to go!
+              </>
+            )}
           </h1>
           <p className="prose dark:prose-invert">
             You can&apos;t be expected to do this all at once, do not feel bad
             if you need to take a break. Progress will be saved as you go!
           </p>
+          {hasProgress && (
+            <p className="prose dark:prose-invert">
+              Keep at it! You started with {account.followingCount} follows. We
+              loaded your progress from last time when you kept {keptIds.length}{" "}
+              accounts that mattered to you.
+              <br />
+              <br />
+              <strong>
+                Let&apos;s get started on the {filteredIds.length} accounts you
+                left!
+              </strong>
+            </p>
+          )}
           <Button
             variant="primary"
             onPress={() => {

@@ -1,9 +1,14 @@
 import clsx from "clsx";
 import parse from "html-react-parser";
+import { uniq } from "lodash-es";
 import { useMemo, useState } from "react";
 import { delayAsync } from "../helpers/asyncHelpers";
 import { useMastodon } from "../helpers/mastodonContext";
 import { useMastoFollowingsList } from "../helpers/mastodonHelpers";
+import {
+    setStoredItem,
+    useItemFromLocalForage
+} from "../helpers/storageHelpers";
 import { Button, SmallButton } from "./button";
 import { renderWithEmoji } from "./emojify";
 import { FeedWidget } from "./feedWidget";
@@ -29,14 +34,24 @@ export function Reviewer() {
     () => getParserOptions(currentAccount?.emojis || []),
     [currentAccount?.emojis]
   );
+  const keptIds = useItemFromLocalForage("keptIds");
+  const unfollowedIds = useItemFromLocalForage("unfollowedIds");
 
   const onNextClick = async () => {
     const shouldUnfollow = animationState === AnimationState.Unfollow;
-
-    if (shouldUnfollow && client && currentAccount) {
-      console.log("Will unfollow", currentAccount.acct);
-      await client.v1.accounts.unfollow(currentAccount.id);
+    if (currentAccount) {
+      if (shouldUnfollow && client) {
+        console.log("Will unfollow", currentAccount.acct);
+        // await client.v1.accounts.unfollow(currentAccount.id);
+        setStoredItem(
+          "unfollowedIds",
+          uniq([...(unfollowedIds || []), currentAccount.id])
+        );
+      } else {
+        setStoredItem("keptIds", uniq([...(keptIds || []), currentAccount.id]));
+      }
     }
+
     setAnimated(AnimationState.Hidden);
     await goToNextAccount();
     await delayAsync(500);
