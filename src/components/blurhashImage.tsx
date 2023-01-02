@@ -7,11 +7,12 @@ interface BlurhashImageProps {
   imgClassname?: string;
   canvasClassname?: string;
   src: string;
-  width: number;
-  height: number;
+  width?: number;
+  height?: number;
   hash: string;
   description?: string;
   isHidden?: boolean;
+  isUncached?: boolean;
 }
 
 export function BlurhashImage(props: BlurhashImageProps) {
@@ -37,15 +38,15 @@ export function BlurhashImage(props: BlurhashImageProps) {
           "text-[0px]"
         )}
         onLoad={() => setIsLoaded(true)}
-        width={props.width}
-        height={props.height}
+        width={props.width || 32}
+        height={props.height || 32}
         alt={props.description || ""}
       />
       <BlurhashCanvas
         className={props.canvasClassname}
         hash={props.hash}
-        width={props.width}
-        height={props.height}
+        width={props.width || 32}
+        height={props.height || 32}
       ></BlurhashCanvas>
     </>
   );

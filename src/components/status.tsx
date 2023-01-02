@@ -34,6 +34,16 @@ export function Status(props: StatusProps) {
     },
     mediaWrapperRef
   );
+  const hasUncachedMedia = status.mediaAttachments.some(
+    (m) => m.type === "unknown"
+  );
+  const renderMediaText = () => {
+    if (hasUncachedMedia) {
+      return "Not available";
+    }
+
+    return areMediaHidden ? "Sensitive content" : "Hide";
+  };
 
   const { pressProps } = usePress({
     onPress: () => {
@@ -51,17 +61,20 @@ export function Status(props: StatusProps) {
         return null;
       }
 
+      const isUncached = m.type === "unknown";
+
       return (
         <div
           key={m.id}
           className="relative w-full overflow-hidden rounded-md object-cover"
         >
           <BlurhashImage
+            isUncached={isUncached}
             isHidden={areMediaHidden}
             imgClassname="relative top-0 left-0 h-full w-full object-cover z-10"
             canvasClassname="absolute top-0 left-0 h-full w-full object-cover"
-            width={m.meta?.small?.width || 0}
-            height={m.meta?.small?.height || 0}
+            width={m.meta?.small?.width}
+            height={m.meta?.small?.height}
             description={m.description || ""}
             src={m.previewUrl}
             hash={m.blurhash}
@@ -162,15 +175,18 @@ export function Status(props: StatusProps) {
             variant="monochrome"
             className={clsx(
               "absolute",
-              areMediaHidden &&
+              (areMediaHidden || hasUncachedMedia) &&
                 "top-1/2 left-1/2 z-20 -translate-x-1/2 -translate-y-1/2",
-              !areMediaHidden && "top-1 left-1 z-20"
+              !areMediaHidden && !hasUncachedMedia && "top-1 left-1 z-20"
             )}
             onPress={() => {
+              if (hasUncachedMedia) {
+                return;
+              }
               setAreMediaHidden((p) => !p);
             }}
           >
-            {areMediaHidden ? "Sensitive content" : "Hide"}
+            {renderMediaText()}
           </SmallButton>
           {mediaRenders}
         </div>
