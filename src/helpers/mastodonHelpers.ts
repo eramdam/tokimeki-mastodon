@@ -2,7 +2,10 @@ import { uniq } from "lodash-es";
 import type { mastodon } from "masto";
 import { useCallback, useEffect, useMemo, useState } from "react";
 import { useMastodon } from "./mastodonContext";
-import { setStoredItem, useItemFromLocalForage } from "./storageHelpers";
+import {
+    getStoredItem,
+    setStoredItem
+} from "./storageHelpers";
 
 export function useMastoFollowingsList() {
   const { client, account } = useMastodon();
@@ -15,8 +18,6 @@ export function useMastoFollowingsList() {
   >(undefined);
   const [followingIndex, setFollowingIndex] = useState(0);
   const [isFetching, setIsFetching] = useState(false);
-  const keptIds = useItemFromLocalForage("keptIds");
-  const unfollowedIds = useItemFromLocalForage("unfollowedIds");
 
   const goToNextAccount = useCallback(async () => {
     setFollowingIndex((p) => p + 1);
@@ -33,7 +34,7 @@ export function useMastoFollowingsList() {
   }, [currentAccount?.id, followingsPage]);
 
   useEffect(() => {
-    if (!client || isFetching || keptIds || unfollowedIds) {
+    if (!client || isFetching) {
       return;
     }
 
@@ -41,11 +42,12 @@ export function useMastoFollowingsList() {
       if (!accountId || !client) {
         return [];
       }
+
+      const keptIds = (await getStoredItem("keptIds")) || [];
+      const unfollowedIds = (await getStoredItem("unfollowedIds")) || [];
+
       setIsFetching(true);
-      const accounts: mastodon.v1.Account[] =
-        process.env.NODE_ENV === "development"
-          ? safeJsonParse(sessionStorage.getItem("followings") || "") || []
-          : [];
+      const accounts: mastodon.v1.Account[] = [];
 
       if (accounts.length === 0) {
         for await (const followings of client.v1.accounts.listFollowing(
@@ -73,7 +75,7 @@ export function useMastoFollowingsList() {
       setFollowingsPage(res);
       setCurrentAccount(res[0]);
     });
-  }, [accountId, client, isFetching, keptIds, unfollowedIds]);
+  }, [accountId, client, isFetching]);
 
   return {
     currentAccount,
@@ -81,12 +83,4 @@ export function useMastoFollowingsList() {
     followingsPage,
     followingIndex,
   };
-}
-
-function safeJsonParse(str: string) {
-  try {
-    return JSON.parse(str);
-  } catch (e) {
-    return null;
-  }
 }
