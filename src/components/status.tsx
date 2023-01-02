@@ -45,13 +45,15 @@ export function Status(props: StatusProps) {
     return areMediaHidden ? "Sensitive content" : "Hide";
   };
 
+  const onPress = () => {
+    if (!status.url) {
+      return;
+    }
+    window.open(status.url, "_blank", "noopener,noreferrer");
+  };
+
   const { pressProps } = usePress({
-    onPress: () => {
-      if (!status.url) {
-        return;
-      }
-      window.open(status.url, "_blank", "noopener,noreferrer");
-    },
+    onPress,
   });
 
   const eligibleMedia = status.mediaAttachments.filter((m) => m.blurhash);
@@ -96,10 +98,11 @@ export function Status(props: StatusProps) {
       className="cursor-pointer border-b-[1px] border-neutral-300 p-2 font-sans no-underline hover:bg-neutral-100 dark:border-neutral-700 dark:hover:bg-white/5"
       onClickCapture={(e) => {
         if (isElement(e.target)) {
-          console.log(e.target);
           if (e.target.closest("button, a")) {
             e.preventDefault();
             return;
+          } else {
+            onPress();
           }
         }
       }}
