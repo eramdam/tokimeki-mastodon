@@ -44,7 +44,9 @@ export function Reviewer(props: ReviewerProps) {
     if (currentAccount) {
       if (shouldUnfollow && client) {
         console.log("Will unfollow", currentAccount.acct);
-        // await client.v1.accounts.unfollow(currentAccount.id);
+        if (process.env.NODE_ENV !== "development") {
+          await client.v1.accounts.unfollow(currentAccount.id);
+        }
         setStoredItem(
           "unfollowedIds",
           uniq([...(unfollowedIds || []), currentAccount.id])
