@@ -4,7 +4,6 @@ import { useEffect, useState } from "react";
 import { useMastodon } from "../helpers/mastodonContext";
 import { Status } from "./status";
 
-// Test
 interface FeedWidgetProps {
   accountId: string;
 }
