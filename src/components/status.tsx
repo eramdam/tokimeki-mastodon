@@ -147,7 +147,8 @@ export function Status(props: StatusProps) {
             class="text-xs leading-tight dark:text-neutral-400"
             datetime={status.createdAt}
             tense="past"
-            format="micro"
+            format="relative"
+            formatStyle="narrow"
           ></relative-time>
         </div>
       </div>
