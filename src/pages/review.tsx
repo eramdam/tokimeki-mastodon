@@ -37,6 +37,7 @@ const Review: NextPage = () => {
     });
   }, [followingIds, keptIds, unfollowedIds]);
   const hasProgress = Boolean(unfollowedIds.length || keptIds.length);
+  const [isFinished, setIsFinished] = useState(false);
 
   function renderContent() {
     if (!account) {
@@ -48,7 +49,13 @@ const Review: NextPage = () => {
     }
 
     if (isReviewing) {
-      return <Reviewer />;
+      return (
+        <Reviewer
+          onFinished={() => {
+            setIsFinished(true);
+          }}
+        />
+      );
     }
 
     return (

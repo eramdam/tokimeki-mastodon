@@ -6,8 +6,8 @@ import { delayAsync } from "../helpers/asyncHelpers";
 import { useMastodon } from "../helpers/mastodonContext";
 import { useMastoFollowingsList } from "../helpers/mastodonHelpers";
 import {
-    setStoredItem,
-    useItemFromLocalForage
+    getStoredItem,
+    setStoredItem
 } from "../helpers/storageHelpers";
 import { Button, SmallButton } from "./button";
 import { renderWithEmoji } from "./emojify";
@@ -22,7 +22,11 @@ enum AnimationState {
   Hidden,
 }
 
-export function Reviewer() {
+interface ReviewerProps {
+  onFinished: () => void;
+}
+
+export function Reviewer(props: ReviewerProps) {
   const { client } = useMastodon();
   const [showBio, setShowBio] = useState(false);
   const [animationState, setAnimated] = useState(AnimationState.Idle);
@@ -34,10 +38,11 @@ export function Reviewer() {
     () => getParserOptions(currentAccount?.emojis || []),
     [currentAccount?.emojis]
   );
-  const keptIds = useItemFromLocalForage("keptIds");
-  const unfollowedIds = useItemFromLocalForage("unfollowedIds");
 
   const onNextClick = async () => {
+    const keptIds = await getStoredItem("keptIds");
+    const unfollowedIds = await getStoredItem("unfollowedIds");
+
     const shouldUnfollow = animationState === AnimationState.Unfollow;
     if (currentAccount) {
       if (shouldUnfollow && client) {
@@ -138,6 +143,14 @@ export function Reviewer() {
     );
   }
 
+  const renderTitle = () => {
+    if (followingIndex === followingsPage.length - 1) {
+      return "Last but not least, ";
+    }
+
+    return followingIndex === 0 ? "Starting with " : `#${followingIndex + 1}: `;
+  };
+
   if (followingsPage?.length === 0) {
     return (
       <Block>
@@ -175,9 +188,7 @@ export function Reviewer() {
           <>
             <div className="flex w-full items-center justify-between ">
               <p className="prose break-words text-left leading-tight dark:prose-invert">
-                {followingIndex === 0
-                  ? "Starting with"
-                  : `#${followingIndex + 1}:`}{" "}
+                {renderTitle()}
                 <strong>
                   {renderWithEmoji(
                     currentAccount.emojis,
@@ -190,8 +201,9 @@ export function Reviewer() {
                   className="text-sm text-neutral-400 hover:underline"
                   rel="noreferrer noopener"
                 >
-                  @{currentAccount.acct}!
+                  @{currentAccount.acct}
                 </a>
+                !
               </p>
               <SmallButton
                 variant="secondary"
