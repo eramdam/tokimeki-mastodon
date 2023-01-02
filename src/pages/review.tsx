@@ -1,3 +1,4 @@
+import { uniq } from "lodash-es";
 import type { NextPage } from "next";
 import { useRouter } from "next/router";
 import { useMemo, useRef, useState } from "react";
@@ -31,7 +32,7 @@ const Review: NextPage = () => {
   });
   const followingIds = useItemFromLocalForage("followingIds");
   const filteredIds = useMemo(() => {
-    return (followingIds || []).filter((i) => {
+    return uniq(followingIds || []).filter((i) => {
       return !unfollowedIds.includes(i) && !keptIds.includes(i);
     });
   }, [followingIds, keptIds, unfollowedIds]);
@@ -84,7 +85,7 @@ const Review: NextPage = () => {
               <br />
               <strong>
                 Let&apos;s get started on the {filteredIds.length} accounts you
-                left!
+                have left!
               </strong>
             </p>
           )}
