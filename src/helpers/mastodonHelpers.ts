@@ -32,7 +32,7 @@ export function useMastoFollowingsList() {
   }, [currentAccount?.id, followingsPage]);
 
   useEffect(() => {
-    if (!client || isFetching || (!keptIds && !unfollowedIds)) {
+    if (!client || isFetching || keptIds || unfollowedIds) {
       return;
     }
 
