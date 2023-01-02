@@ -1,3 +1,4 @@
+import { uniq } from "lodash-es";
 import type { mastodon } from "masto";
 import { useCallback, useEffect, useMemo, useState } from "react";
 import { useMastodon } from "./mastodonContext";
@@ -57,10 +58,7 @@ export function useMastoFollowingsList() {
         }
       }
 
-      setStoredItem(
-        "followingIds",
-        accounts.map((a) => a.id)
-      );
+      setStoredItem("followingIds", uniq(accounts.map((a) => a.id)));
 
       if (process.env.NODE_ENV === "development") {
         sessionStorage.setItem("followings", JSON.stringify(accounts));
