@@ -1,6 +1,7 @@
 import { uniq } from "lodash-es";
 import type { mastodon } from "masto";
 import { useCallback, useEffect, useMemo, useState } from "react";
+
 import { useMastodon } from "./mastodonContext";
 import {
   getStoredItem,

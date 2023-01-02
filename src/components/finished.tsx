@@ -1,6 +1,7 @@
 /* eslint-disable @next/next/no-img-element */
 import { useRouter } from "next/router";
 import { useMemo, useState } from "react";
+
 import type { UseMastoFollowingsListProps } from "../helpers/mastodonHelpers";
 import {
   clearStorage,

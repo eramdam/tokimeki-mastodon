@@ -3,6 +3,7 @@ import type { NextPage } from "next";
 import { useRouter } from "next/router";
 import { useMemo, useRef, useState } from "react";
 import { useButton } from "react-aria";
+
 import { Button } from "../components/button";
 import { Finished } from "../components/finished";
 import { Block } from "../components/main";
@@ -11,7 +12,6 @@ import { MastodonProvider } from "../helpers/mastodonContext";
 import { useMastoFollowingsList } from "../helpers/mastodonHelpers";
 import {
   clearStorage,
-  getStoredItem,
   useItemFromLocalForage,
 } from "../helpers/storageHelpers";
 

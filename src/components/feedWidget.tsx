@@ -1,5 +1,6 @@
 import type { mastodon } from "masto";
 import { useEffect, useState } from "react";
+
 import { useMastodon } from "../helpers/mastodonContext";
 import { Status } from "./status";
 

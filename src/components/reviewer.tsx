@@ -2,12 +2,10 @@ import clsx from "clsx";
 import parse from "html-react-parser";
 import { uniq } from "lodash-es";
 import { useMemo, useState } from "react";
+
 import { delayAsync } from "../helpers/asyncHelpers";
 import { useMastodon } from "../helpers/mastodonContext";
-import type {
-  useMastoFollowingsList,
-  UseMastoFollowingsListProps,
-} from "../helpers/mastodonHelpers";
+import type { UseMastoFollowingsListProps } from "../helpers/mastodonHelpers";
 import { getStoredItem, setStoredItem } from "../helpers/storageHelpers";
 import { Button, SmallButton } from "./button";
 import { renderWithEmoji } from "./emojify";

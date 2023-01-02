@@ -3,6 +3,7 @@ import type { HTMLReactParserOptions } from "html-react-parser";
 import { attributesToProps, domToReact, Element } from "html-react-parser";
 import type { mastodon } from "masto";
 import { mergeProps } from "react-aria";
+
 import { renderWithEmoji } from "./emojify";
 
 export function getParserOptions(emojiArray: mastodon.v1.CustomEmoji[]) {
