@@ -29,11 +29,11 @@ export function BlurhashImage(props: BlurhashImageProps) {
     <>
       <img
         ref={imgRef}
-        src={props.isHidden ? "" : props.src}
+        src={props.isHidden || props.isUncached ? "" : props.src}
         className={clsx(
           props.imgClassname,
           {
-            "opacity-0": !isLoaded || props.isHidden,
+            "opacity-0": !isLoaded || props.isHidden || props.isUncached,
           },
           "text-[0px]"
         )}
