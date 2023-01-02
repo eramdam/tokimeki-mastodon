@@ -28,13 +28,12 @@ export const MastodonProvider = (props: PropsWithChildren<object>) => {
     });
   }, [accessToken, instanceUrl]);
 
-  const value = useMemo(
-    () => ({
+  const value = useMemo(() => {
+    return {
       client: masto,
       account,
-    }),
-    [account, masto]
-  );
+    };
+  }, [account, masto]);
 
   return (
     <MastodonContext.Provider value={value}>

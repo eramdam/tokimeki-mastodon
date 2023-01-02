@@ -8,9 +8,9 @@ import { Button } from "../components/button";
 import { Block } from "../components/main";
 import { TextInput } from "../components/textField";
 import {
-    getAccessToken,
-    getAuthURL,
-    registerApplication
+  getAccessToken,
+  getAuthURL,
+  registerApplication,
 } from "../helpers/authHelpers";
 import { getStoredItem, setStoredItem } from "../helpers/storageHelpers";
 
@@ -64,6 +64,7 @@ const Home: NextPage = () => {
       });
       const account = await masto.v1.accounts.verifyCredentials();
       await setStoredItem("account", account);
+      await setStoredItem("startCount", account.followingCount);
       router.push("/review");
     },
     [router]

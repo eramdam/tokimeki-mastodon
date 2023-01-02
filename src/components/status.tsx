@@ -98,11 +98,13 @@ export function Status(props: StatusProps) {
       className="cursor-pointer border-b-[1px] border-neutral-300 p-2 font-sans no-underline hover:bg-neutral-100 dark:border-neutral-700 dark:hover:bg-white/5"
       onClickCapture={(e) => {
         if (isElement(e.target)) {
+          if (e.target.matches("img")) {
+            onPress();
+            return;
+          }
           if (e.target.closest("button, a")) {
             e.preventDefault();
             return;
-          } else {
-            onPress();
           }
         }
       }}

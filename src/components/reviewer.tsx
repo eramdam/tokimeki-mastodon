@@ -4,11 +4,11 @@ import { uniq } from "lodash-es";
 import { useMemo, useState } from "react";
 import { delayAsync } from "../helpers/asyncHelpers";
 import { useMastodon } from "../helpers/mastodonContext";
-import { useMastoFollowingsList } from "../helpers/mastodonHelpers";
-import {
-    getStoredItem,
-    setStoredItem
-} from "../helpers/storageHelpers";
+import type {
+  useMastoFollowingsList,
+  UseMastoFollowingsListProps,
+} from "../helpers/mastodonHelpers";
+import { getStoredItem, setStoredItem } from "../helpers/storageHelpers";
 import { Button, SmallButton } from "./button";
 import { renderWithEmoji } from "./emojify";
 import { FeedWidget } from "./feedWidget";
@@ -22,17 +22,16 @@ enum AnimationState {
   Hidden,
 }
 
-interface ReviewerProps {
+interface ReviewerProps extends UseMastoFollowingsListProps {
   onFinished: () => void;
 }
 
 export function Reviewer(props: ReviewerProps) {
+  const { currentAccount, goToNextAccount, filteredAccounts, followingIndex } =
+    props;
   const { client } = useMastodon();
   const [showBio, setShowBio] = useState(false);
   const [animationState, setAnimated] = useState(AnimationState.Idle);
-
-  const { currentAccount, goToNextAccount, followingsPage, followingIndex } =
-    useMastoFollowingsList();
 
   const parseOptions = useMemo(
     () => getParserOptions(currentAccount?.emojis || []),
@@ -58,6 +57,12 @@ export function Reviewer(props: ReviewerProps) {
     }
 
     setAnimated(AnimationState.Hidden);
+
+    if (filteredAccounts.length <= 1) {
+      props.onFinished();
+      return;
+    }
+
     await goToNextAccount();
     await delayAsync(500);
     setAnimated(AnimationState.Idle);
@@ -144,14 +149,14 @@ export function Reviewer(props: ReviewerProps) {
   }
 
   const renderTitle = () => {
-    if (followingIndex === followingsPage.length - 1) {
+    if (followingIndex === filteredAccounts.length - 1) {
       return "Last but not least, ";
     }
 
     return followingIndex === 0 ? "Starting with " : `#${followingIndex + 1}: `;
   };
 
-  if (followingsPage?.length === 0) {
+  if (filteredAccounts?.length === 0) {
     return (
       <Block>
         <p className="prose dark:prose-invert">Loading your followings...</p>
@@ -164,7 +169,7 @@ export function Reviewer(props: ReviewerProps) {
   }
 
   return (
-    <div className="flex max-h-full flex-1 flex-shrink flex-col items-center ">
+    <div className="flex max-h-full flex-1 flex-shrink flex-col items-center">
       <Block
         className={clsx(
           "m-auto inline-flex flex-1 flex-shrink overflow-hidden p-0",
