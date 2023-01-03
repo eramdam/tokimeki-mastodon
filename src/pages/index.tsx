@@ -69,7 +69,6 @@ const Home: NextPage = () => {
       saveAfterOAuthCode({
         accessToken: access_token,
         account,
-        startCount: account.followingCount,
       });
       router.push("/review");
     },

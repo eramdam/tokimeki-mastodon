@@ -1,5 +1,6 @@
 import { shuffle } from "lodash-es";
 import type { mastodon } from "masto";
+import { useMemo } from "react";
 import shallow from "zustand/shallow";
 
 import { SortOrders, usePersistedStore } from "./index";
@@ -35,13 +36,19 @@ export const useFilteredFollowings = () => {
   const keptIds = useKeptIds();
   const unfollowedIds = useUnfollowedIds();
 
-  return filterFollowings(baseFollowings, keptIds, unfollowedIds);
+  return useMemo(
+    () => filterFollowings(baseFollowings, keptIds, unfollowedIds),
+    [baseFollowings, keptIds, unfollowedIds]
+  );
 };
 export const useCurrentAccount = () => {
   const currentIndex = useCurrentIndex();
   const followings = useFollowings();
 
-  return followings[currentIndex] || followings[0];
+  return useMemo(
+    () => followings[currentIndex] || followings[0],
+    [currentIndex, followings]
+  );
 };
 export const useCurrentIndex = () =>
   usePersistedStore((state) => state.currentIndex);
@@ -51,7 +58,10 @@ export const useKeptAccounts = () => {
   const baseFollowings = useFollowings();
   const keptIds = useKeptIds();
 
-  return baseFollowings.filter((a) => keptIds?.includes(a.id));
+  return useMemo(
+    () => baseFollowings.filter((a) => keptIds?.includes(a.id)),
+    [baseFollowings, keptIds]
+  );
 };
 /*
  * Helpers.

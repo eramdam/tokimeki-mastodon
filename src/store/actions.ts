@@ -26,12 +26,11 @@ export function saveLoginCredentials(payload: {
 export function saveAfterOAuthCode(payload: {
   accessToken: string;
   account: mastodon.v1.AccountCredentials;
-  startCount: number;
 }): void {
   usePersistedStore.setState({
     accessToken: payload.accessToken,
     account: payload.account,
-    startCount: payload.startCount,
+    startCount: payload.account.followingCount,
   });
 }
 
