@@ -4,7 +4,11 @@ import create from "zustand";
 import { createJSONStorage, persist } from "zustand/middleware";
 import shallow from "zustand/shallow";
 
-import { SortOrders } from "./helpers/storageHelpers";
+export enum SortOrders {
+  OLDEST = "oldest",
+  RANDOM = "random",
+  NEWEST = "newest",
+}
 
 interface BaseTokimekiState {
   clientId?: string;

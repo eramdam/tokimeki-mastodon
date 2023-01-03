@@ -3,6 +3,7 @@ import type { mastodon } from "masto";
 import { useCallback, useEffect, useMemo, useState } from "react";
 
 import {
+  SortOrders,
   useAccountId,
   useActions,
   useKeptIds,
@@ -10,7 +11,6 @@ import {
   useUnfollowedIds,
 } from "../state";
 import { useMastodon } from "./mastodonContext";
-import { SortOrders } from "./storageHelpers";
 
 export type UseMastoFollowingsListProps = ReturnType<
   typeof useMastoFollowingsList

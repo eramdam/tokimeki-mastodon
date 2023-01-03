@@ -10,8 +10,8 @@ import { Radio, RadioGroup } from "../components/radioGroup";
 import { Reviewer } from "../components/reviewer";
 import { MastodonProvider } from "../helpers/mastodonContext";
 import { useMastoFollowingsList } from "../helpers/mastodonHelpers";
-import { SortOrders } from "../helpers/storageHelpers";
 import {
+  SortOrders,
   useAccount,
   useActions,
   useKeptIds,
