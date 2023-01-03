@@ -75,7 +75,7 @@ export async function fetchFollowings(
     isFetching: false,
     followings: sortFollowings(
       accounts,
-      initialPersistedState.settings.sortOrder
+      usePersistedStore.getState().settings.sortOrder
     ),
   });
   return accounts;
