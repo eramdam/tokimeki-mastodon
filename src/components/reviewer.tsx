@@ -64,7 +64,11 @@ export function Reviewer(props: ReviewerProps) {
 
     setAnimated(AnimationState.Hidden);
 
-    if (filteredFollowings.length < 1) {
+    if (
+      filteredFollowings.length < 1 ||
+      (currentAccount &&
+        currentAccount.id === followings[followings.length - 1]?.id)
+    ) {
       props.onFinished();
       return;
     }
