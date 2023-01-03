@@ -15,7 +15,8 @@ export function Finished(props: UseMastoFollowingsListProps) {
   const [maybeReset, setMaybeReset] = useState(false);
   const router = useRouter();
   const account = useItemFromLocalForage("account");
-  const keptIds = useItemFromLocalForage("keptIds", { defaultValue: [] });
+  const keptIdsFromStorage = useItemFromLocalForage("keptIds");
+  const keptIds = useMemo(() => keptIdsFromStorage || [], [keptIdsFromStorage]);
   const startCount = useItemFromLocalForage("startCount");
   const startingCount = startCount || account?.followingCount || 0;
   const keptAccounts = useMemo(() => {

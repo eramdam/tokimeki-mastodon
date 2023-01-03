@@ -1,7 +1,7 @@
 import { uniq } from "lodash-es";
 import type { NextPage } from "next";
 import { useRouter } from "next/router";
-import { useMemo, useRef, useState } from "react";
+import { useEffect, useMemo, useRef, useState } from "react";
 import { useButton } from "react-aria";
 
 import { Button } from "../components/button";
@@ -38,19 +38,31 @@ const ReviewContent = () => {
     buttonRef
   );
   const account = useItemFromLocalForage("account");
-  const keptIds = useItemFromLocalForage("keptIds", { defaultValue: [] });
-  const unfollowedIds = useItemFromLocalForage("unfollowedIds", {
-    defaultValue: [],
-  });
+  const keptIdsFromStorage = useItemFromLocalForage("keptIds");
+  const keptIds = useMemo(() => keptIdsFromStorage || [], [keptIdsFromStorage]);
+  const unfollowedIds = useItemFromLocalForage("unfollowedIds");
   const followingIds = useItemFromLocalForage("followingIds");
   const filteredIds = useMemo(() => {
-    return uniq(followingIds || []).filter((i) => {
-      return !unfollowedIds.includes(i) && !keptIds.includes(i);
+    return uniq(followingIds).filter((i) => {
+      return !(unfollowedIds || []).includes(i) && !(keptIds || []).includes(i);
     });
   }, [followingIds, keptIds, unfollowedIds]);
-  const hasProgress = Boolean(unfollowedIds.length || keptIds.length);
-  const [isFinished, setIsFinished] = useState(() => filteredIds.length < 1);
+  const hasProgress = useMemo(
+    () =>
+      Boolean(
+        (unfollowedIds && unfollowedIds.length) ||
+          (keptIdsFromStorage && keptIdsFromStorage.length)
+      ),
+    [keptIdsFromStorage, unfollowedIds]
+  );
+  const [isFinished, setIsFinished] = useState(false);
   const followingsListProps = useMastoFollowingsList();
+
+  useEffect(() => {
+    if (hasProgress && !filteredIds.length) {
+      setIsFinished(true);
+    }
+  }, [filteredIds.length, hasProgress]);
 
   if (isFinished) {
     return <Finished {...followingsListProps} />;

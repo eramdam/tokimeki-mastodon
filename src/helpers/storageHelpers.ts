@@ -38,13 +38,6 @@ export function getStoredItem<K extends keyof StoredItems>(
 export function useItemFromLocalForage<K extends keyof StoredItems>(
   key: K,
   options?: {
-    defaultValue: StoredItems[K];
-    debug?: boolean;
-  }
-): StoredItems[K];
-export function useItemFromLocalForage<K extends keyof StoredItems>(
-  key: K,
-  options?: {
     debug?: boolean;
   }
 ) {
@@ -83,10 +76,6 @@ export function useItemFromLocalForage<K extends keyof StoredItems>(
 
   if (options?.debug) {
     console.log(key, { item });
-  }
-
-  if (options && "defaultValue" in options && !item) {
-    return options.defaultValue;
   }
 
   return item;
