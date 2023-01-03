@@ -4,8 +4,6 @@ import type { mastodon } from "masto";
 import { useEffect, useRef, useState } from "react";
 import Observable from "zen-observable";
 
-localForage.setDriver(localForage.LOCALSTORAGE);
-
 const localforage = extendPrototype(localForage);
 localforage.newObservable.factory = function (subscribeFn) {
   // @ts-expect-error TODO
