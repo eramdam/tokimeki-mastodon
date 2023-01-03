@@ -1,21 +1,35 @@
 import { uniq } from "lodash-es";
 import type { NextPage } from "next";
 import { useRouter } from "next/router";
-import { useEffect, useMemo, useRef, useState } from "react";
-import { useButton } from "react-aria";
+import { useEffect, useMemo, useState } from "react";
+import { useRadioGroup } from "react-aria";
 
 import { Button } from "../components/button";
 import { Finished } from "../components/finished";
+import { LinkButton } from "../components/linkButton";
 import { Block } from "../components/main";
+import { Radio, RadioGroup } from "../components/radioGroup";
 import { Reviewer } from "../components/reviewer";
 import { MastodonProvider } from "../helpers/mastodonContext";
 import { useMastoFollowingsList } from "../helpers/mastodonHelpers";
 import {
   clearStorage,
+  setStoredItem,
+  SortOrders,
   useItemFromLocalForage,
 } from "../helpers/storageHelpers";
 
 const Review: NextPage = () => {
+  const [hasMounted, setHasMounted] = useState(false);
+
+  useEffect(() => {
+    setHasMounted(true);
+  }, []);
+
+  if (!hasMounted) {
+    return null;
+  }
+
   return (
     <MastodonProvider>
       <ReviewContent />
@@ -27,26 +41,12 @@ const ReviewContent = () => {
   const [isReviewing, setIsReviewing] = useState(false);
   const router = useRouter();
 
-  const buttonRef = useRef(null);
-  const { buttonProps } = useButton(
-    {
-      onPress: () => {
-        clearStorage();
-        router.push("/");
-      },
-    },
-    buttonRef
-  );
   const account = useItemFromLocalForage("account");
   const keptIdsFromStorage = useItemFromLocalForage("keptIds");
   const keptIds = useMemo(() => keptIdsFromStorage || [], [keptIdsFromStorage]);
   const unfollowedIds = useItemFromLocalForage("unfollowedIds");
-  const followingIds = useItemFromLocalForage("followingIds");
-  const filteredIds = useMemo(() => {
-    return uniq(followingIds).filter((i) => {
-      return !(unfollowedIds || []).includes(i) && !(keptIds || []).includes(i);
-    });
-  }, [followingIds, keptIds, unfollowedIds]);
+  const showBio = useItemFromLocalForage("showBio");
+  const sortOrder = useItemFromLocalForage("sortOrder");
   const hasProgress = useMemo(
     () =>
       Boolean(
@@ -57,12 +57,13 @@ const ReviewContent = () => {
   );
   const [isFinished, setIsFinished] = useState(false);
   const followingsListProps = useMastoFollowingsList();
+  console.log(followingsListProps);
 
   useEffect(() => {
-    if (hasProgress && !filteredIds.length) {
+    if (hasProgress && !followingsListProps.filteredAccounts.length) {
       setIsFinished(true);
     }
-  }, [filteredIds.length, hasProgress]);
+  }, [followingsListProps.filteredAccounts.length, hasProgress]);
 
   if (isFinished) {
     return <Finished {...followingsListProps} />;
@@ -78,24 +79,36 @@ const ReviewContent = () => {
 
   if (isReviewing) {
     return (
-      <Reviewer
-        {...followingsListProps}
-        onFinished={() => {
-          setIsFinished(true);
-        }}
-      />
+      <>
+        <LinkButton
+          onPress={() => {
+            setIsReviewing(false);
+          }}
+          position="northeast"
+        >
+          Options
+        </LinkButton>
+        <Reviewer
+          {...followingsListProps}
+          onFinished={() => {
+            setIsFinished(true);
+          }}
+        />
+      </>
     );
   }
 
   return (
     <>
-      <button
-        {...buttonProps}
-        ref={buttonRef}
-        className="absolute right-0 top-0 text-xs underline"
+      <LinkButton
+        position="southeast"
+        onPress={() => {
+          clearStorage();
+          router.push("/");
+        }}
       >
         Log out
-      </button>
+      </LinkButton>
       <Block className="inline-flex flex-col items-center justify-center gap-6">
         <h1 className="text-accentColor text-center">
           {hasProgress ? "Hello again," : "Hello"} @{account.username}!
@@ -104,7 +117,7 @@ const ReviewContent = () => {
           {hasProgress && (
             <>
               <br />
-              {filteredIds.length} to go!
+              {followingsListProps.filteredAccounts.length} to go!
             </>
           )}
         </h1>
@@ -120,11 +133,54 @@ const ReviewContent = () => {
             <br />
             <br />
             <strong>
-              Let&apos;s get started on the {filteredIds.length} accounts you
-              have left!
+              Let&apos;s get started on the{" "}
+              {followingsListProps.filteredAccounts.length} accounts you have
+              left!
             </strong>
           </p>
         )}
+
+        <div className="prose w-full dark:prose-invert">
+          <h3>Options</h3>
+          <div>
+            <label>
+              <input
+                type="checkbox"
+                checked={Boolean(showBio)}
+                onChange={() => {
+                  setStoredItem("showBio", !showBio);
+                }}
+              />{" "}
+              <strong>Show account bio&apos;s</strong> (Recommended: off)
+            </label>
+            <p className="mt-0 leading-tight">
+              I&apos;ve followed a lot of accounts based on their profile or who
+              they are, but not their actual tweets. Hide their bio&apos;s so
+              you can evaluate based on content only.
+            </p>
+          </div>
+          <RadioGroup
+            label={
+              <>
+                <strong>Select an order to use</strong> (Recommended: Oldest
+                first)
+              </>
+            }
+            value={sortOrder || SortOrders.OLDEST}
+            onChange={(value) => {
+              followingsListProps.updateSortOrder(value as SortOrders);
+            }}
+          >
+            <Radio value={SortOrders.OLDEST}>
+              Oldest first, chronological order
+            </Radio>
+            <Radio value={SortOrders.RANDOM}>Random order</Radio>
+            <Radio value={SortOrders.NEWEST}>
+              Newest first, reverse chronological order
+            </Radio>
+          </RadioGroup>
+        </div>
+
         <Button
           variant="primary"
           onPress={() => {

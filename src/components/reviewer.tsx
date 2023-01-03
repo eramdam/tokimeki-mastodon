@@ -6,7 +6,11 @@ import { useMemo, useState } from "react";
 import { delayAsync } from "../helpers/asyncHelpers";
 import { useMastodon } from "../helpers/mastodonContext";
 import type { UseMastoFollowingsListProps } from "../helpers/mastodonHelpers";
-import { getStoredItem, setStoredItem } from "../helpers/storageHelpers";
+import {
+  getStoredItem,
+  setStoredItem,
+  useItemFromLocalForage,
+} from "../helpers/storageHelpers";
 import { Button, SmallButton } from "./button";
 import { renderWithEmoji } from "./emojify";
 import { FeedWidget } from "./feedWidget";
@@ -28,7 +32,8 @@ export function Reviewer(props: ReviewerProps) {
   const { currentAccount, goToNextAccount, filteredAccounts, followingIndex } =
     props;
   const { client } = useMastodon();
-  const [showBio, setShowBio] = useState(false);
+  const initialShowBio = useItemFromLocalForage("showBio");
+  const [showBio, setShowBio] = useState(initialShowBio);
   const [animationState, setAnimated] = useState(AnimationState.Idle);
 
   const parseOptions = useMemo(
@@ -212,7 +217,9 @@ export function Reviewer(props: ReviewerProps) {
               </p>
               <SmallButton
                 variant="secondary"
-                onPress={() => setShowBio((p) => !p)}
+                onPress={() => {
+                  setShowBio((p) => !p);
+                }}
               >
                 {showBio ? "Hide bio" : "Show bio"}
               </SmallButton>

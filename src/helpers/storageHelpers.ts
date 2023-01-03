@@ -4,11 +4,19 @@ import type { mastodon } from "masto";
 import { useEffect, useRef, useState } from "react";
 import Observable from "zen-observable";
 
+localForage.setDriver(localForage.LOCALSTORAGE);
+
 const localforage = extendPrototype(localForage);
 localforage.newObservable.factory = function (subscribeFn) {
   // @ts-expect-error TODO
   return new Observable(subscribeFn);
 };
+
+export enum SortOrders {
+  OLDEST = "oldest",
+  RANDOM = "random",
+  NEWEST = "newest",
+}
 
 interface StoredItems {
   clientId: string;
@@ -17,9 +25,10 @@ interface StoredItems {
   accessToken: string;
   account: mastodon.v1.AccountCredentials;
   startCount: number;
-  followingIds: string[];
   unfollowedIds: string[];
   keptIds: string[];
+  showBio: boolean;
+  sortOrder: SortOrders;
 }
 
 export function setStoredItem<K extends keyof StoredItems>(
@@ -41,7 +50,17 @@ export function useItemFromLocalForage<K extends keyof StoredItems>(
     debug?: boolean;
   }
 ) {
-  const [item, setItem] = useState<StoredItems[K] | null>(null);
+  const [item, setItem] = useState<StoredItems[K] | null>(() => {
+    try {
+      const result = JSON.parse(
+        localStorage.getItem(`localforage/${key}`) || ""
+      );
+
+      return result as StoredItems[K];
+    } catch (e) {
+      return null;
+    }
+  });
   const observable = useRef<ReturnType<
     typeof localforage.newObservable
   > | null>(null);
