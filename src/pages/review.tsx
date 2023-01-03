@@ -134,6 +134,21 @@ const ReviewContent = () => {
           Start
         </Button>
       </Block>
+      <Block className="w-full">
+        <div className="prose opacity-60 dark:prose-invert">
+          <p>
+            Based off{" "}
+            <a href="https://tokimeki-unfollow.glitch.me/">Tokimeki Unfollow</a>{" "}
+            by <a href="https://tarng.com/">Julius Tarng</a>.
+            <br />
+            <br />
+            Made by <a href="https://erambert.me">Damien Erambert</a>. Find me
+            at{" "}
+            <a href="https://octodon.social/@eramdam">eramdam@octodon.social</a>
+            !
+          </p>
+        </div>
+      </Block>
     </>
   );
 };
