@@ -13,13 +13,17 @@ import {
   getAuthURL,
   registerApplication,
 } from "../helpers/authHelpers";
-import { useAccount, useActions, useOAuthCodeDependencies } from "../state";
+import {
+  useAccount,
+  useOAuthCodeDependencies,
+  useTokimekiActions,
+} from "../store/tokimekiStore";
 
 const Home: NextPage = () => {
   const [localInstanceUrl, setInstanceDomain] = useState("");
   const [isLoading, setIsLoading] = useState(false);
   const router = useRouter();
-  const { saveLoginCredentials, saveAfterOAuthCode } = useActions();
+  const { saveLoginCredentials, saveAfterOAuthCode } = useTokimekiActions();
   const {
     clientId,
     clientSecret,

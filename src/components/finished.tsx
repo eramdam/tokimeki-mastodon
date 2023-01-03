@@ -2,29 +2,26 @@
 import { useRouter } from "next/router";
 import { useMemo, useState } from "react";
 
-import type { UseMastoFollowingsListProps } from "../helpers/mastodonHelpers";
 import {
-  useAccount,
-  useActions,
   useInstanceUrl,
+  useKeptAccounts,
   useKeptIds,
   useStartCount,
-} from "../state";
+  useTokimekiActions,
+} from "../store/tokimekiStore";
 import { Button } from "./button";
 import { Block } from "./main";
 
-export function Finished(props: UseMastoFollowingsListProps) {
+export function Finished() {
   const [maybeReset, setMaybeReset] = useState(false);
   const router = useRouter();
   const keptIdsFromStorage = useKeptIds();
   const keptIds = useMemo(() => keptIdsFromStorage || [], [keptIdsFromStorage]);
   const startCount = useStartCount();
   const instanceUrl = useInstanceUrl();
-  const { resetState } = useActions();
+  const { resetState } = useTokimekiActions();
 
-  const keptAccounts = useMemo(() => {
-    return props.followingsPage.filter((a) => keptIds.includes(a.id));
-  }, [keptIds, props.followingsPage]);
+  const keptAccounts = useKeptAccounts();
   const keptPicsRenders = useMemo(() => {
     return keptAccounts.map((pic) => {
       const delay = Math.random() * 10;

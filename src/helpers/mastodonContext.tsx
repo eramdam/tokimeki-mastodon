@@ -3,7 +3,11 @@ import { login } from "masto";
 import type { PropsWithChildren } from "react";
 import { createContext, useContext, useEffect, useMemo, useState } from "react";
 
-import { useAccessToken, useAccount, useInstanceUrl } from "../state";
+import {
+  useAccessToken,
+  useAccount,
+  useInstanceUrl,
+} from "../store/tokimekiStore";
 
 const MastodonContext = createContext<{
   client: mastodon.Client | undefined;

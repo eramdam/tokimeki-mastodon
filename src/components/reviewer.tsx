@@ -1,18 +1,16 @@
 import clsx from "clsx";
 import parse from "html-react-parser";
-import { uniq } from "lodash-es";
 import { useMemo, useState } from "react";
 
 import { delayAsync } from "../helpers/asyncHelpers";
 import { useMastodon } from "../helpers/mastodonContext";
-import type { UseMastoFollowingsListProps } from "../helpers/mastodonHelpers";
 import {
-  useAccount,
-  useActions,
-  useKeptIds,
+  useCurrentAccount,
+  useCurrentIndex,
+  useFilteredFollowings,
   useSettings,
-  useUnfollowedIds,
-} from "../state";
+  useTokimekiActions,
+} from "../store/tokimekiStore";
 import { Button, SmallButton } from "./button";
 import { renderWithEmoji } from "./emojify";
 import { FeedWidget } from "./feedWidget";
@@ -26,13 +24,14 @@ enum AnimationState {
   Hidden,
 }
 
-interface ReviewerProps extends UseMastoFollowingsListProps {
+interface ReviewerProps {
   onFinished: () => void;
 }
 
 export function Reviewer(props: ReviewerProps) {
-  const { currentAccount, goToNextAccount, filteredAccounts, followingIndex } =
-    props;
+  const followingIndex = useCurrentIndex();
+  const currentAccount = useCurrentAccount();
+  const filteredFollowings = useFilteredFollowings();
   const { client } = useMastodon();
   const { showBio: initialShowBio } = useSettings();
   const [showBio, setShowBio] = useState(initialShowBio);
@@ -43,7 +42,8 @@ export function Reviewer(props: ReviewerProps) {
     [currentAccount?.emojis]
   );
 
-  const { keepAccount, unfollowAccount } = useActions();
+  const { keepAccount, unfollowAccount, goToNextAccount } =
+    useTokimekiActions();
 
   const onNextClick = async () => {
     const shouldUnfollow = animationState === AnimationState.Unfollow;
@@ -61,12 +61,12 @@ export function Reviewer(props: ReviewerProps) {
 
     setAnimated(AnimationState.Hidden);
 
-    if (filteredAccounts.length <= 1) {
+    if (filteredFollowings.length <= 1) {
       props.onFinished();
       return;
     }
 
-    await goToNextAccount();
+    goToNextAccount();
     await delayAsync(500);
     setAnimated(AnimationState.Idle);
   };
@@ -152,14 +152,14 @@ export function Reviewer(props: ReviewerProps) {
   }
 
   const renderTitle = () => {
-    if (followingIndex === filteredAccounts.length - 1) {
+    if (followingIndex === filteredFollowings.length - 1) {
       return "Last but not least, ";
     }
 
     return followingIndex === 0 ? "Starting with " : `#${followingIndex + 1}: `;
   };
 
-  if (filteredAccounts?.length === 0) {
+  if (filteredFollowings?.length === 0) {
     return (
       <Block>
         <p className="prose dark:prose-invert">Loading your followings...</p>

@@ -8,16 +8,17 @@ import { LinkButton } from "../components/linkButton";
 import { Block } from "../components/main";
 import { Radio, RadioGroup } from "../components/radioGroup";
 import { Reviewer } from "../components/reviewer";
-import { MastodonProvider } from "../helpers/mastodonContext";
-import { useMastoFollowingsList } from "../helpers/mastodonHelpers";
+import { MastodonProvider, useMastodon } from "../helpers/mastodonContext";
 import {
   SortOrders,
   useAccount,
-  useActions,
+  useAccountId,
+  useFilteredFollowings,
   useKeptIds,
   useSettings,
+  useTokimekiActions,
   useUnfollowedIds,
-} from "../state";
+} from "../store/tokimekiStore";
 
 const Review: NextPage = () => {
   const [hasMounted, setHasMounted] = useState(false);
@@ -41,31 +42,40 @@ const ReviewContent = () => {
   const [isReviewing, setIsReviewing] = useState(false);
   const router = useRouter();
 
+  const { client } = useMastodon();
+  const accountId = useAccountId();
   const account = useAccount();
-  const keptIdsFromStorage = useKeptIds();
-  const keptIds = useMemo(() => keptIdsFromStorage || [], [keptIdsFromStorage]);
+  const keptIds = useKeptIds();
   const unfollowedIds = useUnfollowedIds();
   const { showBio, sortOrder } = useSettings();
-  const { updateSettings, resetState } = useActions();
+  const { updateSettings, resetState, reorderFollowings, fetchFollowings } =
+    useTokimekiActions();
   const hasProgress = useMemo(
     () =>
       Boolean(
-        (unfollowedIds && unfollowedIds.length) ||
-          (keptIdsFromStorage && keptIdsFromStorage.length)
+        (unfollowedIds && unfollowedIds.length) || (keptIds && keptIds.length)
       ),
-    [keptIdsFromStorage, unfollowedIds]
+    [keptIds, unfollowedIds]
   );
   const [isFinished, setIsFinished] = useState(false);
-  const followingsListProps = useMastoFollowingsList();
+  const filteredAccounts = useFilteredFollowings();
 
   useEffect(() => {
-    if (hasProgress && !followingsListProps.filteredAccounts.length) {
-      setIsFinished(true);
+    if (!isReviewing || !client || !accountId) {
+      return;
     }
-  }, [followingsListProps.filteredAccounts.length, hasProgress]);
+
+    fetchFollowings(accountId, client);
+  }, [accountId, client, fetchFollowings, isReviewing]);
+
+  // useEffect(() => {
+  //   if (hasProgress && !filteredAccounts.length) {
+  //     setIsFinished(true);
+  //   }
+  // }, [filteredAccounts.length, hasProgress]);
 
   if (isFinished) {
-    return <Finished {...followingsListProps} />;
+    return <Finished />;
   }
 
   if (!account) {
@@ -88,7 +98,6 @@ const ReviewContent = () => {
           Options
         </LinkButton>
         <Reviewer
-          {...followingsListProps}
           onFinished={() => {
             setIsFinished(true);
           }}
@@ -116,7 +125,7 @@ const ReviewContent = () => {
           {hasProgress && (
             <>
               <br />
-              {followingsListProps.filteredAccounts.length} to go!
+              {filteredAccounts.length} to go!
             </>
           )}
         </h1>
@@ -127,14 +136,13 @@ const ReviewContent = () => {
         {hasProgress && (
           <p className="prose dark:prose-invert">
             Keep at it! You started with {account.followingCount} follows. We
-            loaded your progress from last time when you kept {keptIds.length}{" "}
-            accounts that mattered to you.
+            loaded your progress from last time when you kept{" "}
+            {(keptIds || []).length} accounts that mattered to you.
             <br />
             <br />
             <strong>
-              Let&apos;s get started on the{" "}
-              {followingsListProps.filteredAccounts.length} accounts you have
-              left!
+              Let&apos;s get started on the {filteredAccounts.length} accounts
+              you have left!
             </strong>
           </p>
         )}
@@ -172,7 +180,7 @@ const ReviewContent = () => {
               updateSettings({
                 sortOrder: value as SortOrders,
               });
-              followingsListProps.updateSortOrder(value as SortOrders);
+              reorderFollowings(value as SortOrders);
             }}
           >
             <Radio value={SortOrders.OLDEST}>
