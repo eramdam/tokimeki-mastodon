@@ -2,7 +2,6 @@ import clsx from "clsx";
 import parse from "html-react-parser";
 import { useMemo, useState } from "react";
 
-import { delayAsync } from "../helpers/asyncHelpers";
 import { useMastodon } from "../helpers/mastodonContext";
 import {
   goToNextAccount,
@@ -74,7 +73,6 @@ export function Reviewer(props: ReviewerProps) {
     }
 
     goToNextAccount();
-    await delayAsync(500);
     setAnimated(AnimationState.Idle);
   };
 
