@@ -14,7 +14,6 @@ import {
   useCurrentIndex,
   useFilteredFollowings,
   useFollowings,
-  useIsFetching,
   useSettings,
 } from "../store/selectors";
 import { Button, SmallButton } from "./button";
@@ -43,7 +42,6 @@ export function Reviewer(props: ReviewerProps) {
   const { showBio: initialShowBio } = useSettings();
   const [showBio, setShowBio] = useState(initialShowBio);
   const [animationState, setAnimated] = useState(AnimationState.Idle);
-  const isFetching = useIsFetching();
 
   const parseOptions = useMemo(
     () => getParserOptions(currentAccount?.emojis || []),
