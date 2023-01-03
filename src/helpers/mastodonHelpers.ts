@@ -2,34 +2,40 @@ import { shuffle, uniq } from "lodash-es";
 import type { mastodon } from "masto";
 import { useCallback, useEffect, useMemo, useState } from "react";
 
-import { useMastodon } from "./mastodonContext";
 import {
-  getStoredItem,
-  setStoredItem,
-  SortOrders,
-  useItemFromLocalForage,
-} from "./storageHelpers";
+  useAccountId,
+  useActions,
+  useKeptIds,
+  useSettings,
+  useUnfollowedIds,
+} from "../state";
+import { useMastodon } from "./mastodonContext";
+import { SortOrders } from "./storageHelpers";
 
 export type UseMastoFollowingsListProps = ReturnType<
   typeof useMastoFollowingsList
 >;
 
 export function useMastoFollowingsList() {
-  const { client, account } = useMastodon();
+  const { client } = useMastodon();
+
   const [followingsPage, setFollowingsPage] = useState<mastodon.v1.Account[]>(
     []
   );
   const [followingsFromServer, setFollowingsFromServer] = useState<
     mastodon.v1.Account[]
   >([]);
-  const accountId = useMemo(() => account?.id, [account]);
   const [currentAccount, setCurrentAccount] = useState<
     mastodon.v1.Account | undefined
   >(undefined);
   const [isFetching, setIsFetching] = useState(false);
-  const keptIds = useItemFromLocalForage("keptIds");
-  const unfollowedIds = useItemFromLocalForage("unfollowedIds");
-  const sortOrder = useItemFromLocalForage("sortOrder");
+
+  const keptIds = useKeptIds();
+  const unfollowedIds = useUnfollowedIds();
+  const { sortOrder } = useSettings();
+  const { updateSettings } = useActions();
+
+  const accountId = useAccountId();
   const filteredAccounts = useMemo(() => {
     return followingsPage.filter((a) => {
       return !keptIds?.includes(a.id) && !unfollowedIds?.includes(a.id);
@@ -37,7 +43,7 @@ export function useMastoFollowingsList() {
   }, [followingsPage, keptIds, unfollowedIds]);
   const followingIndex = useMemo(() => {
     const curr = currentAccount || followingsPage[0];
-    console.log({ curr, followingsPage });
+
     if (!curr) {
       return 0;
     }
@@ -46,14 +52,13 @@ export function useMastoFollowingsList() {
 
   const updateSortOrder = useCallback(
     (newOrder: SortOrders) => {
-      setStoredItem("sortOrder", newOrder);
-      console.log({ newOrder, followingsFromServer });
+      updateSettings({ sortOrder: newOrder });
 
       const newFollowings = sortFollowings(followingsFromServer, newOrder);
       setFollowingsPage(newFollowings);
       setCurrentAccount(followingsPage[0]);
     },
-    [followingsFromServer, followingsPage]
+    [followingsFromServer, followingsPage, updateSettings]
   );
 
   const goToNextAccount = useCallback(async () => {
@@ -102,13 +107,11 @@ export function useMastoFollowingsList() {
 
     fetchFollowings().then(async (res) => {
       setFollowingsFromServer(res);
-      const keptIds = await getStoredItem("keptIds");
-      const unfollowedIds = await getStoredItem("unfollowedIds");
       const filteredResults = filterFollowings(res, keptIds, unfollowedIds);
       setFollowingsPage(sortFollowings(res, sortOrder || SortOrders.OLDEST));
       setCurrentAccount(filteredResults[0]);
     });
-  }, [accountId, client, isFetching, sortOrder]);
+  }, [accountId, client, isFetching, keptIds, sortOrder, unfollowedIds]);
 
   return {
     currentAccount,
@@ -123,8 +126,8 @@ export function useMastoFollowingsList() {
 
 function filterFollowings(
   array: mastodon.v1.Account[],
-  keptIds: string[] | null,
-  unfollowedIds: string[] | null
+  keptIds: string[] | null | undefined,
+  unfollowedIds: string[] | null | undefined
 ) {
   return array.filter((a) => {
     return !keptIds?.includes(a.id) && !unfollowedIds?.includes(a.id);

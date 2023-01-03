@@ -3,7 +3,7 @@ import { login } from "masto";
 import type { PropsWithChildren } from "react";
 import { createContext, useContext, useEffect, useMemo, useState } from "react";
 
-import { useItemFromLocalForage } from "./storageHelpers";
+import { useAccessToken, useAccount, useInstanceUrl } from "../state";
 
 const MastodonContext = createContext<{
   client: mastodon.Client | undefined;
@@ -11,9 +11,9 @@ const MastodonContext = createContext<{
 }>({ client: undefined, account: null });
 
 export const MastodonProvider = (props: PropsWithChildren<object>) => {
-  const accessToken = useItemFromLocalForage("accessToken");
-  const account = useItemFromLocalForage("account");
-  const instanceUrl = useItemFromLocalForage("instanceUrl");
+  const accessToken = useAccessToken();
+  const account = useAccount();
+  const instanceUrl = useInstanceUrl();
   const [masto, setMasto] = useState<mastodon.Client | undefined>();
 
   useEffect(() => {
@@ -32,7 +32,7 @@ export const MastodonProvider = (props: PropsWithChildren<object>) => {
   const value = useMemo(() => {
     return {
       client: masto,
-      account,
+      account: account || null,
     };
   }, [account, masto]);
 

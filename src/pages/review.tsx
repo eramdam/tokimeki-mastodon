@@ -1,8 +1,6 @@
-import { uniq } from "lodash-es";
 import type { NextPage } from "next";
 import { useRouter } from "next/router";
 import { useEffect, useMemo, useState } from "react";
-import { useRadioGroup } from "react-aria";
 
 import { Button } from "../components/button";
 import { Finished } from "../components/finished";
@@ -12,12 +10,14 @@ import { Radio, RadioGroup } from "../components/radioGroup";
 import { Reviewer } from "../components/reviewer";
 import { MastodonProvider } from "../helpers/mastodonContext";
 import { useMastoFollowingsList } from "../helpers/mastodonHelpers";
+import { SortOrders } from "../helpers/storageHelpers";
 import {
-  clearStorage,
-  setStoredItem,
-  SortOrders,
-  useItemFromLocalForage,
-} from "../helpers/storageHelpers";
+  useAccount,
+  useActions,
+  useKeptIds,
+  useSettings,
+  useUnfollowedIds,
+} from "../state";
 
 const Review: NextPage = () => {
   const [hasMounted, setHasMounted] = useState(false);
@@ -41,12 +41,12 @@ const ReviewContent = () => {
   const [isReviewing, setIsReviewing] = useState(false);
   const router = useRouter();
 
-  const account = useItemFromLocalForage("account");
-  const keptIdsFromStorage = useItemFromLocalForage("keptIds");
+  const account = useAccount();
+  const keptIdsFromStorage = useKeptIds();
   const keptIds = useMemo(() => keptIdsFromStorage || [], [keptIdsFromStorage]);
-  const unfollowedIds = useItemFromLocalForage("unfollowedIds");
-  const showBio = useItemFromLocalForage("showBio");
-  const sortOrder = useItemFromLocalForage("sortOrder");
+  const unfollowedIds = useUnfollowedIds();
+  const { showBio, sortOrder } = useSettings();
+  const { updateSettings, resetState } = useActions();
   const hasProgress = useMemo(
     () =>
       Boolean(
@@ -57,7 +57,6 @@ const ReviewContent = () => {
   );
   const [isFinished, setIsFinished] = useState(false);
   const followingsListProps = useMastoFollowingsList();
-  console.log(followingsListProps);
 
   useEffect(() => {
     if (hasProgress && !followingsListProps.filteredAccounts.length) {
@@ -103,7 +102,7 @@ const ReviewContent = () => {
       <LinkButton
         position="southeast"
         onPress={() => {
-          clearStorage();
+          resetState();
           router.push("/");
         }}
       >
@@ -148,7 +147,9 @@ const ReviewContent = () => {
                 type="checkbox"
                 checked={Boolean(showBio)}
                 onChange={() => {
-                  setStoredItem("showBio", !showBio);
+                  updateSettings({
+                    showBio: !showBio,
+                  });
                 }}
               />{" "}
               <strong>Show account bio&apos;s</strong> (Recommended: off)
@@ -168,6 +169,9 @@ const ReviewContent = () => {
             }
             value={sortOrder || SortOrders.OLDEST}
             onChange={(value) => {
+              updateSettings({
+                sortOrder: value as SortOrders,
+              });
               followingsListProps.updateSortOrder(value as SortOrders);
             }}
           >

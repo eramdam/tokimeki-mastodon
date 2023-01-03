@@ -4,21 +4,24 @@ import { useMemo, useState } from "react";
 
 import type { UseMastoFollowingsListProps } from "../helpers/mastodonHelpers";
 import {
-  clearStorage,
-  getStoredItem,
-  useItemFromLocalForage,
-} from "../helpers/storageHelpers";
+  useAccount,
+  useActions,
+  useInstanceUrl,
+  useKeptIds,
+  useStartCount,
+} from "../state";
 import { Button } from "./button";
 import { Block } from "./main";
 
 export function Finished(props: UseMastoFollowingsListProps) {
   const [maybeReset, setMaybeReset] = useState(false);
   const router = useRouter();
-  const account = useItemFromLocalForage("account");
-  const keptIdsFromStorage = useItemFromLocalForage("keptIds");
+  const keptIdsFromStorage = useKeptIds();
   const keptIds = useMemo(() => keptIdsFromStorage || [], [keptIdsFromStorage]);
-  const startCount = useItemFromLocalForage("startCount");
-  const startingCount = startCount || account?.followingCount || 0;
+  const startCount = useStartCount();
+  const instanceUrl = useInstanceUrl();
+  const { resetState } = useActions();
+
   const keptAccounts = useMemo(() => {
     return props.followingsPage.filter((a) => keptIds.includes(a.id));
   }, [keptIds, props.followingsPage]);
@@ -62,7 +65,7 @@ export function Finished(props: UseMastoFollowingsListProps) {
             </Button>
             <Button
               onPress={() => {
-                clearStorage();
+                resetState();
                 router.push("/");
               }}
               variant="secondary"
@@ -86,11 +89,10 @@ export function Finished(props: UseMastoFollowingsListProps) {
           <Button
             variant="secondary"
             onPress={async () => {
-              const instanceUrl = await getStoredItem("instanceUrl");
               const text =
                 "✨I just konmari'd my Mastodon feed!✨\n\n" +
-                `Started with ${startingCount} follows and unfollowed ${
-                  startingCount - keptIds.length
+                `Started with ${startCount} follows and unfollowed ${
+                  startCount - keptIds.length
                 }` +
                 ` using Tokimeki Unfollow\n${window.origin}`;
 
@@ -125,12 +127,12 @@ export function Finished(props: UseMastoFollowingsListProps) {
             <div className="opacity-60">Results</div>
             <div className="flex">
               <span className="flex-1">Starting follows</span>
-              <span>{startingCount}</span>
+              <span>{startCount}</span>
             </div>
             <div className="flex">
               <span className="flex-1">Unfollowed</span>
               <span className="text-red-500">
-                {keptIds.length - startingCount}
+                {keptIds.length - startCount}
               </span>
             </div>
             <hr className="my-4" />

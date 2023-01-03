@@ -13,30 +13,33 @@ import {
   getAuthURL,
   registerApplication,
 } from "../helpers/authHelpers";
-import { getStoredItem, setStoredItem } from "../helpers/storageHelpers";
+import { useAccount, useActions, useOAuthCodeDependencies } from "../state";
 
 const Home: NextPage = () => {
-  const [instanceUrl, setInstanceDomain] = useState("");
+  const [localInstanceUrl, setInstanceDomain] = useState("");
   const [isLoading, setIsLoading] = useState(false);
   const router = useRouter();
+  const { saveLoginCredentials, saveAfterOAuthCode } = useActions();
+  const {
+    clientId,
+    clientSecret,
+    instanceUrl: storedInstanceUrl,
+  } = useOAuthCodeDependencies();
 
   const isInstanceValid: ValidationState | undefined = useMemo(() => {
     try {
-      new URL(instanceUrl);
+      new URL(localInstanceUrl);
       return "valid";
     } catch (e) {
       return "invalid";
     }
-  }, [instanceUrl]);
+  }, [localInstanceUrl]);
 
   const onCode = useCallback(
     async (code: string) => {
       setIsLoading(true);
-      const clientId = await getStoredItem("clientId");
-      const clientSecret = await getStoredItem("clientSecret");
-      const instanceUrl = await getStoredItem("instanceUrl");
 
-      if (!clientId || !clientSecret || !instanceUrl) {
+      if (!clientId || !clientSecret || !storedInstanceUrl) {
         return;
       }
 
@@ -44,7 +47,7 @@ const Home: NextPage = () => {
         clientId,
         clientSecret,
         code,
-        instanceUrl,
+        instanceUrl: storedInstanceUrl,
       });
 
       if (!accessTokenResponse) {
@@ -57,37 +60,38 @@ const Home: NextPage = () => {
         return;
       }
 
-      await setStoredItem("accessToken", access_token);
       const masto = await login({
-        url: instanceUrl,
+        url: storedInstanceUrl,
         accessToken: access_token,
         timeout: 30_000,
       });
       const account = await masto.v1.accounts.verifyCredentials();
-      await setStoredItem("account", account);
-      await setStoredItem("startCount", account.followingCount);
+      console.log({ saveAfterOAuthCode });
+      saveAfterOAuthCode({
+        accessToken: access_token,
+        account,
+        startCount: account.followingCount,
+      });
       router.push("/review");
     },
-    [router]
+    [clientId, clientSecret, router, saveAfterOAuthCode, storedInstanceUrl]
   );
 
+  const account = useAccount();
+
   useEffect(() => {
-    const accountPromise = getStoredItem("account");
+    if (account) {
+      router.push("/review");
+      return;
+    }
+    const code = new URLSearchParams(window.location.search).get("code");
 
-    accountPromise.then((accessToken) => {
-      if (accessToken) {
-        router.push("/review");
-        return;
-      }
-      const code = new URLSearchParams(window.location.search).get("code");
+    if (!code) {
+      return;
+    }
 
-      if (!code) {
-        return;
-      }
-
-      onCode(code);
-    });
-  });
+    onCode(code);
+  }, [account, onCode, router]);
 
   const onLogin = async () => {
     if (!isInstanceValid) {
@@ -98,17 +102,20 @@ const Home: NextPage = () => {
 
     try {
       const { clientId, clientSecret } = await registerApplication(
-        instanceUrl,
+        localInstanceUrl,
         window.location.origin
       );
 
       if (clientId && clientSecret) {
-        await setStoredItem("instanceUrl", instanceUrl);
-        await setStoredItem("clientId", clientId);
-        await setStoredItem("clientSecret", clientSecret);
+        console.log({ saveLoginCredentials });
+        saveLoginCredentials({
+          instanceUrl: localInstanceUrl,
+          clientId,
+          clientSecret,
+        });
 
         location.href = getAuthURL({
-          instanceUrl,
+          instanceUrl: localInstanceUrl,
           clientId,
         });
       }
@@ -150,7 +157,7 @@ const Home: NextPage = () => {
             placeholder="https://"
             type={"url"}
             className="prose flex flex-col gap-2 text-center dark:prose-invert"
-            value={instanceUrl}
+            value={localInstanceUrl}
             onChange={setInstanceDomain}
             validationState={isInstanceValid || "valid"}
             isDisabled={isLoading}

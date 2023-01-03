@@ -7,10 +7,12 @@ import { delayAsync } from "../helpers/asyncHelpers";
 import { useMastodon } from "../helpers/mastodonContext";
 import type { UseMastoFollowingsListProps } from "../helpers/mastodonHelpers";
 import {
-  getStoredItem,
-  setStoredItem,
-  useItemFromLocalForage,
-} from "../helpers/storageHelpers";
+  useAccount,
+  useActions,
+  useKeptIds,
+  useSettings,
+  useUnfollowedIds,
+} from "../state";
 import { Button, SmallButton } from "./button";
 import { renderWithEmoji } from "./emojify";
 import { FeedWidget } from "./feedWidget";
@@ -32,7 +34,7 @@ export function Reviewer(props: ReviewerProps) {
   const { currentAccount, goToNextAccount, filteredAccounts, followingIndex } =
     props;
   const { client } = useMastodon();
-  const initialShowBio = useItemFromLocalForage("showBio");
+  const { showBio: initialShowBio } = useSettings();
   const [showBio, setShowBio] = useState(initialShowBio);
   const [animationState, setAnimated] = useState(AnimationState.Idle);
 
@@ -41,10 +43,9 @@ export function Reviewer(props: ReviewerProps) {
     [currentAccount?.emojis]
   );
 
-  const onNextClick = async () => {
-    const keptIds = await getStoredItem("keptIds");
-    const unfollowedIds = await getStoredItem("unfollowedIds");
+  const { keepAccount, unfollowAccount } = useActions();
 
+  const onNextClick = async () => {
     const shouldUnfollow = animationState === AnimationState.Unfollow;
     if (currentAccount) {
       if (shouldUnfollow && client) {
@@ -52,12 +53,9 @@ export function Reviewer(props: ReviewerProps) {
         if (process.env.NODE_ENV !== "development") {
           await client.v1.accounts.unfollow(currentAccount.id);
         }
-        setStoredItem(
-          "unfollowedIds",
-          uniq([...(unfollowedIds || []), currentAccount.id])
-        );
+        unfollowAccount(currentAccount.id);
       } else {
-        setStoredItem("keptIds", uniq([...(keptIds || []), currentAccount.id]));
+        keepAccount(currentAccount.id);
       }
     }
 
