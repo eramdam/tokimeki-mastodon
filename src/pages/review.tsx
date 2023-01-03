@@ -49,7 +49,7 @@ const ReviewContent = () => {
     });
   }, [followingIds, keptIds, unfollowedIds]);
   const hasProgress = Boolean(unfollowedIds.length || keptIds.length);
-  const [isFinished, setIsFinished] = useState(false);
+  const [isFinished, setIsFinished] = useState(() => filteredIds.length < 1);
   const followingsListProps = useMastoFollowingsList();
 
   if (isFinished) {
