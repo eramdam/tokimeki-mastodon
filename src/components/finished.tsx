@@ -2,13 +2,13 @@
 import { useRouter } from "next/router";
 import { useMemo, useState } from "react";
 
+import { resetState } from "../store/actions";
 import {
   useInstanceUrl,
   useKeptAccounts,
   useKeptIds,
   useStartCount,
-  useTokimekiActions,
-} from "../store";
+} from "../store/selectors";
 import { Button } from "./button";
 import { Block } from "./main";
 
@@ -19,7 +19,6 @@ export function Finished() {
   const keptIds = useMemo(() => keptIdsFromStorage || [], [keptIdsFromStorage]);
   const startCount = useStartCount();
   const instanceUrl = useInstanceUrl();
-  const { resetState } = useTokimekiActions();
 
   const keptAccounts = useKeptAccounts();
   const keptPicsRenders = useMemo(() => {

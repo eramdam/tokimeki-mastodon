@@ -9,16 +9,23 @@ import { Block } from "../components/main";
 import { Radio, RadioGroup } from "../components/radioGroup";
 import { Reviewer } from "../components/reviewer";
 import { MastodonProvider, useMastodon } from "../helpers/mastodonContext";
+import { SortOrders } from "../store";
 import {
-  SortOrders,
+  fetchFollowings,
+  markAsFinished,
+  reorderFollowings,
+  resetState,
+  updateSettings,
+} from "../store/actions";
+import {
   useAccount,
   useAccountId,
   useFilteredFollowings,
+  useIsFinished,
   useKeptIds,
   useSettings,
-  useTokimekiActions,
   useUnfollowedIds,
-} from "../store";
+} from "../store/selectors";
 
 const Review: NextPage = () => {
   const [hasMounted, setHasMounted] = useState(false);
@@ -48,8 +55,6 @@ const ReviewContent = () => {
   const keptIds = useKeptIds();
   const unfollowedIds = useUnfollowedIds();
   const { showBio, sortOrder } = useSettings();
-  const { updateSettings, resetState, reorderFollowings, fetchFollowings } =
-    useTokimekiActions();
   const hasProgress = useMemo(
     () =>
       Boolean(
@@ -57,8 +62,8 @@ const ReviewContent = () => {
       ),
     [keptIds, unfollowedIds]
   );
-  const [isFinished, setIsFinished] = useState(false);
-  const filteredAccounts = useFilteredFollowings();
+  const isFinished = useIsFinished();
+  const filteredFollowings = useFilteredFollowings();
 
   useEffect(() => {
     if (!isReviewing || !client || !accountId) {
@@ -66,13 +71,7 @@ const ReviewContent = () => {
     }
 
     fetchFollowings(accountId, client);
-  }, [accountId, client, fetchFollowings, isReviewing]);
-
-  // useEffect(() => {
-  //   if (hasProgress && !filteredAccounts.length) {
-  //     setIsFinished(true);
-  //   }
-  // }, [filteredAccounts.length, hasProgress]);
+  }, [accountId, client, isReviewing]);
 
   if (isFinished) {
     return <Finished />;
@@ -97,9 +96,18 @@ const ReviewContent = () => {
         >
           Options
         </LinkButton>
+        <LinkButton
+          position="southeast"
+          onPress={() => {
+            resetState();
+            router.push("/");
+          }}
+        >
+          Log out
+        </LinkButton>
         <Reviewer
           onFinished={() => {
-            setIsFinished(true);
+            markAsFinished();
           }}
         />
       </>
@@ -125,7 +133,7 @@ const ReviewContent = () => {
           {hasProgress && (
             <>
               <br />
-              {filteredAccounts.length} to go!
+              {filteredFollowings.length} to go!
             </>
           )}
         </h1>
@@ -141,7 +149,7 @@ const ReviewContent = () => {
             <br />
             <br />
             <strong>
-              Let&apos;s get started on the {filteredAccounts.length} accounts
+              Let&apos;s get started on the {filteredFollowings.length} accounts
               you have left!
             </strong>
           </p>

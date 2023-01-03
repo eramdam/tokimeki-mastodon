@@ -13,17 +13,13 @@ import {
   getAuthURL,
   registerApplication,
 } from "../helpers/authHelpers";
-import {
-  useAccount,
-  useOAuthCodeDependencies,
-  useTokimekiActions,
-} from "../store";
+import { saveAfterOAuthCode, saveLoginCredentials } from "../store/actions";
+import { useAccount, useOAuthCodeDependencies } from "../store/selectors";
 
 const Home: NextPage = () => {
   const [localInstanceUrl, setInstanceDomain] = useState("");
   const [isLoading, setIsLoading] = useState(false);
   const router = useRouter();
-  const { saveLoginCredentials, saveAfterOAuthCode } = useTokimekiActions();
   const {
     clientId,
     clientSecret,
@@ -70,7 +66,6 @@ const Home: NextPage = () => {
         timeout: 30_000,
       });
       const account = await masto.v1.accounts.verifyCredentials();
-      console.log({ saveAfterOAuthCode });
       saveAfterOAuthCode({
         accessToken: access_token,
         account,
@@ -78,7 +73,7 @@ const Home: NextPage = () => {
       });
       router.push("/review");
     },
-    [clientId, clientSecret, router, saveAfterOAuthCode, storedInstanceUrl]
+    [clientId, clientSecret, router, storedInstanceUrl]
   );
 
   const account = useAccount();
@@ -111,7 +106,6 @@ const Home: NextPage = () => {
       );
 
       if (clientId && clientSecret) {
-        console.log({ saveLoginCredentials });
         saveLoginCredentials({
           instanceUrl: localInstanceUrl,
           clientId,

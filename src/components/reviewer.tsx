@@ -5,12 +5,18 @@ import { useMemo, useState } from "react";
 import { delayAsync } from "../helpers/asyncHelpers";
 import { useMastodon } from "../helpers/mastodonContext";
 import {
+  goToNextAccount,
+  keepAccount,
+  unfollowAccount,
+} from "../store/actions";
+import {
   useCurrentAccount,
   useCurrentIndex,
   useFilteredFollowings,
+  useFollowings,
+  useIsFetching,
   useSettings,
-  useTokimekiActions,
-} from "../store";
+} from "../store/selectors";
 import { Button, SmallButton } from "./button";
 import { renderWithEmoji } from "./emojify";
 import { FeedWidget } from "./feedWidget";
@@ -32,18 +38,17 @@ export function Reviewer(props: ReviewerProps) {
   const followingIndex = useCurrentIndex();
   const currentAccount = useCurrentAccount();
   const filteredFollowings = useFilteredFollowings();
+  const followings = useFollowings();
   const { client } = useMastodon();
   const { showBio: initialShowBio } = useSettings();
   const [showBio, setShowBio] = useState(initialShowBio);
   const [animationState, setAnimated] = useState(AnimationState.Idle);
+  const isFetching = useIsFetching();
 
   const parseOptions = useMemo(
     () => getParserOptions(currentAccount?.emojis || []),
     [currentAccount?.emojis]
   );
-
-  const { keepAccount, unfollowAccount, goToNextAccount } =
-    useTokimekiActions();
 
   const onNextClick = async () => {
     const shouldUnfollow = animationState === AnimationState.Unfollow;
@@ -61,7 +66,7 @@ export function Reviewer(props: ReviewerProps) {
 
     setAnimated(AnimationState.Hidden);
 
-    if (filteredFollowings.length <= 1) {
+    if (filteredFollowings.length < 1) {
       props.onFinished();
       return;
     }
@@ -152,14 +157,14 @@ export function Reviewer(props: ReviewerProps) {
   }
 
   const renderTitle = () => {
-    if (followingIndex === filteredFollowings.length - 1) {
+    if (followingIndex === followings.length - 1) {
       return "Last but not least, ";
     }
 
     return followingIndex === 0 ? "Starting with " : `#${followingIndex + 1}: `;
   };
 
-  if (filteredFollowings?.length === 0) {
+  if (followings?.length === 0) {
     return (
       <Block>
         <p className="prose dark:prose-invert">Loading your followings...</p>
