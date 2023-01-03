@@ -18,7 +18,7 @@ import {
   useSettings,
   useTokimekiActions,
   useUnfollowedIds,
-} from "../store/tokimekiStore";
+} from "../store";
 
 const Review: NextPage = () => {
   const [hasMounted, setHasMounted] = useState(false);

@@ -10,7 +10,7 @@ import {
   useFilteredFollowings,
   useSettings,
   useTokimekiActions,
-} from "../store/tokimekiStore";
+} from "../store";
 import { Button, SmallButton } from "./button";
 import { renderWithEmoji } from "./emojify";
 import { FeedWidget } from "./feedWidget";

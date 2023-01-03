@@ -17,7 +17,7 @@ import {
   useAccount,
   useOAuthCodeDependencies,
   useTokimekiActions,
-} from "../store/tokimekiStore";
+} from "../store";
 
 const Home: NextPage = () => {
   const [localInstanceUrl, setInstanceDomain] = useState("");

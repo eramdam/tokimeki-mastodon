@@ -8,7 +8,7 @@ import {
   useKeptIds,
   useStartCount,
   useTokimekiActions,
-} from "../store/tokimekiStore";
+} from "../store";
 import { Button } from "./button";
 import { Block } from "./main";
 
