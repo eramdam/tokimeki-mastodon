@@ -7,12 +7,12 @@ export function renderWithEmoji(
   text: string
 ) {
   const emojiMap = keyBy(emojiArray, (e) => e.shortcode);
-  const shortcodes = Object.keys(emojiMap);
+  const shortcodes = Object.keys(emojiMap).map((s) => `:${s}:`);
 
   if (emojiArray.length < 1) {
     return isString(text) ? <>{text}</> : text;
   }
-  const regex = new RegExp(`(:${shortcodes.join("|")}:)`, "i");
+  const regex = new RegExp(`(${shortcodes.join("|")})`, "i");
   const textParts = String(text).split(regex);
 
   if (textParts.length === 1) {
