@@ -116,7 +116,7 @@ export function Status(props: StatusProps) {
           🔁 {booster.displayName} boosted
         </div>
       )}
-      <div className="flex items-center gap-3 pt-2">
+      <div className={clsx("flex items-center gap-3", booster && "pt-2")}>
         <div className="relative">
           <img
             alt={status.account.displayName}
