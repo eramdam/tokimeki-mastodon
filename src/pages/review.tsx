@@ -2,10 +2,10 @@ import type { NextPage } from "next";
 import { useRouter } from "next/router";
 import { useEffect, useMemo, useState } from "react";
 
+import { Block } from "../components/block";
 import { Button } from "../components/button";
 import { Finished } from "../components/finished";
 import { LinkButton } from "../components/linkButton";
-import { Block } from "../components/main";
 import { Radio, RadioGroup } from "../components/radioGroup";
 import { Reviewer } from "../components/reviewer";
 import { MastodonProvider, useMastodon } from "../helpers/mastodonContext";

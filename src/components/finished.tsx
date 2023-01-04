@@ -9,8 +9,8 @@ import {
   useKeptIds,
   useStartCount,
 } from "../store/selectors";
+import { Block } from "./block";
 import { Button } from "./button";
-import { Block } from "./main";
 
 export function Finished() {
   const [maybeReset, setMaybeReset] = useState(false);
