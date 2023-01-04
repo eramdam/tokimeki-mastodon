@@ -1,6 +1,5 @@
 import clsx from "clsx";
-import parse from "html-react-parser";
-import { useMemo, useState } from "react";
+import { useState } from "react";
 
 import { useMastodon } from "../helpers/mastodonContext";
 import {
@@ -11,16 +10,12 @@ import {
 import {
   useCurrentAccount,
   useCurrentAccountRelationship,
-  useCurrentIndex,
   useFilteredFollowings,
   useFollowings,
-  useSettings,
 } from "../store/selectors";
 import { Block } from "./block";
-import { Button, SmallButton } from "./button";
 import { FeedWidget } from "./feedWidget";
 import { FollowingsLoadingIndicator } from "./followingsLoadingIndicator";
-import { getParserOptions } from "./htmlReactParserOptions";
 import { ReviewerButtons } from "./reviewerButtons";
 import { ReviewerFooter } from "./reviewerFooter";
 import { ReviewerPrompt } from "./reviewerPrompt";
@@ -43,7 +38,6 @@ export function Reviewer(props: ReviewerProps) {
   const followings = useFollowings();
   const { client } = useMastodon();
 
-  // Testing
   const [animationState, setAnimated] = useState(AnimationState.Idle);
   const isVisible = animationState === AnimationState.Idle;
 
