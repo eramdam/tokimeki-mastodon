@@ -122,12 +122,7 @@ export function Reviewer(props: ReviewerProps) {
       return <>Loading...</>;
     }
 
-    return (
-      <>
-        Do their posts still spark joy or feel important to you?{" "}
-        {currentAccountRelationship?.followedBy && "They follow you."}
-      </>
-    );
+    return <>Do their posts still spark joy or feel important to you?</>;
   }
 
   function renderFooter() {
