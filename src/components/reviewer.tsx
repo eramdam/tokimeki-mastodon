@@ -119,7 +119,7 @@ export function Reviewer(props: ReviewerProps) {
               currentAccount.displayName.trim() || currentAccount.acct
             )}
           </strong>{" "}
-          for all the posts you&apos;ve enjoyed before.{" "}
+          for all the toots you&apos;ve enjoyed before.{" "}
         </>
       );
     }
@@ -128,7 +128,7 @@ export function Reviewer(props: ReviewerProps) {
       return <>Loading...</>;
     }
 
-    return <>Do their posts still spark joy or feel important to you?</>;
+    return <>Do their toots still spark joy or feel important to you?</>;
   }
 
   function renderFooter() {
