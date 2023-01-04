@@ -99,7 +99,10 @@ export function Reviewer(props: ReviewerProps) {
         <>
           Glad to hear{" "}
           <strong>
-            {renderWithEmoji(currentAccount.emojis, currentAccount.displayName)}
+            {renderWithEmoji(
+              currentAccount.emojis,
+              currentAccount.displayName.trim() || currentAccount.acct
+            )}
           </strong>
           &apos;s toots are still important to you.
         </>
@@ -111,7 +114,10 @@ export function Reviewer(props: ReviewerProps) {
         <>
           Great, unfollowed! Let&apos;s thank{" "}
           <strong>
-            {renderWithEmoji(currentAccount.emojis, currentAccount.displayName)}
+            {renderWithEmoji(
+              currentAccount.emojis,
+              currentAccount.displayName.trim() || currentAccount.acct
+            )}
           </strong>{" "}
           for all the posts you&apos;ve enjoyed before.{" "}
         </>
@@ -228,12 +234,14 @@ export function Reviewer(props: ReviewerProps) {
             <div className="flex w-full items-center justify-between">
               <p className="prose break-words text-left leading-normal dark:prose-invert">
                 {renderTitle()}
-                <strong className="inline-block">
-                  {renderWithEmoji(
-                    currentAccount.emojis,
-                    currentAccount.displayName
-                  )}
-                </strong>{" "}
+                {currentAccount.displayName && (
+                  <strong className="inline-block">
+                    {renderWithEmoji(
+                      currentAccount.emojis,
+                      currentAccount.displayName.trim()
+                    )}
+                  </strong>
+                )}{" "}
                 <a
                   href={currentAccount.url}
                   target="_blank"
