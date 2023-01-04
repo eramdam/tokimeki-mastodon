@@ -3,13 +3,10 @@ import type { mastodon } from "masto";
 import { useMemo, useState } from "react";
 
 import {
-  useCurrentAccount,
-  useCurrentAccountRelationship,
   useCurrentIndex,
   useFollowings,
   useSettings,
 } from "../store/selectors";
-import { Block } from "./block";
 import { SmallButton } from "./button";
 import { renderWithEmoji } from "./emojify";
 import { getParserOptions } from "./htmlReactParserOptions";
