@@ -43,6 +43,7 @@ export function Reviewer(props: ReviewerProps) {
   const followings = useFollowings();
   const { client } = useMastodon();
 
+  // Testing
   const [animationState, setAnimated] = useState(AnimationState.Idle);
   const isVisible = animationState === AnimationState.Idle;
 
