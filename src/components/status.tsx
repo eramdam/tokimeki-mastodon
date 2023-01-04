@@ -89,7 +89,7 @@ export function Status(props: StatusProps) {
   );
 
   const parseOptions = useMemo(
-    () => getParserOptions(status.emojis),
+    () => getParserOptions({ emojiArray: status.emojis }),
     [status.emojis]
   );
 
@@ -135,10 +135,10 @@ export function Status(props: StatusProps) {
         </div>
 
         <div className="mb-2 flex flex-col gap-1 truncate dark:text-neutral-200">
-          <span className="truncate text-base leading-tight">
+          <span className="truncate text-base leading-normal">
             {renderWithEmoji(status.account.emojis, status.account.displayName)}
           </span>
-          <span className="truncate text-xs leading-tight">
+          <span className="truncate text-xs leading-normal">
             {status.account.acct}
           </span>
         </div>
@@ -148,7 +148,7 @@ export function Status(props: StatusProps) {
         <div className="self-start">
           <relative-time
             // @ts-expect-error - relative-time-element is not typed properly
-            class="text-xs leading-tight dark:text-neutral-400"
+            class="text-xs leading-normal dark:text-neutral-400"
             datetime={status.createdAt}
             tense="past"
             format="relative"

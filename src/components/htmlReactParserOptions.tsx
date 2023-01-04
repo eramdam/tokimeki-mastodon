@@ -1,3 +1,4 @@
+import clsx from "clsx";
 import type { Text } from "domhandler";
 import type { HTMLReactParserOptions } from "html-react-parser";
 import { attributesToProps, domToReact, Element } from "html-react-parser";
@@ -6,7 +7,15 @@ import { mergeProps } from "react-aria";
 
 import { renderWithEmoji } from "./emojify";
 
-export function getParserOptions(emojiArray: mastodon.v1.CustomEmoji[]) {
+interface GetParserOptionsProps {
+  emojiArray: mastodon.v1.CustomEmoji[];
+  classNames?: {
+    p?: string;
+    a?: string;
+  };
+}
+export function getParserOptions(options: GetParserOptionsProps) {
+  const { emojiArray, classNames } = options;
   const parseOptions: HTMLReactParserOptions = {
     replace: (domNode) => {
       if (domNode.type === "text") {
@@ -19,7 +28,7 @@ export function getParserOptions(emojiArray: mastodon.v1.CustomEmoji[]) {
         }
         if (domNode.tagName === "a") {
           const anchorProps = mergeProps(attributesToProps(domNode.attribs), {
-            className: "text-blue-500 hover:underline",
+            className: clsx("text-blue-500 hover:underline", classNames?.a),
             target: "_blank",
             rel: "noreferrer noopener",
           });
@@ -29,7 +38,7 @@ export function getParserOptions(emojiArray: mastodon.v1.CustomEmoji[]) {
         }
         if (domNode.tagName === "p") {
           return (
-            <p className="mb-4 leading-normal last:mb-0">
+            <p className={clsx("mb-4 leading-normal last:mb-0", classNames?.p)}>
               {domToReact(domNode.children, parseOptions)}
             </p>
           );

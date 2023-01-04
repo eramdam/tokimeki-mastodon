@@ -1,7 +1,15 @@
-import { uniq } from "lodash-es";
+import {
+  camelCase,
+  chunk,
+  compact,
+  flatten,
+  keyBy,
+  mapKeys,
+  uniq,
+} from "lodash-es";
 import type { mastodon } from "masto";
 
-import type { SortOrders } from ".";
+import type { SortOrders, TokimekiState } from ".";
 import { initialPersistedState, usePersistedStore } from ".";
 import { sortFollowings } from "./selectors";
 
@@ -34,10 +42,9 @@ export function saveAfterOAuthCode(payload: {
   });
 }
 
-export function updateSettings(payload: {
-  showBio?: boolean;
-  sortOrder?: SortOrders;
-}): void {
+export function updateSettings(
+  payload: Partial<TokimekiState["settings"]>
+): void {
   usePersistedStore.setState((state) => ({
     settings: {
       ...state.settings,
@@ -58,8 +65,38 @@ export function keepAccount(accountId: string): void {
 export async function fetchFollowings(
   accountId: string,
   client: mastodon.Client
-): Promise<mastodon.v1.Account[]> {
+) {
   usePersistedStore.setState({ isFetching: true });
+  const persistedState = usePersistedStore.getState();
+
+  if (persistedState.baseFollowings.length) {
+    const existingRelationships = persistedState.relationships;
+    usePersistedStore.setState({
+      followings: sortFollowings(
+        persistedState.baseFollowings,
+        usePersistedStore.getState().settings.sortOrder
+      ),
+    });
+
+    const missingIds = persistedState.baseFollowings
+      .filter((a) => !existingRelationships[a.id])
+      .map((a) => a.id);
+
+    if (missingIds.length) {
+      const relationshipsMap = await fetchRelationships({
+        ids: missingIds,
+        state: usePersistedStore.getState(),
+      });
+
+      usePersistedStore.setState({
+        isFetching: false,
+        relationships: relationshipsMap,
+      });
+    }
+
+    return;
+  }
+
   const accounts: mastodon.v1.Account[] = [];
 
   if (accounts.length === 0) {
@@ -72,13 +109,21 @@ export async function fetchFollowings(
 
   usePersistedStore.setState({
     baseFollowings: accounts,
-    isFetching: false,
     followings: sortFollowings(
       accounts,
       usePersistedStore.getState().settings.sortOrder
     ),
   });
-  return accounts;
+
+  const relationshipsMap = await fetchRelationships({
+    ids: accounts.map((f) => f.id),
+    state: usePersistedStore.getState(),
+  });
+
+  usePersistedStore.setState({
+    isFetching: false,
+    relationships: relationshipsMap,
+  });
 }
 export function reorderFollowings(order: SortOrders): void {
   usePersistedStore.setState((state) => ({
@@ -94,4 +139,56 @@ export function goToNextAccount(): void {
 }
 export function markAsFinished(): void {
   usePersistedStore.setState({ isFinished: true });
+}
+
+interface FetchRelationshipsOptions {
+  ids: string[];
+  state: TokimekiState;
+}
+
+// Hack to get around https://github.com/neet/masto.js/issues/672
+async function fetchRelationships(opts: FetchRelationshipsOptions) {
+  const { ids, state } = opts;
+
+  const chunks = chunk(ids, 40);
+
+  return keyBy(
+    compact(
+      flatten(
+        await Promise.all(
+          chunks.map((chunk) => {
+            return fetchRelationshipsBase({
+              ids: chunk,
+              state,
+            });
+          })
+        )
+      )
+    ),
+    (r) => r.id
+  );
+}
+async function fetchRelationshipsBase(options: FetchRelationshipsOptions) {
+  const params = new URLSearchParams();
+  options.ids.forEach((id) => params.append("id[]", id));
+
+  const rawResponse = await fetch(
+    `${
+      options.state.instanceUrl
+    }/api/v1/accounts/relationships?${params.toString()}`,
+    {
+      headers: {
+        Authorization: "Bearer " + options.state.accessToken,
+      },
+    }
+  );
+  const json = await rawResponse.json();
+
+  if (!Array.isArray(json)) {
+    return;
+  }
+
+  return json.map((r) => {
+    return mapKeys(r, (_v, k) => camelCase(k)) as mastodon.v1.Relationship;
+  });
 }

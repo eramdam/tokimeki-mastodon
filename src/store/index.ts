@@ -9,7 +9,7 @@ export enum SortOrders {
   NEWEST = "newest",
 }
 
-interface TokimekiState {
+export interface TokimekiState {
   clientId?: string;
   clientSecret?: string;
   instanceUrl?: string;
@@ -20,6 +20,8 @@ interface TokimekiState {
   keptIds?: string[];
   settings: {
     showBio: boolean;
+    showNote: boolean;
+    showFollowLabel: boolean;
     sortOrder: SortOrders;
   };
   isFetching: boolean;
@@ -27,18 +29,22 @@ interface TokimekiState {
   baseFollowings: mastodon.v1.Account[];
   followings: mastodon.v1.Account[];
   isFinished: boolean;
+  relationships: Record<string, mastodon.v1.Relationship>;
 }
 
 export const initialPersistedState: TokimekiState = {
   settings: {
     sortOrder: SortOrders.OLDEST,
     showBio: false,
+    showNote: false,
+    showFollowLabel: false,
   },
   isFinished: false,
   isFetching: false,
   currentIndex: 0,
   baseFollowings: [],
   followings: [],
+  relationships: {},
 };
 
 export const usePersistedStore = create<TokimekiState>()(

@@ -54,7 +54,7 @@ const ReviewContent = () => {
   const account = useAccount();
   const keptIds = useKeptIds();
   const unfollowedIds = useUnfollowedIds();
-  const { showBio, sortOrder } = useSettings();
+  const { showBio, sortOrder, showFollowLabel, showNote } = useSettings();
   const hasProgress = useMemo(
     () =>
       Boolean(
@@ -170,10 +170,45 @@ const ReviewContent = () => {
               />{" "}
               <strong>Show account bio&apos;s</strong> (Recommended: off)
             </label>
-            <p className="mt-0 leading-tight">
+            <p className="mt-0 leading-normal">
               I&apos;ve followed a lot of accounts based on their profile or who
               they are, but not their actual tweets. Hide their bio&apos;s so
               you can evaluate based on content only.
+            </p>
+          </div>
+          <div>
+            <label>
+              <input
+                type="checkbox"
+                checked={Boolean(showNote)}
+                onChange={() => {
+                  updateSettings({
+                    showNote: !showNote,
+                  });
+                }}
+              />{" "}
+              <strong>Show account note&apos;s</strong>
+            </label>
+            <p className="mt-0 leading-normal">
+              Account notes can be useful to remember why you followed someone.
+              Hide their note&apos;s so you can evaluate based on content only.
+            </p>
+          </div>
+          <div>
+            <label>
+              <input
+                type="checkbox"
+                checked={Boolean(showFollowLabel)}
+                onChange={() => {
+                  updateSettings({
+                    showFollowLabel: !showFollowLabel,
+                  });
+                }}
+              />{" "}
+              <strong>Show if account follows you</strong> (Recommended: off)
+            </label>
+            <p className="mt-0 leading-normal">
+              Show a badge indicating whether or not the account follows you.
             </p>
           </div>
           <RadioGroup

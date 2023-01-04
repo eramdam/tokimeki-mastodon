@@ -50,6 +50,18 @@ export const useCurrentAccount = () => {
     [currentIndex, followings]
   );
 };
+export const useRelationships = () =>
+  usePersistedStore((state) => state.relationships);
+export const useCurrentAccountRelationship = () => {
+  const currentAccount = useCurrentAccount();
+  const relationships = useRelationships();
+
+  if (!currentAccount) {
+    return undefined;
+  }
+
+  return relationships[currentAccount.id];
+};
 export const useCurrentIndex = () =>
   usePersistedStore((state) => state.currentIndex);
 export const useIsFetching = () =>
