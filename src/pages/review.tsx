@@ -168,12 +168,12 @@ const ReviewContent = () => {
                   });
                 }}
               />{" "}
-              <strong>Show account bio&apos;s</strong> (Recommended: off)
+              <strong>Show account bio</strong> (Recommended: off)
             </label>
             <p className="mt-0 leading-normal">
               I&apos;ve followed a lot of accounts based on their profile or who
-              they are, but not their actual tweets. Hide their bio&apos;s so
-              you can evaluate based on content only.
+              they are, but not their actual tweets. Hide their bio so you can
+              evaluate based on content only.
             </p>
           </div>
           <div>
@@ -187,11 +187,11 @@ const ReviewContent = () => {
                   });
                 }}
               />{" "}
-              <strong>Show account note&apos;s</strong>
+              <strong>Show account notes</strong>
             </label>
             <p className="mt-0 leading-normal">
               Account notes can be useful to remember why you followed someone.
-              Hide their note&apos;s so you can evaluate based on content only.
+              Hide their note so you can evaluate based on content only.
             </p>
           </div>
           <div>
