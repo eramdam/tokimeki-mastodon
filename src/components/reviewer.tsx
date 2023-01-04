@@ -48,6 +48,7 @@ export function Reviewer(props: ReviewerProps) {
   const [showBio, setShowBio] = useState(initialShowBio);
   const [showNote, setShowNote] = useState(initialShowNote);
   const [animationState, setAnimated] = useState(AnimationState.Idle);
+  const isVisible = animationState === AnimationState.Idle;
 
   const parseOptions = useMemo(
     () =>
@@ -257,28 +258,30 @@ export function Reviewer(props: ReviewerProps) {
           </>
         )}
 
-        <div className="flex gap-2">
-          {currentAccount?.note && (
-            <SmallButton
-              variant="secondary"
-              onPress={() => {
-                setShowBio((p) => !p);
-              }}
-            >
-              {showBio ? "Hide bio" : "Show bio"}
-            </SmallButton>
-          )}
-          {currentAccountRelationship?.note && (
-            <SmallButton
-              variant="secondary"
-              onPress={() => {
-                setShowNote((p) => !p);
-              }}
-            >
-              {showNote ? "Hide note" : "Show note"}
-            </SmallButton>
-          )}
-        </div>
+        {isVisible && (
+          <div className="flex gap-2">
+            {currentAccount?.note && (
+              <SmallButton
+                variant="secondary"
+                onPress={() => {
+                  setShowBio((p) => !p);
+                }}
+              >
+                {showBio ? "Hide bio" : "Show bio"}
+              </SmallButton>
+            )}
+            {currentAccountRelationship?.note && (
+              <SmallButton
+                variant="secondary"
+                onPress={() => {
+                  setShowNote((p) => !p);
+                }}
+              >
+                {showNote ? "Hide note" : "Show note"}
+              </SmallButton>
+            )}
+          </div>
+        )}
         {showBio && currentAccount.note && (
           <div className="prose w-full rounded-md border-[1px] border-black/30 bg-black/10 p-2 leading-normal dark:bg-black/50 dark:prose-invert">
             <strong className="text-sm">Bio:</strong>{" "}
