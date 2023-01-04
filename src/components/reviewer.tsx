@@ -232,7 +232,7 @@ export function Reviewer(props: ReviewerProps) {
             <div className="flex w-full items-center justify-between">
               <p className="prose break-words text-left leading-normal dark:prose-invert">
                 {renderTitle()}
-                <strong>
+                <strong className="inline-block">
                   {renderWithEmoji(
                     currentAccount.emojis,
                     currentAccount.displayName
