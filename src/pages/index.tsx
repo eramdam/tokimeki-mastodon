@@ -155,7 +155,11 @@ const Home: NextPage = () => {
             type={"url"}
             className="prose flex flex-col gap-2 text-center dark:prose-invert"
             value={localInstanceUrl}
-            onChange={setInstanceDomain}
+            onChange={(value) => {
+              setInstanceDomain(
+                value.startsWith("https://") ? value : `https://${value}`
+              );
+            }}
             validationState={isInstanceValid || "valid"}
             isDisabled={isLoading}
           ></TextInput>
