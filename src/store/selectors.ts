@@ -1,5 +1,4 @@
 import { shuffle } from "lodash-es";
-import type { mastodon } from "masto";
 import { useMemo } from "react";
 import shallow from "zustand/shallow";
 

@@ -1,5 +1,4 @@
 import parse from "html-react-parser";
-import type { mastodon } from "masto";
 import { useMemo, useState } from "react";
 
 import type { TokimekiAccount, TokimekiRelationship } from "../store";

@@ -8,9 +8,7 @@ import { useMastodon } from "../helpers/mastodonContext";
 import { resetState } from "../store/actions";
 import {
   useAccountId,
-  useBaseFollowings,
   useInstanceUrl,
-  useKeptAccounts,
   useKeptIds,
   useStartCount,
 } from "../store/selectors";

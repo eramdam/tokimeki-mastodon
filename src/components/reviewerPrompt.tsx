@@ -1,4 +1,3 @@
-import type { mastodon } from "masto";
 import type { PropsWithChildren } from "react";
 
 import type { TokimekiAccount } from "../store";
