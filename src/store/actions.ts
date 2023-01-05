@@ -73,30 +73,6 @@ export async function fetchFollowings(
   const persistedState = usePersistedStore.getState();
 
   if (persistedState.baseFollowingIds.length) {
-    const existingRelationships = persistedState.relationships;
-    usePersistedStore.setState({
-      followingIds: sortFollowings(
-        persistedState.baseFollowingIds,
-        usePersistedStore.getState().settings.sortOrder
-      ),
-    });
-
-    const missingIds = persistedState.baseFollowingIds.filter(
-      (a) => !existingRelationships[a]
-    );
-
-    if (missingIds.length) {
-      const relationshipsMap = await fetchRelationships({
-        ids: missingIds,
-        state: usePersistedStore.getState(),
-      });
-
-      usePersistedStore.setState({
-        isFetching: false,
-        relationships: relationshipsMap,
-      });
-    }
-
     return;
   }
 
@@ -133,14 +109,16 @@ export async function fetchFollowings(
       undefined,
   });
 
-  const relationshipsMap = await fetchRelationships({
-    ids: accounts.map((f) => f.id),
-    state: usePersistedStore.getState(),
-  });
+  const relationships = await client.v1.accounts.fetchRelationships(
+    compact([firstAccount?.id])
+  );
+  const currentRelationship = relationships[0]
+    ? pick(relationships[0], ["followedBy", "note"])
+    : undefined;
 
   usePersistedStore.setState({
     isFetching: false,
-    relationships: relationshipsMap,
+    currentRelationship,
   });
 }
 export function reorderFollowings(order: SortOrders): void {
@@ -162,6 +140,12 @@ export async function goToNextAccount(
   const currentIndex = followingIds.indexOf(currentAccount.id);
   const newAccountId = followingIds[currentIndex + 1] || followingIds[0];
   const newAccount = await client.v1.accounts.fetch(newAccountId || "");
+  const relationships = await client.v1.accounts.fetchRelationships(
+    compact([newAccount.id])
+  );
+  const currentRelationship = relationships[0]
+    ? pick(relationships[0], ["followedBy", "note"])
+    : undefined;
 
   usePersistedStore.setState(() => ({
     currentAccount: pick(newAccount, [
@@ -172,63 +156,9 @@ export async function goToNextAccount(
       "url",
       "emojis",
     ]),
+    currentRelationship,
   }));
 }
 export function markAsFinished(): void {
   usePersistedStore.setState({ isFinished: true });
-}
-
-interface FetchRelationshipsOptions {
-  ids: string[];
-  state: TokimekiState;
-}
-
-// Hack to get around https://github.com/neet/masto.js/issues/672
-async function fetchRelationships(opts: FetchRelationshipsOptions) {
-  const { ids, state } = opts;
-
-  const chunks = chunk(ids, 40);
-
-  return mapValues(
-    keyBy(
-      compact(
-        flatten(
-          await Promise.all(
-            chunks.map((chunk) => {
-              return fetchRelationshipsBase({
-                ids: chunk,
-                state,
-              });
-            })
-          )
-        )
-      ),
-      (r) => r.id
-    ),
-    (r) => pick(r, ["followedBy", "note"])
-  );
-}
-async function fetchRelationshipsBase(options: FetchRelationshipsOptions) {
-  const params = new URLSearchParams();
-  options.ids.forEach((id) => params.append("id[]", id));
-
-  const rawResponse = await fetch(
-    `${
-      options.state.instanceUrl
-    }/api/v1/accounts/relationships?${params.toString()}`,
-    {
-      headers: {
-        Authorization: "Bearer " + options.state.accessToken,
-      },
-    }
-  );
-  const json = await rawResponse.json();
-
-  if (!Array.isArray(json)) {
-    return;
-  }
-
-  return json.map((r) => {
-    return mapKeys(r, (_v, k) => camelCase(k)) as mastodon.v1.Relationship;
-  });
 }

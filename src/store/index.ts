@@ -44,7 +44,7 @@ export interface TokimekiState {
   baseFollowingIds: string[];
   followingIds: string[];
   isFinished: boolean;
-  relationships: Record<string, TokimekiRelationship>;
+  currentRelationship?: TokimekiRelationship;
 }
 
 export const initialPersistedState: TokimekiState = {
@@ -58,7 +58,6 @@ export const initialPersistedState: TokimekiState = {
   isFetching: false,
   baseFollowingIds: [],
   followingIds: [],
-  relationships: {},
 };
 
 export const usePersistedStore = create<TokimekiState>()(
