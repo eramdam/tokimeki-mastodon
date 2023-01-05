@@ -67,6 +67,7 @@ export const usePersistedStore = create<TokimekiState>()(
       partialize(state) {
         return omit(state, ["actions"]);
       },
+      version: 1,
     }),
     { name: "main-store" }
   )
