@@ -5,6 +5,7 @@ import {
   flatten,
   keyBy,
   mapKeys,
+  pick,
   uniq,
 } from "lodash-es";
 import type { mastodon } from "masto";
@@ -109,7 +110,9 @@ export async function fetchFollowings(
   }
 
   usePersistedStore.setState({
-    baseFollowings: accounts,
+    baseFollowings: accounts.map((a) =>
+      pick(a, ["id", "acct", "note", "avatar", "displayName", "url", "emojis"])
+    ),
     followingIds: sortFollowings(
       accounts,
       usePersistedStore.getState().settings.sortOrder
