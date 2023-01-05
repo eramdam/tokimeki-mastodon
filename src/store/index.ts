@@ -13,7 +13,6 @@ export type TokimekiAccount = {
   id: string;
   acct: string;
   note: string;
-  avatar: string;
   displayName: string;
   url: string;
   emojis: mastodon.v1.CustomEmoji[];

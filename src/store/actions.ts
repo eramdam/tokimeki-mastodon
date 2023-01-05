@@ -111,7 +111,7 @@ export async function fetchFollowings(
 
   usePersistedStore.setState({
     baseFollowings: accounts.map((a) =>
-      pick(a, ["id", "acct", "note", "avatar", "displayName", "url", "emojis"])
+      pick(a, ["id", "acct", "note", "displayName", "url", "emojis"])
     ),
     followingIds: sortFollowings(
       accounts,

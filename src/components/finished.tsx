@@ -1,9 +1,13 @@
 /* eslint-disable @next/next/no-img-element */
+import { pick } from "lodash-es";
 import { useRouter } from "next/router";
 import { useMemo, useState } from "react";
+import useSWR from "swr";
 
+import { useMastodon } from "../helpers/mastodonContext";
 import { resetState } from "../store/actions";
 import {
+  useAccountId,
   useBaseFollowings,
   useInstanceUrl,
   useKeptAccounts,
@@ -20,29 +24,41 @@ export function Finished() {
   const keptIds = useMemo(() => keptIdsFromStorage || [], [keptIdsFromStorage]);
   const startCount = useStartCount();
   const instanceUrl = useInstanceUrl();
+  const accountId = useAccountId();
 
-  const keptAccountIds = useKeptAccounts();
-  const allAccounts = useBaseFollowings();
+  const { client } = useMastodon();
+  const { data: avatarsData } = useSWR("pics", async () => {
+    if (!client || !accountId) {
+      return [];
+    }
+
+    const accounts = await client.v1.accounts.listFollowing(accountId, {
+      limit: 80,
+    });
+    return accounts.map((a) => pick(a, ["id", "avatar", "displayName"]));
+  });
+
   const keptPicsRenders = useMemo(() => {
-    return allAccounts
-      .filter((a) => keptAccountIds.includes(a.id))
-      .map((pic) => {
-        const delay = Math.random() * 10;
-        return (
-          <div
-            className="snowflake overflow-hidden rounded-full bg-white shadow-lg"
-            key={pic.id}
-            style={{
-              left: `${Math.random() * 110 - 10}%`,
-              animationDelay: `${delay}s, ${delay - Math.random() * 3}s`,
-              zIndex: `${Math.random() > 0.5 ? 1 : -1}`,
-            }}
-          >
-            <img src={pic.avatar} alt={pic.displayName} />
-          </div>
-        );
-      });
-  }, [allAccounts, keptAccountIds]);
+    if (!avatarsData) {
+      return null;
+    }
+    return avatarsData.map((pic) => {
+      const delay = Math.random() * 10;
+      return (
+        <div
+          className="snowflake overflow-hidden rounded-full bg-white shadow-lg"
+          key={pic.id}
+          style={{
+            left: `${Math.random() * 110 - 10}%`,
+            animationDelay: `${delay}s, ${delay - Math.random() * 3}s`,
+            zIndex: `${Math.random() > 0.5 ? 1 : -1}`,
+          }}
+        >
+          <img src={pic.avatar} alt={pic.displayName} />
+        </div>
+      );
+    });
+  }, [avatarsData]);
 
   const renderFinishedFooter = () => {
     if (maybeReset) {
