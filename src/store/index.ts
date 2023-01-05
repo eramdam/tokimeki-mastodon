@@ -9,14 +9,19 @@ export enum SortOrders {
   NEWEST = "newest",
 }
 
-export type TokimekiAccount = {
+export interface TokimekiAccount {
   id: string;
   acct: string;
   note: string;
   displayName: string;
   url: string;
   emojis: mastodon.v1.CustomEmoji[];
-};
+}
+
+export interface TokimekiRelationship {
+  followedBy: boolean;
+  note?: string | null;
+}
 
 export interface TokimekiState {
   clientId?: string;
@@ -35,11 +40,11 @@ export interface TokimekiState {
     sortOrder: SortOrders;
   };
   isFetching: boolean;
-  currentIndex: number;
-  baseFollowings: TokimekiAccount[];
+  currentAccount?: TokimekiAccount;
+  baseFollowingIds: string[];
   followingIds: string[];
   isFinished: boolean;
-  relationships: Record<string, mastodon.v1.Relationship>;
+  relationships: Record<string, TokimekiRelationship>;
 }
 
 export const initialPersistedState: TokimekiState = {
@@ -51,8 +56,7 @@ export const initialPersistedState: TokimekiState = {
   },
   isFinished: false,
   isFetching: false,
-  currentIndex: 0,
-  baseFollowings: [],
+  baseFollowingIds: [],
   followingIds: [],
   relationships: {},
 };

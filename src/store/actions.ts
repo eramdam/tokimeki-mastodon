@@ -5,12 +5,13 @@ import {
   flatten,
   keyBy,
   mapKeys,
+  mapValues,
   pick,
   uniq,
 } from "lodash-es";
 import type { mastodon } from "masto";
 
-import type { SortOrders, TokimekiState } from ".";
+import type { SortOrders, TokimekiAccount, TokimekiState } from ".";
 import { initialPersistedState, usePersistedStore } from ".";
 import { sortFollowings } from "./selectors";
 
@@ -71,18 +72,18 @@ export async function fetchFollowings(
   usePersistedStore.setState({ isFetching: true });
   const persistedState = usePersistedStore.getState();
 
-  if (persistedState.baseFollowings.length) {
+  if (persistedState.baseFollowingIds.length) {
     const existingRelationships = persistedState.relationships;
     usePersistedStore.setState({
       followingIds: sortFollowings(
-        persistedState.baseFollowings,
+        persistedState.baseFollowingIds,
         usePersistedStore.getState().settings.sortOrder
-      ).map((f) => f.id),
+      ),
     });
 
-    const missingIds = persistedState.baseFollowings
-      .filter((a) => !existingRelationships[a.id])
-      .map((a) => a.id);
+    const missingIds = persistedState.baseFollowingIds.filter(
+      (a) => !existingRelationships[a]
+    );
 
     if (missingIds.length) {
       const relationshipsMap = await fetchRelationships({
@@ -109,14 +110,27 @@ export async function fetchFollowings(
     }
   }
 
+  const sortedFollowings = sortFollowings(
+    accounts.map((a) => a.id),
+    usePersistedStore.getState().settings.sortOrder
+  );
+  const firstId = sortedFollowings[0] || "";
+  const firstAccount = accounts.find((a) => a.id === firstId);
+
   usePersistedStore.setState({
-    baseFollowings: accounts.map((a) =>
-      pick(a, ["id", "acct", "note", "displayName", "url", "emojis"])
-    ),
-    followingIds: sortFollowings(
-      accounts,
-      usePersistedStore.getState().settings.sortOrder
-    ).map((f) => f.id),
+    baseFollowingIds: accounts.map((a) => a.id),
+    followingIds: sortedFollowings,
+    currentAccount:
+      (firstAccount &&
+        pick(firstAccount, [
+          "id",
+          "acct",
+          "note",
+          "displayName",
+          "url",
+          "emojis",
+        ])) ||
+      undefined,
   });
 
   const relationshipsMap = await fetchRelationships({
@@ -131,14 +145,33 @@ export async function fetchFollowings(
 }
 export function reorderFollowings(order: SortOrders): void {
   usePersistedStore.setState((state) => ({
-    followingIds: sortFollowings(state.baseFollowings, order).map((f) => f.id),
-    currentIndex: 0,
+    followingIds: sortFollowings(state.baseFollowingIds, order),
   }));
 }
-export function goToNextAccount(): void {
-  usePersistedStore.setState((state) => ({
-    ...state,
-    currentIndex: state.currentIndex + 1,
+export async function setCurrentAccountEmpty() {
+  usePersistedStore.setState({
+    currentAccount: undefined,
+  });
+}
+export async function goToNextAccount(
+  client: mastodon.Client,
+  currentAccount: TokimekiAccount
+) {
+  const { followingIds } = usePersistedStore.getState();
+
+  const currentIndex = followingIds.indexOf(currentAccount.id);
+  const newAccountId = followingIds[currentIndex + 1] || followingIds[0];
+  const newAccount = await client.v1.accounts.fetch(newAccountId || "");
+
+  usePersistedStore.setState(() => ({
+    currentAccount: pick(newAccount, [
+      "id",
+      "acct",
+      "note",
+      "displayName",
+      "url",
+      "emojis",
+    ]),
   }));
 }
 export function markAsFinished(): void {
@@ -156,20 +189,23 @@ async function fetchRelationships(opts: FetchRelationshipsOptions) {
 
   const chunks = chunk(ids, 40);
 
-  return keyBy(
-    compact(
-      flatten(
-        await Promise.all(
-          chunks.map((chunk) => {
-            return fetchRelationshipsBase({
-              ids: chunk,
-              state,
-            });
-          })
+  return mapValues(
+    keyBy(
+      compact(
+        flatten(
+          await Promise.all(
+            chunks.map((chunk) => {
+              return fetchRelationshipsBase({
+                ids: chunk,
+                state,
+              });
+            })
+          )
         )
-      )
+      ),
+      (r) => r.id
     ),
-    (r) => r.id
+    (r) => pick(r, ["followedBy", "note"])
   );
 }
 async function fetchRelationshipsBase(options: FetchRelationshipsOptions) {

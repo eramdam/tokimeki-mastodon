@@ -5,6 +5,7 @@ import { useMastodon } from "../helpers/mastodonContext";
 import {
   goToNextAccount,
   keepAccount,
+  setCurrentAccountEmpty,
   unfollowAccount,
 } from "../store/actions";
 import {
@@ -42,9 +43,12 @@ export function Reviewer(props: ReviewerProps) {
   const isVisible = animationState === AnimationState.Idle;
 
   const onNextClick = async () => {
+    if (!client || !currentAccount) {
+      return;
+    }
     const shouldUnfollow = animationState === AnimationState.Unfollow;
     if (currentAccount) {
-      if (shouldUnfollow && client) {
+      if (shouldUnfollow) {
         console.log("Will unfollow", currentAccount.acct);
         if (process.env.NODE_ENV !== "development") {
           await client.v1.accounts.unfollow(currentAccount.id);
@@ -66,16 +70,13 @@ export function Reviewer(props: ReviewerProps) {
       return;
     }
 
-    goToNextAccount();
     setAnimated(AnimationState.Idle);
+    setCurrentAccountEmpty();
+    await goToNextAccount(client, currentAccount);
   };
 
   if (followings?.length === 0) {
     return <FollowingsLoadingIndicator />;
-  }
-
-  if (!currentAccount) {
-    return null;
   }
 
   return (
@@ -93,27 +94,37 @@ export function Reviewer(props: ReviewerProps) {
             "translate-x-[-20%] translate-y-[200px] rotate-[-10deg] scale-[0.5] opacity-0"
         )}
       >
-        <FeedWidget
-          key={currentAccount.id}
-          accountId={currentAccount.id}
-        ></FeedWidget>
+        {currentAccount ? (
+          <FeedWidget
+            key={currentAccount.id}
+            accountId={currentAccount.id}
+          ></FeedWidget>
+        ) : (
+          <p className="prose p-3 dark:prose-invert">Loading...</p>
+        )}
       </Block>
 
       <Block className="mt-0 flex w-3/4 flex-shrink-0 flex-col items-start">
-        {isVisible && (
-          <ReviewerFooter
-            account={currentAccount}
-            accountRelationship={currentAccountRelationship}
-          />
+        {currentAccount ? (
+          <>
+            {isVisible && (
+              <ReviewerFooter
+                account={currentAccount}
+                accountRelationship={currentAccountRelationship}
+              />
+            )}
+            <ReviewerPrompt account={currentAccount} />
+            <ReviewerButtons
+              onUndoClick={() => setAnimated(AnimationState.Idle)}
+              onUnfollowClick={() => setAnimated(AnimationState.Unfollow)}
+              onKeepClick={() => setAnimated(AnimationState.Keep)}
+              onNextClick={onNextClick}
+              isVisible={isVisible}
+            />
+          </>
+        ) : (
+          <p className="prose p-3 dark:prose-invert">Loading...</p>
         )}
-        <ReviewerPrompt account={currentAccount} />
-        <ReviewerButtons
-          onUndoClick={() => setAnimated(AnimationState.Idle)}
-          onUnfollowClick={() => setAnimated(AnimationState.Unfollow)}
-          onKeepClick={() => setAnimated(AnimationState.Keep)}
-          onNextClick={onNextClick}
-          isVisible={isVisible}
-        />
       </Block>
     </div>
   );

@@ -2,7 +2,7 @@ import parse from "html-react-parser";
 import type { mastodon } from "masto";
 import { useMemo, useState } from "react";
 
-import type { TokimekiAccount } from "../store";
+import type { TokimekiAccount, TokimekiRelationship } from "../store";
 import {
   useCurrentIndex,
   useFollowingIds,
@@ -14,7 +14,7 @@ import { getParserOptions } from "./htmlReactParserOptions";
 
 interface ReviewerFooterProps {
   account: TokimekiAccount;
-  accountRelationship: mastodon.v1.Relationship | undefined;
+  accountRelationship: TokimekiRelationship | undefined;
 }
 export function ReviewerFooter(props: ReviewerFooterProps) {
   const { account, accountRelationship } = props;

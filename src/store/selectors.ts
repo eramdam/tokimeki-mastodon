@@ -32,7 +32,7 @@ export const useOAuthCodeDependencies = () =>
 export const useFollowingIds = () =>
   usePersistedStore((state) => state.followingIds);
 export const useBaseFollowings = () =>
-  usePersistedStore((state) => state.baseFollowings);
+  usePersistedStore((state) => state.baseFollowingIds);
 export const useFilteredFollowings = () => {
   const baseFollowings = useFollowingIds();
   const keptIds = useKeptIds();
@@ -43,17 +43,7 @@ export const useFilteredFollowings = () => {
     [baseFollowings, keptIds, unfollowedIds]
   );
 };
-export const useCurrentAccount = () => {
-  const currentIndex = useCurrentIndex();
-  const followingIds = useFollowingIds();
-  const targetId = followingIds[currentIndex] || followingIds[0];
-  const followings = useBaseFollowings();
 
-  return useMemo(
-    () => followings.find((a) => a.id === targetId),
-    [followings, targetId]
-  );
-};
 export const useRelationships = () =>
   usePersistedStore((state) => state.relationships);
 export const useCurrentAccountRelationship = () => {
@@ -66,8 +56,18 @@ export const useCurrentAccountRelationship = () => {
 
   return relationships[currentAccount.id];
 };
-export const useCurrentIndex = () =>
-  usePersistedStore((state) => state.currentIndex);
+export const useCurrentAccount = () =>
+  usePersistedStore((state) => state.currentAccount);
+export const useCurrentIndex = () => {
+  const currentAccount = useCurrentAccount();
+  const followings = useFollowingIds();
+
+  if (!currentAccount) {
+    return 0;
+  }
+
+  return followings.indexOf(currentAccount.id);
+};
 export const useIsFetching = () =>
   usePersistedStore((state) => state.isFetching);
 export const useKeptAccounts = () => {
@@ -91,7 +91,7 @@ function filterFollowingIds(
     return !keptIds?.includes(a) && !unfollowedIds?.includes(a);
   });
 }
-export function sortFollowings(array: { id: string }[], sortOrder: SortOrders) {
+export function sortFollowings(array: string[], sortOrder: SortOrders) {
   switch (sortOrder) {
     case SortOrders.NEWEST: {
       return array;
