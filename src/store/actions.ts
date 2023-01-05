@@ -5,8 +5,6 @@ import type { SortOrders, TokimekiAccount, TokimekiState } from ".";
 import { initialPersistedState, usePersistedStore } from ".";
 import { sortFollowings } from "./selectors";
 
-// Test
-
 export function resetState() {
   return usePersistedStore.setState(() => {
     return initialPersistedState;
