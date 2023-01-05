@@ -122,7 +122,7 @@ export function Reviewer(props: ReviewerProps) {
         <FeedWidget accountId={currentAccount?.id}></FeedWidget>
       </Block>
 
-      <Block className="mt-0 flex w-3/4 flex-shrink-0 flex-col items-start">
+      <Block className="mt-0 flex max-h-[50vh] w-3/4 flex-shrink-0 flex-col items-start">
         {currentAccount && currentAccountRelationship ? (
           <>
             {isVisible && (

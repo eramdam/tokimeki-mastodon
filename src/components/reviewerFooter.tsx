@@ -96,18 +96,23 @@ export function ReviewerFooter(props: ReviewerFooterProps) {
           </SmallButton>
         )}
       </div>
-      {showBio && account.note && (
-        <div className="prose w-full rounded-md border-[1px] border-black/30 bg-black/10 p-2 leading-normal dark:bg-black/50 dark:prose-invert">
-          <strong className="text-sm">Bio:</strong>{" "}
-          {parse(account.note, parseOptions)}
-        </div>
-      )}
-      {showNote && accountRelationship?.note && (
-        <div className="prose w-full rounded-md border-[1px] border-black/30 bg-yellow-400/10 p-2 leading-normal dark:prose-invert">
-          <strong className="text-sm">Note:</strong>{" "}
-          <p className="mt-0 inline-block text-sm">
-            {parse(accountRelationship.note, parseOptions)}
-          </p>
+      {((showBio && account.note) ||
+        (showNote && accountRelationship?.note)) && (
+        <div className="flex flex-shrink flex-grow flex-col gap-3 overflow-scroll">
+          {showBio && account.note && (
+            <div className="prose w-full rounded-md border-[1px] border-black/30 bg-black/10 p-2 leading-normal dark:bg-black/50 dark:prose-invert">
+              <strong className="text-sm">Bio:</strong>{" "}
+              {parse(account.note, parseOptions)}
+            </div>
+          )}
+          {showNote && accountRelationship?.note && (
+            <div className="prose w-full rounded-md border-[1px] border-black/30 bg-yellow-400/10 p-2 leading-normal dark:prose-invert">
+              <strong className="text-sm">Note:</strong>{" "}
+              <p className="mt-0 inline-block text-sm">
+                {parse(accountRelationship.note, parseOptions)}
+              </p>
+            </div>
+          )}
         </div>
       )}
     </>
