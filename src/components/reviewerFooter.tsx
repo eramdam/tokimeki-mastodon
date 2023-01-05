@@ -2,9 +2,10 @@ import parse from "html-react-parser";
 import type { mastodon } from "masto";
 import { useMemo, useState } from "react";
 
+import type { TokimekiAccount } from "../store";
 import {
   useCurrentIndex,
-  useFollowings,
+  useFollowingIds,
   useSettings,
 } from "../store/selectors";
 import { SmallButton } from "./button";
@@ -12,13 +13,13 @@ import { renderWithEmoji } from "./emojify";
 import { getParserOptions } from "./htmlReactParserOptions";
 
 interface ReviewerFooterProps {
-  account: mastodon.v1.Account;
+  account: TokimekiAccount;
   accountRelationship: mastodon.v1.Relationship | undefined;
 }
 export function ReviewerFooter(props: ReviewerFooterProps) {
   const { account, accountRelationship } = props;
   const followingIndex = useCurrentIndex();
-  const followings = useFollowings();
+  const followings = useFollowingIds();
 
   const {
     showBio: initialShowBio,

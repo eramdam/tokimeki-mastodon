@@ -3,16 +3,20 @@ import { login } from "masto";
 import type { PropsWithChildren } from "react";
 import { createContext, useContext, useEffect, useMemo, useState } from "react";
 
-import { useAccessToken, useAccount, useInstanceUrl } from "../store/selectors";
+import {
+  useAccessToken,
+  useAccountId,
+  useInstanceUrl,
+} from "../store/selectors";
 
 const MastodonContext = createContext<{
   client: mastodon.Client | undefined;
-  account: mastodon.v1.Account | null;
-}>({ client: undefined, account: null });
+  accountId: string | null;
+}>({ client: undefined, accountId: null });
 
 export const MastodonProvider = (props: PropsWithChildren<object>) => {
   const accessToken = useAccessToken();
-  const account = useAccount();
+  const accountId = useAccountId();
   const instanceUrl = useInstanceUrl();
   const [masto, setMasto] = useState<mastodon.Client | undefined>();
 
@@ -32,9 +36,9 @@ export const MastodonProvider = (props: PropsWithChildren<object>) => {
   const value = useMemo(() => {
     return {
       client: masto,
-      account: account || null,
+      accountId: accountId || null,
     };
-  }, [account, masto]);
+  }, [accountId, masto]);
 
   return (
     <MastodonContext.Provider value={value}>

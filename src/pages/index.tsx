@@ -14,7 +14,7 @@ import {
   registerApplication,
 } from "../helpers/authHelpers";
 import { saveAfterOAuthCode, saveLoginCredentials } from "../store/actions";
-import { useAccount, useOAuthCodeDependencies } from "../store/selectors";
+import { useAccountId, useOAuthCodeDependencies } from "../store/selectors";
 
 const Home: NextPage = () => {
   const [localInstanceUrl, setInstanceDomain] = useState("");
@@ -75,7 +75,7 @@ const Home: NextPage = () => {
     [clientId, clientSecret, router, storedInstanceUrl]
   );
 
-  const account = useAccount();
+  const account = useAccountId();
 
   useEffect(() => {
     if (account) {

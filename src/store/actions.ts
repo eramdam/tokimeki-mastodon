@@ -37,7 +37,8 @@ export function saveAfterOAuthCode(payload: {
 }): void {
   usePersistedStore.setState({
     accessToken: payload.accessToken,
-    account: payload.account,
+    accountId: payload.account.id,
+    accountUsername: payload.account.username,
     startCount: payload.account.followingCount,
   });
 }
@@ -72,10 +73,10 @@ export async function fetchFollowings(
   if (persistedState.baseFollowings.length) {
     const existingRelationships = persistedState.relationships;
     usePersistedStore.setState({
-      followings: sortFollowings(
+      followingIds: sortFollowings(
         persistedState.baseFollowings,
         usePersistedStore.getState().settings.sortOrder
-      ),
+      ).map((f) => f.id),
     });
 
     const missingIds = persistedState.baseFollowings
@@ -109,10 +110,10 @@ export async function fetchFollowings(
 
   usePersistedStore.setState({
     baseFollowings: accounts,
-    followings: sortFollowings(
+    followingIds: sortFollowings(
       accounts,
       usePersistedStore.getState().settings.sortOrder
-    ),
+    ).map((f) => f.id),
   });
 
   const relationshipsMap = await fetchRelationships({
@@ -127,7 +128,7 @@ export async function fetchFollowings(
 }
 export function reorderFollowings(order: SortOrders): void {
   usePersistedStore.setState((state) => ({
-    followings: sortFollowings(state.baseFollowings, order),
+    followingIds: sortFollowings(state.baseFollowings, order).map((f) => f.id),
     currentIndex: 0,
   }));
 }

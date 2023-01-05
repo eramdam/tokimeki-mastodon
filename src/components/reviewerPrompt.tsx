@@ -1,13 +1,14 @@
 import type { mastodon } from "masto";
 import type { PropsWithChildren } from "react";
 
+import type { TokimekiAccount } from "../store";
 import { renderWithEmoji } from "./emojify";
 import { AnimationState } from "./reviewer";
 
 export const ReviewerPrompt = (
   props: PropsWithChildren<{
     animationState?: AnimationState;
-    account: mastodon.v1.Account;
+    account: TokimekiAccount;
   }>
 ) => {
   const { animationState, account } = props;

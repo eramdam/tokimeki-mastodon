@@ -11,7 +11,7 @@ import {
   useCurrentAccount,
   useCurrentAccountRelationship,
   useFilteredFollowings,
-  useFollowings,
+  useFollowingIds,
 } from "../store/selectors";
 import { Block } from "./block";
 import { FeedWidget } from "./feedWidget";
@@ -35,7 +35,7 @@ export function Reviewer(props: ReviewerProps) {
   const currentAccount = useCurrentAccount();
   const currentAccountRelationship = useCurrentAccountRelationship();
   const filteredFollowings = useFilteredFollowings();
-  const followings = useFollowings();
+  const followings = useFollowingIds();
   const { client } = useMastodon();
 
   const [animationState, setAnimated] = useState(AnimationState.Idle);
@@ -60,7 +60,7 @@ export function Reviewer(props: ReviewerProps) {
     if (
       filteredFollowings.length < 1 ||
       (currentAccount &&
-        currentAccount.id === followings[followings.length - 1]?.id)
+        currentAccount.id === followings[followings.length - 1])
     ) {
       props.onFinished();
       return;

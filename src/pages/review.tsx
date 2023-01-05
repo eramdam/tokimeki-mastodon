@@ -18,8 +18,9 @@ import {
   updateSettings,
 } from "../store/actions";
 import {
-  useAccount,
   useAccountId,
+  useAccountUsername,
+  useBaseFollowings,
   useFilteredFollowings,
   useIsFinished,
   useKeptIds,
@@ -51,7 +52,7 @@ const ReviewContent = () => {
 
   const { client } = useMastodon();
   const accountId = useAccountId();
-  const account = useAccount();
+  const accountUsername = useAccountUsername();
   const keptIds = useKeptIds();
   const unfollowedIds = useUnfollowedIds();
   const { showBio, sortOrder, showFollowLabel, showNote } = useSettings();
@@ -64,6 +65,7 @@ const ReviewContent = () => {
   );
   const isFinished = useIsFinished();
   const filteredFollowings = useFilteredFollowings();
+  const baseFollowings = useBaseFollowings();
 
   useEffect(() => {
     if (!isReviewing || !client || !accountId) {
@@ -77,7 +79,7 @@ const ReviewContent = () => {
     return <Finished />;
   }
 
-  if (!account) {
+  if (!accountUsername || !accountId) {
     return (
       <Block>
         <p className="prose dark:prose-invert">Loading...</p>
@@ -127,8 +129,8 @@ const ReviewContent = () => {
       </LinkButton>
       <Block className="inline-flex flex-col items-center justify-center gap-6">
         <h1 className="text-accentColor text-center">
-          {hasProgress ? "Hello again," : "Hello"} @{account.username}!
-          Let&apos;s go through those {account.followingCount} accounts you are
+          {hasProgress ? "Hello again," : "Hello"} @{accountUsername}!
+          Let&apos;s go through those {baseFollowings.length} accounts you are
           following 😤
           {hasProgress && (
             <>
@@ -143,7 +145,7 @@ const ReviewContent = () => {
         </p>
         {hasProgress && (
           <p className="prose dark:prose-invert">
-            Keep at it! You started with {account.followingCount} follows. We
+            Keep at it! You started with {baseFollowings.length} follows. We
             loaded your progress from last time when you kept{" "}
             {(keptIds || []).length} accounts that mattered to you.
             <br />

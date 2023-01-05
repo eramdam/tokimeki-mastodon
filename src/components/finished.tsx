@@ -4,6 +4,7 @@ import { useMemo, useState } from "react";
 
 import { resetState } from "../store/actions";
 import {
+  useBaseFollowings,
   useInstanceUrl,
   useKeptAccounts,
   useKeptIds,
@@ -20,25 +21,28 @@ export function Finished() {
   const startCount = useStartCount();
   const instanceUrl = useInstanceUrl();
 
-  const keptAccounts = useKeptAccounts();
+  const keptAccountIds = useKeptAccounts();
+  const allAccounts = useBaseFollowings();
   const keptPicsRenders = useMemo(() => {
-    return keptAccounts.map((pic) => {
-      const delay = Math.random() * 10;
-      return (
-        <div
-          className="snowflake overflow-hidden rounded-full bg-white shadow-lg"
-          key={pic.id}
-          style={{
-            left: `${Math.random() * 110 - 10}%`,
-            animationDelay: `${delay}s, ${delay - Math.random() * 3}s`,
-            zIndex: `${Math.random() > 0.5 ? 1 : -1}`,
-          }}
-        >
-          <img src={pic.avatar} alt={pic.displayName} />
-        </div>
-      );
-    });
-  }, [keptAccounts]);
+    return allAccounts
+      .filter((a) => keptAccountIds.includes(a.id))
+      .map((pic) => {
+        const delay = Math.random() * 10;
+        return (
+          <div
+            className="snowflake overflow-hidden rounded-full bg-white shadow-lg"
+            key={pic.id}
+            style={{
+              left: `${Math.random() * 110 - 10}%`,
+              animationDelay: `${delay}s, ${delay - Math.random() * 3}s`,
+              zIndex: `${Math.random() > 0.5 ? 1 : -1}`,
+            }}
+          >
+            <img src={pic.avatar} alt={pic.displayName} />
+          </div>
+        );
+      });
+  }, [allAccounts, keptAccountIds]);
 
   const renderFinishedFooter = () => {
     if (maybeReset) {
