@@ -7,10 +7,10 @@ export function Block(props: PropsWithHtmlProps<"div">) {
   return (
     <div
       className={clsx(
-        "my-10 mx-auto max-w-2xl gap-3 rounded-lg p-4 shadow-xl first:mt-2",
+        "mx-0 w-full gap-2 p-2 first:mt-0 lg:my-10 lg:mx-auto lg:max-w-2xl lg:gap-3 lg:rounded-lg lg:p-4 lg:shadow-xl first:lg:mt-2",
         "bg-white",
         "dark:bg-neutral-800",
-        "peer peer-[]:-mt-4",
+        "peer lg:peer-[]:-mt-4",
         className
       )}
       {...rest}

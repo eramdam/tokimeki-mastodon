@@ -38,7 +38,7 @@ export function getParserOptions(options: GetParserOptionsProps) {
         }
         if (domNode.tagName === "p") {
           return (
-            <p className={clsx("mb-4 leading-normal last:mb-0", classNames?.p)}>
+            <p className={clsx("leading-normal last:mb-0", classNames?.p)}>
               {domToReact(domNode.children, parseOptions)}
             </p>
           );

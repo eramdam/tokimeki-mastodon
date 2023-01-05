@@ -48,7 +48,7 @@ export function ReviewerButtons(props: ReviewerButtonsProps) {
   }
 
   return (
-    <div className="mt-2 -mb-8 inline-flex w-full justify-center gap-4">
+    <div className="mt-2 inline-flex w-full justify-center gap-4 lg:-mb-8">
       {renderContent()}
     </div>
   );

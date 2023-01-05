@@ -36,11 +36,11 @@ export function FeedWidget(props: FeedWidgetProps) {
 
   function renderContent() {
     if (isLoading || !accountId) {
-      return <p className="prose p-3 dark:prose-invert">Loading...</p>;
+      return <p className="custom-prose">Loading...</p>;
     }
     if (statuses.length === 0) {
       return (
-        <p className="prose p-3 dark:prose-invert">
+        <p className="custom-prose">
           It seems this user has not posted anything yet!
         </p>
       );

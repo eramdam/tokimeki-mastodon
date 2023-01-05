@@ -108,9 +108,10 @@ export function Reviewer(props: ReviewerProps) {
     <div className="flex max-h-full flex-1 flex-shrink flex-col items-center">
       <Block
         className={clsx(
-          "m-auto inline-flex flex-1 flex-shrink overflow-hidden p-0",
-          "w-[400px]",
-          "opacity-0 transition-all duration-[250ms] ease-in-out",
+          "relative m-auto inline-flex flex-1 flex-shrink overflow-hidden p-0",
+          "w-full lg:w-[400px]",
+          animationState !== AnimationState.Idle &&
+            "pointer-events-none opacity-0 transition-all duration-[250ms] ease-in-out",
           animationState === AnimationState.Hidden && "scale-50 opacity-0",
           animationState === AnimationState.Idle && "scale-1 opacity-100",
           animationState === AnimationState.Keep &&
@@ -122,7 +123,11 @@ export function Reviewer(props: ReviewerProps) {
         <FeedWidget accountId={currentAccount?.id}></FeedWidget>
       </Block>
 
-      <Block className="mt-0 flex max-h-[50vh] w-3/4 flex-shrink-0 flex-col items-start">
+      <Block
+        className={clsx(
+          "mt-0 flex max-h-[75vh] flex-shrink-0 flex-col items-start border-t-2 dark:border-t-neutral-600 lg:max-h-[50vh] lg:w-3/4"
+        )}
+      >
         {currentAccount && currentAccountRelationship ? (
           <>
             {isVisible && (
@@ -145,7 +150,7 @@ export function Reviewer(props: ReviewerProps) {
             />
           </>
         ) : (
-          <span className="prose p-3 dark:prose-invert">Loading...</span>
+          <span className="custom-prose">Loading...</span>
         )}
       </Block>
     </div>

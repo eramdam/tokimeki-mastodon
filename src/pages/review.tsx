@@ -25,6 +25,7 @@ import {
   useIsFinished,
   useKeptIds,
   useSettings,
+  useStartCount,
   useUnfollowedIds,
 } from "../store/selectors";
 
@@ -55,6 +56,7 @@ const ReviewContent = () => {
   const accountUsername = useAccountUsername();
   const keptIds = useKeptIds();
   const unfollowedIds = useUnfollowedIds();
+  const startCount = useStartCount();
   const { showBio, sortOrder, showFollowLabel, showNote, skipConfirmation } =
     useSettings();
   const hasProgress = useMemo(
@@ -83,7 +85,7 @@ const ReviewContent = () => {
   if (!accountUsername || !accountId) {
     return (
       <Block>
-        <p className="prose dark:prose-invert">Loading...</p>
+        <p className="custom-prose">Loading...</p>
       </Block>
     );
   }
@@ -95,18 +97,9 @@ const ReviewContent = () => {
           onPress={() => {
             setIsReviewing(false);
           }}
-          position="northeast"
+          position="southeast"
         >
           Options
-        </LinkButton>
-        <LinkButton
-          position="southeast"
-          onPress={() => {
-            resetState();
-            router.push("/");
-          }}
-        >
-          Log out
         </LinkButton>
         <Reviewer
           onFinished={() => {
@@ -119,20 +112,10 @@ const ReviewContent = () => {
 
   return (
     <>
-      <LinkButton
-        position="southeast"
-        onPress={() => {
-          resetState();
-          router.push("/");
-        }}
-      >
-        Log out
-      </LinkButton>
       <Block className="inline-flex flex-col items-center justify-center gap-6">
         <h1 className="text-accentColor text-center">
           {hasProgress ? "Hello again," : "Hello"} @{accountUsername}!
-          Let&apos;s go through those {baseFollowings.length} accounts you are
-          following 😤
+          Let&apos;s go through those {startCount} accounts you are following 😤
           {hasProgress && (
             <>
               <br />
@@ -140,15 +123,15 @@ const ReviewContent = () => {
             </>
           )}
         </h1>
-        <p className="prose dark:prose-invert">
+        <p className="custom-prose">
           You can&apos;t be expected to do this all at once, do not feel bad if
           you need to take a break. Progress will be saved as you go!
         </p>
         {hasProgress && (
-          <p className="prose dark:prose-invert">
-            Keep at it! You started with {baseFollowings.length} follows. We
-            loaded your progress from last time when you kept{" "}
-            {(keptIds || []).length} accounts that mattered to you.
+          <p className="custom-prose">
+            Keep at it! You started with {startCount} follows. We loaded your
+            progress from last time when you kept {(keptIds || []).length}{" "}
+            accounts that mattered to you.
             <br />
             <br />
             <strong>
@@ -158,7 +141,7 @@ const ReviewContent = () => {
           </p>
         )}
 
-        <div className="prose w-full dark:prose-invert">
+        <div className="custom-prose w-full ">
           <h3>Options</h3>
           <div>
             <label>
@@ -269,7 +252,7 @@ const ReviewContent = () => {
         </Button>
       </Block>
       <Block className="w-full">
-        <div className="prose opacity-60 dark:prose-invert">
+        <div className="custom-prose opacity-60 ">
           <p>
             Based off{" "}
             <a href="https://tokimeki-unfollow.glitch.me/">Tokimeki Unfollow</a>{" "}

@@ -25,7 +25,7 @@ export function LinkButton(props: LinkButtonProps) {
       {...buttonProps}
       ref={ref}
       className={clsx(
-        "link-button fixed block text-sm underline",
+        "link-button fixed block text-sm underline dark:text-white",
         positionClassnames[props.position],
         props.className
       )}

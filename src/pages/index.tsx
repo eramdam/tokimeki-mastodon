@@ -132,10 +132,10 @@ const Home: NextPage = () => {
         <h1 className="text-accentColor text-center">
           ✨ Welcome to Tokimeki Mastodon ✨
         </h1>
-        <p className="prose dark:prose-invert">
+        <p className="custom-prose">
           Following too many accounts? You&apos;re in the right place!
         </p>
-        <p className="prose dark:prose-invert">
+        <p className="custom-prose">
           If you&apos;re like me, you have followed a lot of accounts over the
           years on Mastodon. Some of them date from years ago, you were a
           different human being! Some of them you feel like you *have* to keep
@@ -153,7 +153,7 @@ const Home: NextPage = () => {
             label="Instance URL"
             placeholder="https://"
             type={"url"}
-            className="prose flex flex-col gap-2 text-center dark:prose-invert"
+            className="custom-prose flex flex-col gap-2 text-center "
             value={localInstanceUrl}
             onChange={(value) => {
               setInstanceDomain(
@@ -175,7 +175,7 @@ const Home: NextPage = () => {
         </form>
       </Block>
       <Block>
-        <div className="prose opacity-60 dark:prose-invert">
+        <div className="custom-prose opacity-60 ">
           <p>
             P.S. Tokimeki is the original word that was translated to
             &quot;spark joy&quot; in English. &quot;Spark joy&quot; doesn&apos;t

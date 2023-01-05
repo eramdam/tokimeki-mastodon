@@ -34,7 +34,7 @@ export function renderWithEmoji(
               key={emoji.shortcode + index}
               src={emoji.url}
               alt={emoji.shortcode}
-              className="m-0 inline h-[1em] w-[1em] align-middle"
+              className="!m-0 inline h-[1em] w-[1em] align-middle"
             />
           );
         }

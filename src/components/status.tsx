@@ -47,17 +47,6 @@ export function Status(props: StatusProps) {
     return areMediaHidden ? "Sensitive content" : "Hide";
   };
 
-  const onPress = () => {
-    if (!status.url) {
-      return;
-    }
-    window.open(status.url, "_blank", "noopener,noreferrer");
-  };
-
-  const { pressProps } = usePress({
-    onPress,
-  });
-
   const eligibleMedia = status.mediaAttachments.filter((m) => m.blurhash);
   const mediaRenders = compact(
     eligibleMedia.map((m) => {
@@ -96,20 +85,25 @@ export function Status(props: StatusProps) {
   return (
     <article
       role="article"
-      {...pressProps}
-      className="cursor-pointer border-b-[1px] border-neutral-300 p-2 font-sans no-underline hover:bg-neutral-100 dark:border-neutral-700 dark:hover:bg-white/5"
       onClickCapture={(e) => {
+        if (!status.url) {
+          return;
+        }
+
+        console.log(e.currentTarget, e.target);
+
         if (isElement(e.target)) {
           if (e.target.matches("img")) {
-            onPress();
             return;
           }
           if (e.target.closest("button, a")) {
-            e.preventDefault();
             return;
           }
+
+          window.open(status.url, "_blank", "noopener,noreferrer");
         }
       }}
+      className="relative cursor-pointer border-b-[1px] border-neutral-300 p-2 font-sans no-underline last:border-b-0 hover:bg-neutral-100 dark:border-neutral-700 dark:hover:bg-white/5"
     >
       {booster && (
         <div className="text-xs text-neutral-500 dark:text-neutral-400">

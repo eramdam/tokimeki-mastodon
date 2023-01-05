@@ -7,7 +7,7 @@
     @apply bg-gray-200 font-mono accent-violet-800 dark:bg-gray-500;
   }
   h1 {
-    @apply text-2xl font-bold text-gray-800;
+    @apply text-xl font-bold text-gray-800 lg:text-2xl;
   }
 
   #__next {
@@ -18,6 +18,10 @@
 @layer utilities {
   .text-accentColor {
     @apply text-violet-600;
+  }
+
+  .custom-prose {
+    @apply prose prose-sm dark:prose-invert lg:prose-base;
   }
 }
 

@@ -16,7 +16,7 @@ export function TextInput(props: PropsWithChildren<TextFieldProps>) {
 
   return (
     <div className={props.className}>
-      <label {...labelProps} className="prose dark:prose-invert">
+      <label {...labelProps} className="custom-prose">
         {label}
       </label>
       <input

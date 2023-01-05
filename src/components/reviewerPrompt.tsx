@@ -45,12 +45,8 @@ export const ReviewerPrompt = (
   }
 
   if (animationState === AnimationState.Hidden) {
-    return <span className="prose p-3 dark:prose-invert">Loading...</span>;
+    return <span className="custom-prose">Loading...</span>;
   }
 
-  return (
-    <div className="prose leading-normal dark:prose-invert">
-      {renderContent()}
-    </div>
-  );
+  return <div className="custom-prose leading-normal ">{renderContent()}</div>;
 };

@@ -62,7 +62,7 @@ export function Finished() {
     if (maybeReset) {
       return (
         <Block className="mt-0 flex w-3/4 flex-shrink-0 flex-col items-start">
-          <p className="prose leading-normal dark:prose-invert">
+          <p className="custom-prose leading-normal ">
             Wanna do it again with your current follows? <br />
             <br />
             This will reset your progress data and start over. Then, it will log
@@ -93,7 +93,7 @@ export function Finished() {
 
     return (
       <Block className="mt-0 flex w-3/4 flex-shrink-0 flex-col items-start">
-        <p className="prose leading-normal dark:prose-invert">
+        <p className="custom-prose leading-normal ">
           Wow, you&apos;ve done it — amazing! Hope you enjoy your new feed. Come
           back if you ever feel like it&apos;s getting out of control again.{" "}
           <br />
@@ -134,7 +134,7 @@ export function Finished() {
     <div className="flex max-h-full flex-1 flex-shrink flex-col items-center">
       {keptPicsRenders}
       <div className="flex-1">
-        <Block className="prose dark:prose-invert">
+        <Block className="custom-prose">
           <h1 className="text-accentColor text-center">Tokimeki Complete!</h1>
 
           <div className="flex flex-col gap-2">

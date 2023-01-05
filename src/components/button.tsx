@@ -1,5 +1,6 @@
 import clsx from "clsx";
 import type { PropsWithChildren } from "react";
+import { useEffect } from "react";
 import { useRef } from "react";
 import type { AriaButtonProps } from "react-aria";
 import { mergeProps, useButton, useFocusRing, useHover } from "react-aria";
@@ -20,7 +21,7 @@ export function Button(props: PropsWithChildren<ButtonProps>) {
   const { disabled } = mergedProps;
 
   const baseClassname = clsx(
-    "inline-block rounded-md px-4 py-2 shadow-lg outline-none",
+    "inline-block rounded-md px-4 py-2 shadow-lg outline-none text-sm lg:text-base",
     (isPressed || isFocused) && !isStatic && "ring-2 ring-offset-2",
     (isHovered || isFocused) && !isStatic && " -translate-y-0.5",
     !isStatic && "transition-all duration-200 ease-in-out",
@@ -43,6 +44,13 @@ export function Button(props: PropsWithChildren<ButtonProps>) {
       isHovered && "bg-black/80"
     ),
   };
+
+  // Workaround for react/react-aria #1513
+  useEffect(() => {
+    ref.current?.addEventListener("touchstart", (event: TouchEvent) => {
+      event.preventDefault();
+    });
+  }, []);
 
   return (
     <button

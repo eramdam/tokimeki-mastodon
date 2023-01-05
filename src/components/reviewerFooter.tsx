@@ -41,7 +41,7 @@ export function ReviewerFooter(props: ReviewerFooterProps) {
       getParserOptions({
         emojiArray: account.emojis || [],
         classNames: {
-          p: "inline-block first-of-type:mt-0 text-sm",
+          p: "inline-block first-of-type:mt-0 text-sm !mt-1 lg:!mt-2",
         },
       }),
     [account.emojis]
@@ -50,7 +50,7 @@ export function ReviewerFooter(props: ReviewerFooterProps) {
   return (
     <>
       <div className="flex w-full items-center justify-between">
-        <p className="prose break-words text-left leading-normal dark:prose-invert">
+        <p className="custom-prose break-words text-left leading-normal ">
           {renderTitle()}
           {account.displayName && (
             <strong className="inline-block">
@@ -78,7 +78,8 @@ export function ReviewerFooter(props: ReviewerFooterProps) {
         {account.note && (
           <SmallButton
             variant="secondary"
-            onPress={() => {
+            onPress={(e) => {
+              console.log(e.target);
               setShowBio((p) => !p);
             }}
           >
@@ -100,13 +101,13 @@ export function ReviewerFooter(props: ReviewerFooterProps) {
         (showNote && accountRelationship?.note)) && (
         <div className="flex flex-shrink flex-grow flex-col gap-3 overflow-scroll">
           {showBio && account.note && (
-            <div className="prose w-full rounded-md border-[1px] border-black/30 bg-black/10 p-2 leading-normal dark:bg-black/50 dark:prose-invert">
+            <div className="custom-prose w-full rounded-md border-[1px] border-black/30 bg-black/10 p-2 leading-normal dark:bg-black/50 ">
               <strong className="text-sm">Bio:</strong>{" "}
               {parse(account.note, parseOptions)}
             </div>
           )}
           {showNote && accountRelationship?.note && (
-            <div className="prose w-full rounded-md border-[1px] border-black/30 bg-yellow-400/10 p-2 leading-normal dark:prose-invert">
+            <div className="custom-prose w-full rounded-md border-[1px] border-black/30 bg-yellow-400/10 p-2 leading-normal ">
               <strong className="text-sm">Note:</strong>{" "}
               <p className="mt-0 inline-block text-sm">
                 {parse(accountRelationship.note, parseOptions)}
