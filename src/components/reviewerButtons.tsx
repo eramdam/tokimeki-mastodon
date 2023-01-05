@@ -6,19 +6,26 @@ interface ReviewerButtonsProps {
   onUndoClick: () => void;
   onNextClick: () => void;
   isVisible: boolean;
+  shouldSkipConfirmation: boolean;
 }
 export function ReviewerButtons(props: ReviewerButtonsProps) {
-  const { isVisible, onKeepClick, onNextClick, onUndoClick, onUnfollowClick } =
-    props;
+  const {
+    isVisible,
+    onKeepClick,
+    onNextClick,
+    onUndoClick,
+    onUnfollowClick,
+    shouldSkipConfirmation,
+  } = props;
 
   function renderContent() {
     if (isVisible) {
       return (
         <>
-          <Button variant="secondary" onPress={onUnfollowClick}>
+          <Button variant="secondary" onPress={() => onUnfollowClick()}>
             Unfollow
           </Button>
-          <Button onPress={onKeepClick} variant="secondary">
+          <Button onPress={() => onKeepClick()} variant="secondary">
             Keep
           </Button>
         </>
@@ -27,14 +34,17 @@ export function ReviewerButtons(props: ReviewerButtonsProps) {
 
     return (
       <>
-        <Button variant="secondary" onPress={onUndoClick}>
+        <Button variant="secondary" onPress={() => onUndoClick()}>
           Undo
         </Button>
-        <Button onPress={onNextClick} variant="secondary">
+        <Button onPress={() => onNextClick()} variant="secondary">
           Next
         </Button>
       </>
     );
+  }
+  if (shouldSkipConfirmation && !isVisible) {
+    return null;
   }
 
   return (

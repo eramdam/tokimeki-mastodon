@@ -1,6 +1,7 @@
 import clsx from "clsx";
 import { useState } from "react";
 
+import { delayAsync } from "../helpers/asyncHelpers";
 import { useMastodon } from "../helpers/mastodonContext";
 import {
   goToNextAccount,
@@ -13,6 +14,7 @@ import {
   useCurrentAccountRelationship,
   useFilteredFollowings,
   useFollowingIds,
+  useSettings,
 } from "../store/selectors";
 import { Block } from "./block";
 import { FeedWidget } from "./feedWidget";
@@ -41,12 +43,15 @@ export function Reviewer(props: ReviewerProps) {
 
   const [animationState, setAnimated] = useState(AnimationState.Idle);
   const isVisible = animationState === AnimationState.Idle;
+  const { skipConfirmation } = useSettings();
 
-  const onNextClick = async () => {
+  const onNextClick = async (forceUnfollow?: boolean) => {
     if (!client || !currentAccount) {
       return;
     }
-    const shouldUnfollow = animationState === AnimationState.Unfollow;
+
+    const shouldUnfollow =
+      forceUnfollow ?? animationState === AnimationState.Unfollow;
     if (currentAccount) {
       if (shouldUnfollow) {
         console.log("Will unfollow", currentAccount.acct);
@@ -75,6 +80,26 @@ export function Reviewer(props: ReviewerProps) {
     await goToNextAccount(client, currentAccount);
   };
 
+  const onUndoClick = () => setAnimated(AnimationState.Idle);
+  const onUnfollowClick = async () => {
+    if (skipConfirmation) {
+      setAnimated(AnimationState.Hidden);
+      await delayAsync(350);
+      onNextClick(true);
+    } else {
+      setAnimated(AnimationState.Unfollow);
+    }
+  };
+  const onKeepClick = async () => {
+    if (skipConfirmation) {
+      setAnimated(AnimationState.Hidden);
+      await delayAsync(350);
+      onNextClick(false);
+    } else {
+      setAnimated(AnimationState.Keep);
+    }
+  };
+
   if (followings?.length === 0) {
     return <FollowingsLoadingIndicator />;
   }
@@ -86,7 +111,7 @@ export function Reviewer(props: ReviewerProps) {
           "m-auto inline-flex flex-1 flex-shrink overflow-hidden p-0",
           "w-[400px]",
           "opacity-0 transition-all duration-[250ms] ease-in-out",
-          animationState === AnimationState.Hidden && "scale-0",
+          animationState === AnimationState.Hidden && "scale-50 opacity-0",
           animationState === AnimationState.Idle && "scale-1 opacity-100",
           animationState === AnimationState.Keep &&
             "translate-x-[20%] translate-y-[200px] rotate-[10deg] scale-[0.5] opacity-0",
@@ -105,7 +130,7 @@ export function Reviewer(props: ReviewerProps) {
       </Block>
 
       <Block className="mt-0 flex w-3/4 flex-shrink-0 flex-col items-start">
-        {currentAccount ? (
+        {currentAccount && currentAccountRelationship ? (
           <>
             {isVisible && (
               <ReviewerFooter
@@ -113,17 +138,21 @@ export function Reviewer(props: ReviewerProps) {
                 accountRelationship={currentAccountRelationship}
               />
             )}
-            <ReviewerPrompt account={currentAccount} />
+            <ReviewerPrompt
+              account={currentAccount}
+              animationState={animationState}
+            />
             <ReviewerButtons
-              onUndoClick={() => setAnimated(AnimationState.Idle)}
-              onUnfollowClick={() => setAnimated(AnimationState.Unfollow)}
-              onKeepClick={() => setAnimated(AnimationState.Keep)}
+              onUndoClick={onUndoClick}
+              onUnfollowClick={onUnfollowClick}
+              onKeepClick={onKeepClick}
               onNextClick={onNextClick}
               isVisible={isVisible}
+              shouldSkipConfirmation={skipConfirmation}
             />
           </>
         ) : (
-          <p className="prose p-3 dark:prose-invert">Loading...</p>
+          <span className="prose p-3 dark:prose-invert">Loading...</span>
         )}
       </Block>
     </div>

@@ -6,7 +6,7 @@ import { AnimationState } from "./reviewer";
 
 export const ReviewerPrompt = (
   props: PropsWithChildren<{
-    animationState?: AnimationState;
+    animationState: AnimationState;
     account: TokimekiAccount;
   }>
 ) => {
@@ -39,11 +39,13 @@ export const ReviewerPrompt = (
           for all the toots you&apos;ve enjoyed before.{" "}
         </>
       );
-    } else if (animationState === AnimationState.Hidden) {
-      return <>Loading...</>;
     }
 
     return <>Do their toots still spark joy or feel important to you?</>;
+  }
+
+  if (animationState === AnimationState.Hidden) {
+    return <span className="prose p-3 dark:prose-invert">Loading...</span>;
   }
 
   return (

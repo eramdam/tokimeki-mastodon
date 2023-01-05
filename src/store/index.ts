@@ -38,6 +38,7 @@ export interface TokimekiState {
     showNote: boolean;
     showFollowLabel: boolean;
     sortOrder: SortOrders;
+    skipConfirmation: boolean;
   };
   isFetching: boolean;
   currentAccount?: TokimekiAccount;
@@ -53,6 +54,7 @@ export const initialPersistedState: TokimekiState = {
     showBio: false,
     showNote: false,
     showFollowLabel: false,
+    skipConfirmation: false,
   },
   isFinished: false,
   isFetching: false,

@@ -55,7 +55,8 @@ const ReviewContent = () => {
   const accountUsername = useAccountUsername();
   const keptIds = useKeptIds();
   const unfollowedIds = useUnfollowedIds();
-  const { showBio, sortOrder, showFollowLabel, showNote } = useSettings();
+  const { showBio, sortOrder, showFollowLabel, showNote, skipConfirmation } =
+    useSettings();
   const hasProgress = useMemo(
     () =>
       Boolean(
@@ -214,6 +215,7 @@ const ReviewContent = () => {
             </p>
           </div>
           <RadioGroup
+            className="mb-5"
             label={
               <>
                 <strong>Select an order to use</strong> (Recommended: Oldest
@@ -236,6 +238,25 @@ const ReviewContent = () => {
               Newest first, reverse chronological order
             </Radio>
           </RadioGroup>
+          <div>
+            <label>
+              <input
+                type="checkbox"
+                checked={Boolean(skipConfirmation)}
+                onChange={() => {
+                  updateSettings({
+                    skipConfirmation: !skipConfirmation,
+                  });
+                }}
+              />{" "}
+              <strong>Skip confirmation/undo step</strong> (Recommended: off)
+            </label>
+            <p className="mt-0 leading-normal">
+              Turn this on to skip the confirmation step after you click
+              Unfollow/Keep. This will make the process faster, but you
+              won&apos;t be able to undo your actions.
+            </p>
+          </div>
         </div>
 
         <Button
