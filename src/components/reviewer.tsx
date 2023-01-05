@@ -119,14 +119,7 @@ export function Reviewer(props: ReviewerProps) {
             "translate-x-[-20%] translate-y-[200px] rotate-[-10deg] scale-[0.5] opacity-0"
         )}
       >
-        {currentAccount ? (
-          <FeedWidget
-            key={currentAccount.id}
-            accountId={currentAccount.id}
-          ></FeedWidget>
-        ) : (
-          <p className="prose p-3 dark:prose-invert">Loading...</p>
-        )}
+        <FeedWidget accountId={currentAccount?.id}></FeedWidget>
       </Block>
 
       <Block className="mt-0 flex w-3/4 flex-shrink-0 flex-col items-start">

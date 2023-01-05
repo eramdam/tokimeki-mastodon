@@ -1,3 +1,4 @@
+import clsx from "clsx";
 import type { mastodon } from "masto";
 import { useEffect, useState } from "react";
 
@@ -5,7 +6,8 @@ import { useMastodon } from "../helpers/mastodonContext";
 import { Status } from "./status";
 
 interface FeedWidgetProps {
-  accountId: string;
+  accountId?: string;
+  className?: string;
 }
 
 export function FeedWidget(props: FeedWidgetProps) {
@@ -16,12 +18,12 @@ export function FeedWidget(props: FeedWidgetProps) {
 
   useEffect(() => {
     setIsLoading(true);
-    if (!client) {
+    if (!client || !accountId) {
       return;
     }
 
     const statusesPromise = client.v1.accounts.listStatuses(accountId, {
-      limit: 18,
+      limit: 14,
       excludeReplies: true,
       excludeReblogs: false,
     });
@@ -33,7 +35,7 @@ export function FeedWidget(props: FeedWidgetProps) {
   }, [accountId, client]);
 
   function renderContent() {
-    if (isLoading) {
+    if (isLoading || !accountId) {
       return <p className="prose p-3 dark:prose-invert">Loading...</p>;
     }
     if (statuses.length === 0) {
@@ -58,7 +60,12 @@ export function FeedWidget(props: FeedWidgetProps) {
   }
 
   return (
-    <div className="flex min-h-[400px] min-w-full flex-col overflow-y-scroll">
+    <div
+      className={clsx(
+        "flex min-h-[400px] min-w-full flex-col overflow-y-scroll",
+        props.className
+      )}
+    >
       {renderContent()}
     </div>
   );
