@@ -1,19 +1,11 @@
-import {
-  camelCase,
-  chunk,
-  compact,
-  flatten,
-  keyBy,
-  mapKeys,
-  mapValues,
-  pick,
-  uniq,
-} from "lodash-es";
+import { compact, pick, uniq } from "lodash-es";
 import type { mastodon } from "masto";
 
 import type { SortOrders, TokimekiAccount, TokimekiState } from ".";
 import { initialPersistedState, usePersistedStore } from ".";
 import { sortFollowings } from "./selectors";
+
+// Test
 
 export function resetState() {
   return usePersistedStore.setState(() => {
