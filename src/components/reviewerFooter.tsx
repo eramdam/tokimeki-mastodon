@@ -79,7 +79,6 @@ export function ReviewerFooter(props: ReviewerFooterProps) {
           <SmallButton
             variant="secondary"
             onPress={(e) => {
-              console.log(e.target);
               setShowBio((p) => !p);
             }}
           >

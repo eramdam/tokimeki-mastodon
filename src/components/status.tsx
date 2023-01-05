@@ -90,8 +90,6 @@ export function Status(props: StatusProps) {
           return;
         }
 
-        console.log(e.currentTarget, e.target);
-
         if (isElement(e.target)) {
           if (e.target.matches("img")) {
             return;
