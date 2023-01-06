@@ -42,10 +42,12 @@ export interface TokimekiState {
   };
   isFetching: boolean;
   currentAccount?: TokimekiAccount;
+  nextAccount?: TokimekiAccount;
   baseFollowingIds: string[];
   followingIds: string[];
   isFinished: boolean;
   currentRelationship?: TokimekiRelationship;
+  nextRelationship?: TokimekiRelationship;
 }
 
 export const initialPersistedState: TokimekiState = {
@@ -67,7 +69,7 @@ export const usePersistedStore = create<TokimekiState>()(
     persist(() => initialPersistedState, {
       name: "tokimeki-mastodon", // name of the item in the storage (must be unique)
       partialize(state) {
-        return omit(state, ["actions"]);
+        return omit(state, ["actions", "nextAccount", "nextRelationship"]);
       },
       version: 1,
     }),

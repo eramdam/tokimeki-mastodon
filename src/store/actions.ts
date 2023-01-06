@@ -82,6 +82,8 @@ export async function fetchFollowings(
   );
   const firstId = sortedFollowings[0] || "";
   const firstAccount = accounts.find((a) => a.id === firstId);
+  const secondId = sortedFollowings[1] || "";
+  const secondAccount = accounts.find((a) => a.id === secondId);
 
   usePersistedStore.setState({
     baseFollowingIds: accounts.map((a) => a.id),
@@ -89,6 +91,17 @@ export async function fetchFollowings(
     currentAccount:
       (firstAccount &&
         pick(firstAccount, [
+          "id",
+          "acct",
+          "note",
+          "displayName",
+          "url",
+          "emojis",
+        ])) ||
+      undefined,
+    nextAccount:
+      (secondAccount &&
+        pick(secondAccount, [
           "id",
           "acct",
           "note",
@@ -125,19 +138,22 @@ export async function goToNextAccount(
   client: mastodon.Client,
   currentAccount: TokimekiAccount
 ) {
-  const { followingIds } = usePersistedStore.getState();
+  const { followingIds, nextAccount, nextRelationship } =
+    usePersistedStore.getState();
 
   const currentIndex = followingIds.indexOf(currentAccount.id);
-  const newAccountId = followingIds[currentIndex + 1] || followingIds[0];
-  const newAccount = await client.v1.accounts.fetch(newAccountId || "");
-  const relationships = await client.v1.accounts.fetchRelationships(
-    compact([newAccount.id])
-  );
+  const newAccountId =
+    nextAccount?.id ?? (followingIds[currentIndex + 1] || followingIds[0]);
+  const newAccount =
+    nextAccount ?? (await client.v1.accounts.fetch(newAccountId || ""));
+  const relationships = nextRelationship
+    ? [nextRelationship]
+    : await client.v1.accounts.fetchRelationships(compact([newAccountId]));
   const currentRelationship = relationships[0]
     ? pick(relationships[0], ["followedBy", "note"])
     : undefined;
 
-  usePersistedStore.setState(() => ({
+  usePersistedStore.setState({
     currentAccount: pick(newAccount, [
       "id",
       "acct",
@@ -147,7 +163,33 @@ export async function goToNextAccount(
       "emojis",
     ]),
     currentRelationship,
-  }));
+  });
+
+  const nextAccountId = followingIds[currentIndex + 2];
+
+  if (!nextAccountId) {
+    return;
+  }
+
+  const newNextAccount = await client.v1.accounts.fetch(nextAccountId);
+  const newNextRelationship = await client.v1.accounts.fetchRelationships([
+    nextAccountId,
+  ]);
+  const newNextRelationshipPicked = newNextRelationship[0]
+    ? pick(newNextRelationship[0], ["followedBy", "note"])
+    : undefined;
+
+  usePersistedStore.setState({
+    nextAccount: pick(newNextAccount, [
+      "id",
+      "acct",
+      "note",
+      "displayName",
+      "url",
+      "emojis",
+    ]),
+    nextRelationship: newNextRelationshipPicked,
+  });
 }
 export function markAsFinished(): void {
   usePersistedStore.setState({ isFinished: true });
