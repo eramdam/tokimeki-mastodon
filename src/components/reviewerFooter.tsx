@@ -71,7 +71,7 @@ export function ReviewerFooter(props: ReviewerFooterProps) {
           </a>
           !{" "}
           {showFollowLabel && accountRelationship?.followedBy && (
-            <span className="rounded-md bg-violet-500 py-[4px] px-2 align-middle text-[10px] uppercase text-white dark:bg-violet-800">
+            <span className="inline-block rounded-md bg-violet-500 py-[2px] px-2 align-middle text-[10px] uppercase text-white dark:bg-violet-800">
               Follows you
             </span>
           )}
