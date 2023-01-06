@@ -68,7 +68,6 @@ const ReviewContent = () => {
   );
   const isFinished = useIsFinished();
   const filteredFollowings = useFilteredFollowings();
-  const baseFollowings = useBaseFollowings();
 
   useEffect(() => {
     if (!isReviewing || !client || !accountId) {
@@ -112,6 +111,15 @@ const ReviewContent = () => {
 
   return (
     <>
+      <LinkButton
+        position="southeast"
+        onPress={() => {
+          resetState();
+          router.push("/");
+        }}
+      >
+        Log out
+      </LinkButton>
       <Block className="inline-flex flex-col items-center justify-center gap-6">
         <h1 className="text-accentColor text-center">
           {hasProgress ? "Hello again," : "Hello"} @{accountUsername}!

@@ -2,7 +2,7 @@ import { Block } from "./block";
 
 export function FollowingsLoadingIndicator() {
   return (
-    <Block>
+    <Block className="text-center lg:max-w-md">
       <p className="custom-prose">Loading your followings</p>
       <div className="mt-4 flex justify-center gap-2">
         {Array.from({ length: 6 }).map((_, i) => {

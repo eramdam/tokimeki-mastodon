@@ -1,3 +1,4 @@
+import clsx from "clsx";
 import parse from "html-react-parser";
 import { useMemo, useState } from "react";
 
@@ -46,6 +47,9 @@ export function ReviewerFooter(props: ReviewerFooterProps) {
       }),
     [account.emojis]
   );
+
+  const baseBlockClassname =
+    "custom-prose w-full rounded-md border-[1px] border-black/30 p-2 leading-normal";
 
   return (
     <>
@@ -98,19 +102,22 @@ export function ReviewerFooter(props: ReviewerFooterProps) {
       </div>
       {((showBio && account.note) ||
         (showNote && accountRelationship?.note)) && (
-        <div className="flex flex-shrink flex-grow flex-col gap-3 overflow-scroll">
+        <div className="flex w-full flex-shrink flex-grow flex-col gap-3 overflow-scroll">
           {showBio && account.note && (
-            <div className="custom-prose w-full rounded-md border-[1px] border-black/30 bg-black/10 p-2 leading-normal dark:bg-black/50 ">
+            <div
+              className={clsx(
+                baseBlockClassname,
+                "border-black/30 bg-black/10 dark:bg-black/50"
+              )}
+            >
               <strong className="text-sm">Bio:</strong>{" "}
               {parse(account.note, parseOptions)}
             </div>
           )}
           {showNote && accountRelationship?.note && (
-            <div className="custom-prose w-full rounded-md border-[1px] border-black/30 bg-yellow-400/10 p-2 leading-normal ">
+            <div className={clsx(baseBlockClassname, "bg-yellow-400/10")}>
               <strong className="text-sm">Note:</strong>{" "}
-              <p className="mt-0 inline-block text-sm">
-                {parse(accountRelationship.note, parseOptions)}
-              </p>
+              {parse(accountRelationship.note, parseOptions)}
             </div>
           )}
         </div>

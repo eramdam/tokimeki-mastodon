@@ -108,10 +108,10 @@ export function Reviewer(props: ReviewerProps) {
     <div className="flex max-h-full flex-1 flex-shrink flex-col items-center">
       <Block
         className={clsx(
-          "relative m-auto inline-flex flex-1 flex-shrink overflow-hidden p-0",
+          "relative m-auto inline-flex flex-1 flex-shrink overflow-hidden !p-0",
           "w-full lg:w-[400px]",
-          animationState !== AnimationState.Idle &&
-            "pointer-events-none opacity-0 transition-all duration-[250ms] ease-in-out",
+          "transition-all duration-[250ms] ease-in-out",
+          animationState !== AnimationState.Idle && "opacity-0",
           animationState === AnimationState.Hidden && "scale-50 opacity-0",
           animationState === AnimationState.Idle && "scale-1 opacity-100",
           animationState === AnimationState.Keep &&

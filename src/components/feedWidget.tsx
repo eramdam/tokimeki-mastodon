@@ -36,7 +36,7 @@ export function FeedWidget(props: FeedWidgetProps) {
 
   function renderContent() {
     if (isLoading || !accountId) {
-      return <p className="custom-prose">Loading...</p>;
+      return <p className="custom-prose p-2">Loading...</p>;
     }
     if (statuses.length === 0) {
       return (
