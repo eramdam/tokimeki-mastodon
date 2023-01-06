@@ -6,7 +6,8 @@ import parse from "html-react-parser";
 import { compact } from "lodash-es";
 import type { mastodon } from "masto";
 import { useMemo, useRef, useState } from "react";
-import { useButton, usePress } from "react-aria";
+// import { useButton, usePress } from "react-aria";
+import { useButton } from "react-aria";
 
 import { isElement } from "../helpers/domHelpers";
 import { BlurhashImage } from "./blurhashImage";

@@ -10,6 +10,7 @@ import {
 } from "../store/selectors";
 import { SmallButton } from "./button";
 import { renderWithEmoji } from "./emojify";
+// import { getParserOptions } from "./htmlReactParserOptions";
 import { getParserOptions } from "./htmlReactParserOptions";
 
 interface ReviewerFooterProps {
@@ -82,7 +83,7 @@ export function ReviewerFooter(props: ReviewerFooterProps) {
         {account.note && (
           <SmallButton
             variant="secondary"
-            onPress={(e) => {
+            onPress={() => {
               setShowBio((p) => !p);
             }}
           >

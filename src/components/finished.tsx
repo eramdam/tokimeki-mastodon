@@ -132,7 +132,7 @@ export function Finished() {
 
   return (
     <div className="flex max-h-full flex-1 flex-shrink flex-col items-center">
-      {/* {keptPicsRenders} */}
+      {keptPicsRenders}
       <div className="w-full flex-1 lg:w-auto">
         <Block className="custom-prose">
           <h1 className="text-accentColor text-center">Tokimeki Complete!</h1>
