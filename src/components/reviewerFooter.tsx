@@ -10,7 +10,6 @@ import {
 } from "../store/selectors";
 import { SmallButton } from "./button";
 import { renderWithEmoji } from "./emojify";
-// import { getParserOptions } from "./htmlReactParserOptions";
 import { getParserOptions } from "./htmlReactParserOptions";
 
 interface ReviewerFooterProps {
