@@ -150,7 +150,7 @@ const ReviewContent = () => {
         )}
 
         <div className="custom-prose w-full ">
-          <h3>Options</h3>
+          <h3 className="!mt-2">Options</h3>
           <div>
             <label>
               <input
@@ -164,7 +164,7 @@ const ReviewContent = () => {
               />{" "}
               <strong>Show account bio</strong> (Recommended: off)
             </label>
-            <p className="mt-0 leading-normal">
+            <p className="!mt-0">
               I&apos;ve followed a lot of accounts based on their profile or who
               they are, but not their actual tweets. Hide their bio so you can
               evaluate based on content only.
@@ -183,7 +183,7 @@ const ReviewContent = () => {
               />{" "}
               <strong>Show account notes</strong>
             </label>
-            <p className="mt-0 leading-normal">
+            <p className="!mt-0">
               Account notes can be useful to remember why you followed someone.
               Hide their note so you can evaluate based on content only.
             </p>
@@ -201,7 +201,7 @@ const ReviewContent = () => {
               />{" "}
               <strong>Show if account follows you</strong> (Recommended: off)
             </label>
-            <p className="mt-0 leading-normal">
+            <p className="!mt-0">
               Show a badge indicating whether or not the account follows you.
             </p>
           </div>
@@ -242,7 +242,7 @@ const ReviewContent = () => {
               />{" "}
               <strong>Skip confirmation/undo step</strong> (Recommended: off)
             </label>
-            <p className="mt-0 leading-normal">
+            <p className="!mt-0">
               Turn this on to skip the confirmation step after you click
               Unfollow/Keep. This will make the process faster, but you
               won&apos;t be able to undo your actions.

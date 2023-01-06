@@ -147,7 +147,7 @@ const Home: NextPage = () => {
             e.preventDefault();
             onLogin();
           }}
-          className="my-10 flex w-full max-w-lg flex-col gap-5"
+          className="my-10 mb-2 flex w-full max-w-lg flex-col gap-5"
         >
           <TextInput
             label="Instance URL"
@@ -174,8 +174,8 @@ const Home: NextPage = () => {
           </div>
         </form>
       </Block>
-      <Block>
-        <div className="custom-prose opacity-60 ">
+      <Block className="lg:py-0">
+        <div className="custom-prose opacity-60">
           <p>
             P.S. Tokimeki is the original word that was translated to
             &quot;spark joy&quot; in English. &quot;Spark joy&quot; doesn&apos;t

@@ -1,4 +1,4 @@
-import type { PropsWithChildren } from "react";
+import type { PropsWithChildren, ReactNode } from "react";
 
 import type { TokimekiAccount } from "../store";
 import { renderWithEmoji } from "./emojify";
@@ -8,6 +8,7 @@ export const ReviewerPrompt = (
   props: PropsWithChildren<{
     animationState: AnimationState;
     account: TokimekiAccount;
+    loadingRender: ReactNode;
   }>
 ) => {
   const { animationState, account } = props;
@@ -45,7 +46,7 @@ export const ReviewerPrompt = (
   }
 
   if (animationState === AnimationState.Hidden) {
-    return <span className="custom-prose">Loading...</span>;
+    return <>{props.loadingRender}</>;
   }
 
   return <div className="custom-prose leading-normal ">{renderContent()}</div>;

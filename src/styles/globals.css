@@ -4,7 +4,7 @@
 
 @layer base {
   body {
-    @apply bg-gray-200 font-mono accent-violet-800 dark:bg-gray-500;
+    @apply bg-gray-200 font-mono accent-violet-800 dark:bg-neutral-800 lg:dark:bg-gray-500;
   }
   h1 {
     @apply text-xl font-bold text-gray-800 lg:text-2xl;

@@ -104,6 +104,10 @@ export function Reviewer(props: ReviewerProps) {
     return <FollowingsLoadingIndicator />;
   }
 
+  const loadingRender = (
+    <span className="custom-prose min-h-[100px]">Loading...</span>
+  );
+
   return (
     <div className="flex max-h-full flex-1 flex-shrink flex-col items-center">
       <Block
@@ -112,12 +116,12 @@ export function Reviewer(props: ReviewerProps) {
           "w-full lg:w-[400px]",
           "transition-all duration-[250ms] ease-in-out",
           animationState !== AnimationState.Idle && "opacity-0",
-          animationState === AnimationState.Hidden && "scale-50 opacity-0",
+          animationState === AnimationState.Hidden && "scale-0 opacity-0",
           animationState === AnimationState.Idle && "scale-1 opacity-100",
           animationState === AnimationState.Keep &&
-            "translate-x-[20%] translate-y-[200px] rotate-[10deg] scale-[0.5] opacity-0",
+            "translate-x-[20%] translate-y-[200px] rotate-[10deg] scale-0 opacity-0",
           animationState === AnimationState.Unfollow &&
-            "translate-x-[-20%] translate-y-[200px] rotate-[-10deg] scale-[0.5] opacity-0"
+            "translate-x-[-20%] translate-y-[200px] rotate-[-10deg] scale-0 opacity-0"
         )}
       >
         <FeedWidget accountId={currentAccount?.id}></FeedWidget>
@@ -139,6 +143,7 @@ export function Reviewer(props: ReviewerProps) {
             <ReviewerPrompt
               account={currentAccount}
               animationState={animationState}
+              loadingRender={loadingRender}
             />
             <ReviewerButtons
               onUndoClick={onUndoClick}
@@ -150,7 +155,7 @@ export function Reviewer(props: ReviewerProps) {
             />
           </>
         ) : (
-          <span className="custom-prose">Loading...</span>
+          loadingRender
         )}
       </Block>
     </div>

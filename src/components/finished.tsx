@@ -61,14 +61,14 @@ export function Finished() {
   const renderFinishedFooter = () => {
     if (maybeReset) {
       return (
-        <Block className="mt-0 flex w-3/4 flex-shrink-0 flex-col items-start">
+        <Block className="mt-0 flex flex-shrink-0 flex-col items-start lg:w-3/4">
           <p className="custom-prose leading-normal ">
             Wanna do it again with your current follows? <br />
             <br />
             This will reset your progress data and start over. Then, it will log
             you out so you can log in again and start over fresh!
           </p>
-          <div className="mt-2 -mb-8 inline-flex w-full justify-center gap-4">
+          <div className="mt-2 inline-flex w-full justify-center gap-4 lg:-mb-8">
             <Button
               variant="secondary"
               onPress={async () => {
@@ -92,14 +92,14 @@ export function Finished() {
     }
 
     return (
-      <Block className="mt-0 flex w-3/4 flex-shrink-0 flex-col items-start">
+      <Block className="mt-0 flex flex-shrink-0 flex-col items-start lg:w-3/4">
         <p className="custom-prose leading-normal ">
           Wow, you&apos;ve done it — amazing! Hope you enjoy your new feed. Come
           back if you ever feel like it&apos;s getting out of control again.{" "}
           <br />
           <br />— <a href="https://octodon.social/@eramdam">@Eramdam</a>
         </p>
-        <div className="mt-2 -mb-8 inline-flex w-full justify-center gap-4">
+        <div className="mt-2 inline-flex w-full justify-center gap-4 lg:-mb-8">
           <Button
             variant="secondary"
             onPress={async () => {
@@ -132,8 +132,8 @@ export function Finished() {
 
   return (
     <div className="flex max-h-full flex-1 flex-shrink flex-col items-center">
-      {keptPicsRenders}
-      <div className="flex-1">
+      {/* {keptPicsRenders} */}
+      <div className="w-full flex-1 lg:w-auto">
         <Block className="custom-prose">
           <h1 className="text-accentColor text-center">Tokimeki Complete!</h1>
 
