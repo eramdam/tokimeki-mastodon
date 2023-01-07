@@ -63,6 +63,35 @@ export async function fetchFollowings(
   const persistedState = usePersistedStore.getState();
 
   if (persistedState.baseFollowingIds.length) {
+    const sortedFollowings = sortFollowings(
+      persistedState.baseFollowingIds,
+      usePersistedStore.getState().settings.sortOrder
+    );
+    usePersistedStore.setState({
+      currentAccount: undefined,
+      currentRelationship: undefined,
+      nextAccount: undefined,
+      nextRelationship: undefined,
+      followingIds: sortedFollowings,
+    });
+
+    const [firstAccountId, secondAccountId] = sortedFollowings;
+    const idsToFetch = compact([firstAccountId, secondAccountId]);
+    const accountPromises = idsToFetch.map((id) => {
+      return client.v1.accounts.fetch(id);
+    });
+    const relationshipsPromises =
+      client.v1.accounts.fetchRelationships(idsToFetch);
+    const [currentAccount, nextAccount] = await Promise.all(accountPromises);
+    const [currentRelationship, nextRelationship] = await relationshipsPromises;
+
+    usePersistedStore.setState({
+      currentAccount,
+      currentRelationship,
+      nextAccount,
+      nextRelationship,
+    });
+
     return;
   }
 
@@ -76,17 +105,19 @@ export async function fetchFollowings(
     }
   }
 
+  const accountIds = accounts.map((a) => a.id);
   const sortedFollowings = sortFollowings(
-    accounts.map((a) => a.id),
+    accountIds,
     usePersistedStore.getState().settings.sortOrder
   );
+
   const firstId = sortedFollowings[0] || "";
   const firstAccount = accounts.find((a) => a.id === firstId);
   const secondId = sortedFollowings[1] || "";
   const secondAccount = accounts.find((a) => a.id === secondId);
 
   usePersistedStore.setState({
-    baseFollowingIds: accounts.map((a) => a.id),
+    baseFollowingIds: accountIds,
     followingIds: sortedFollowings,
     currentAccount:
       (firstAccount &&
