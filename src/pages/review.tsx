@@ -6,25 +6,16 @@ import { Block } from "../components/block";
 import { Button } from "../components/button";
 import { Finished } from "../components/finished";
 import { LinkButton } from "../components/linkButton";
-import { Radio, RadioGroup } from "../components/radioGroup";
+import { Options } from "../components/options";
 import { Reviewer } from "../components/reviewer";
 import { MastodonProvider, useMastodon } from "../helpers/mastodonContext";
-import { SortOrders } from "../store";
-import {
-  fetchFollowings,
-  markAsFinished,
-  reorderFollowings,
-  resetState,
-  updateSettings,
-} from "../store/actions";
+import { fetchFollowings, markAsFinished, resetState } from "../store/actions";
 import {
   useAccountId,
   useAccountUsername,
-  useBaseFollowings,
   useFilteredFollowings,
   useIsFinished,
   useKeptIds,
-  useSettings,
   useStartCount,
   useUnfollowedIds,
 } from "../store/selectors";
@@ -57,8 +48,7 @@ const ReviewContent = () => {
   const keptIds = useKeptIds();
   const unfollowedIds = useUnfollowedIds();
   const startCount = useStartCount();
-  const { showBio, sortOrder, showFollowLabel, showNote, skipConfirmation } =
-    useSettings();
+
   const hasProgress = useMemo(
     () =>
       Boolean(
@@ -149,106 +139,7 @@ const ReviewContent = () => {
           </p>
         )}
 
-        <div className="custom-prose w-full ">
-          <h3 className="!mt-2">Options</h3>
-          <div>
-            <label>
-              <input
-                type="checkbox"
-                checked={Boolean(showBio)}
-                onChange={() => {
-                  updateSettings({
-                    showBio: !showBio,
-                  });
-                }}
-              />{" "}
-              <strong>Show account bio</strong> (Recommended: off)
-            </label>
-            <p className="!mt-0">
-              I&apos;ve followed a lot of accounts based on their profile or who
-              they are, but not their actual tweets. Hide their bio so you can
-              evaluate based on content only.
-            </p>
-          </div>
-          <div>
-            <label>
-              <input
-                type="checkbox"
-                checked={Boolean(showNote)}
-                onChange={() => {
-                  updateSettings({
-                    showNote: !showNote,
-                  });
-                }}
-              />{" "}
-              <strong>Show account notes</strong>
-            </label>
-            <p className="!mt-0">
-              Account notes can be useful to remember why you followed someone.
-              Hide their note so you can evaluate based on content only.
-            </p>
-          </div>
-          <div>
-            <label>
-              <input
-                type="checkbox"
-                checked={Boolean(showFollowLabel)}
-                onChange={() => {
-                  updateSettings({
-                    showFollowLabel: !showFollowLabel,
-                  });
-                }}
-              />{" "}
-              <strong>Show if account follows you</strong> (Recommended: off)
-            </label>
-            <p className="!mt-0">
-              Show a badge indicating whether or not the account follows you.
-            </p>
-          </div>
-          <RadioGroup
-            className="mb-5"
-            label={
-              <>
-                <strong>Select an order to use</strong> (Recommended: Oldest
-                first)
-              </>
-            }
-            value={sortOrder || SortOrders.OLDEST}
-            onChange={(value) => {
-              updateSettings({
-                sortOrder: value as SortOrders,
-              });
-              reorderFollowings(value as SortOrders);
-            }}
-          >
-            <Radio value={SortOrders.OLDEST}>
-              Oldest first, chronological order
-            </Radio>
-            <Radio value={SortOrders.RANDOM}>Random order</Radio>
-            <Radio value={SortOrders.NEWEST}>
-              Newest first, reverse chronological order
-            </Radio>
-          </RadioGroup>
-          <div>
-            <label>
-              <input
-                type="checkbox"
-                checked={Boolean(skipConfirmation)}
-                onChange={() => {
-                  updateSettings({
-                    skipConfirmation: !skipConfirmation,
-                  });
-                }}
-              />{" "}
-              <strong>Skip confirmation/undo step</strong> (Recommended: off)
-            </label>
-            <p className="!mt-0">
-              Turn this on to skip the confirmation step after you click
-              Unfollow/Keep. This will make the process faster, but you
-              won&apos;t be able to undo your actions.
-            </p>
-          </div>
-        </div>
+        <Options />
 
         <Button
           variant="primary"
