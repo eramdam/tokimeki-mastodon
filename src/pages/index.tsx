@@ -101,19 +101,19 @@ const Home: NextPage = () => {
 
     try {
       const { clientId, clientSecret } = await registerApplication(
-        localInstanceUrl,
+        localInstanceUrl.replace(/\/$/, ""),
         window.location.origin
       );
 
       if (clientId && clientSecret) {
         saveLoginCredentials({
-          instanceUrl: localInstanceUrl,
+          instanceUrl: localInstanceUrl.replace(/\/$/, ""),
           clientId,
           clientSecret,
         });
 
         location.href = getAuthURL({
-          instanceUrl: localInstanceUrl,
+          instanceUrl: localInstanceUrl.replace(/\/$/, ""),
           clientId,
         });
       }
