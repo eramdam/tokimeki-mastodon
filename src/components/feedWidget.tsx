@@ -1,44 +1,62 @@
 import clsx from "clsx";
 import type { mastodon } from "masto";
-import { useEffect, useState } from "react";
+import { useEffect, useMemo, useState } from "react";
 
 import { useMastodon } from "../helpers/mastodonContext";
+import type { TokimekiAccount } from "../store";
+import { useInstanceUrl } from "../store/selectors";
 import { Status } from "./status";
 
 interface FeedWidgetProps {
-  accountId?: string;
+  account?: TokimekiAccount;
   className?: string;
 }
 
 export function FeedWidget(props: FeedWidgetProps) {
-  const { accountId } = props;
+  const { account } = props;
   const { client } = useMastodon();
   const [isLoading, setIsLoading] = useState(true);
   const [statuses, setStatuses] = useState<mastodon.v1.Status[]>([]);
+  const instanceUrl = useInstanceUrl();
+  const isRemote = useMemo(() => {
+    return !(instanceUrl && account?.url.startsWith(instanceUrl));
+  }, [account?.url, instanceUrl]);
 
   useEffect(() => {
     setIsLoading(true);
-    if (!client || !accountId) {
+    if (!client || !account) {
       return;
     }
 
-    const statusesPromise = client.v1.accounts.listStatuses(accountId, {
-      limit: 14,
+    const statusesPromise = client.v1.accounts.listStatuses(account.id, {
+      limit: 40,
       excludeReplies: true,
       excludeReblogs: false,
     });
 
     statusesPromise.then((res) => {
-      setStatuses(res);
+      setStatuses(res.slice(0, 20));
       setIsLoading(false);
     });
-  }, [accountId, client]);
+  }, [account, client]);
 
   function renderContent() {
-    if (isLoading || !accountId) {
-      return <p className="custom-prose p-2">Loading...</p>;
+    if (isLoading || !account) {
+      return <p className="custom-prose p-2 text-center">Loading...</p>;
     }
     if (statuses.length === 0) {
+      if (isRemote) {
+        return (
+          <p className="custom-prose p-2 text-center">
+            Older posts are not available for remote users.
+            <br />
+            <a href={account.url} target="_blank" rel="noreferrer noopener">
+              Browse original profile
+            </a>
+          </p>
+        );
+      }
+
       return (
         <p className="custom-prose p-2">
           It seems this user has not posted anything yet!

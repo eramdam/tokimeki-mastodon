@@ -133,7 +133,7 @@ export function Reviewer(props: ReviewerProps) {
             "translate-x-[-20%] translate-y-[200px] rotate-[-10deg] scale-0 opacity-0"
         )}
       >
-        <FeedWidget accountId={currentAccount?.id}></FeedWidget>
+        <FeedWidget account={currentAccount}></FeedWidget>
       </Block>
 
       <Block
