@@ -127,7 +127,7 @@ const Home: NextPage = () => {
         <Head>
           <title>Tokimeki Mastodon</title>
           <meta name="description" content="" />
-          <link rel="icon" href="/favicon.ico" />
+          <link rel="icon" href="/favicon.png" />
         </Head>
         <h1 className="text-accentColor text-center">
           ✨ Welcome to Tokimeki Mastodon ✨
