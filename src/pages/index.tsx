@@ -92,7 +92,7 @@ const Home: NextPage = () => {
   }, [account, onCode, router]);
 
   const onLogin = async () => {
-    if (!isInstanceValid) {
+    if (!isInstanceValid || isLoading) {
       return;
     }
 
@@ -167,6 +167,9 @@ const Home: NextPage = () => {
             <Button
               variant="primary"
               type="submit"
+              onPress={(e) => {
+                onLogin();
+              }}
               isDisabled={isInstanceValid === "invalid" || isLoading}
             >
               {(isLoading && "Loading...") || "Login"}
