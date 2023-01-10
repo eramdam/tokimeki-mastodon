@@ -198,7 +198,7 @@ const Home: NextPage = () => {
               open source and hosted on GitHub.
             </a>
           </p>
-          <p>
+          <p className="!mb-2">
             Based off{" "}
             <a href="https://tokimeki-unfollow.glitch.me/">Tokimeki Unfollow</a>{" "}
             by <a href="https://tarng.com/">Julius Tarng</a>.
