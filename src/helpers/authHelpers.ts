@@ -1,5 +1,12 @@
 import { login } from "masto";
 
+const OAUTH_SCOPES = [
+  "read:follows",
+  "write:follows",
+  "read:accounts",
+  "read:statuses",
+].join(" ");
+
 export async function registerApplication(instanceURL: string, origin: string) {
   const masto = await login({
     url: instanceURL,
@@ -9,7 +16,7 @@ export async function registerApplication(instanceURL: string, origin: string) {
     clientName: process.env.NEXT_PUBLIC_CLIENT_NAME || "",
     // redirectUris: "urn:ietf:wg:oauth:2.0:oob",
     redirectUris: `${origin}`,
-    scopes: "read write follow",
+    scopes: OAUTH_SCOPES,
     website: origin,
   });
 }
@@ -17,7 +24,7 @@ export async function registerApplication(instanceURL: string, origin: string) {
 export function getAuthURL(opts: { clientId: string; instanceUrl: string }) {
   const authorizationParams = new URLSearchParams({
     client_id: opts.clientId,
-    scope: "read write follow",
+    scope: OAUTH_SCOPES,
     redirect_uri: `${location.origin}`,
     response_type: "code",
   });
@@ -41,7 +48,7 @@ export async function getAccessToken(opts: {
     redirect_uri: location.origin,
     grant_type: "authorization_code",
     code: opts.code,
-    scope: "read write follow",
+    scope: OAUTH_SCOPES,
   });
   const tokenResponse = await fetch(
     `https://${opts.instanceUrl.replace(/https?:\/\//, "")}/oauth/token`,
