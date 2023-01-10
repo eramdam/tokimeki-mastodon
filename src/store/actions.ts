@@ -3,7 +3,7 @@ import type { mastodon } from "masto";
 
 import type { SortOrders, TokimekiAccount, TokimekiState } from ".";
 import { initialPersistedState, usePersistedStore } from ".";
-import { sortFollowings } from "./selectors";
+import { filterFollowingIds, sortFollowings } from "./selectors";
 
 export function resetState() {
   return usePersistedStore.setState(() => {
@@ -64,7 +64,11 @@ export async function fetchFollowings(
 
   if (persistedState.baseFollowingIds.length) {
     const sortedFollowings = sortFollowings(
-      persistedState.baseFollowingIds,
+      filterFollowingIds(
+        persistedState.baseFollowingIds,
+        persistedState.keptIds,
+        persistedState.unfollowedIds
+      ),
       usePersistedStore.getState().settings.sortOrder
     );
     usePersistedStore.setState({

@@ -71,7 +71,7 @@ export const useKeptAccounts = () => {
 /*
  * Helpers.
  */
-function filterFollowingIds(
+export function filterFollowingIds(
   array: string[],
   keptIds: string[] | null | undefined,
   unfollowedIds: string[] | null | undefined

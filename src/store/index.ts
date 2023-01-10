@@ -31,8 +31,8 @@ export interface TokimekiState {
   accountId?: string;
   accountUsername?: string;
   startCount?: number;
-  unfollowedIds?: string[];
-  keptIds?: string[];
+  unfollowedIds: string[];
+  keptIds: string[];
   settings: {
     showBio: boolean;
     showNote: boolean;
@@ -58,6 +58,8 @@ export const initialPersistedState: TokimekiState = {
     showFollowLabel: false,
     skipConfirmation: false,
   },
+  keptIds: [],
+  unfollowedIds: [],
   isFinished: false,
   isFetching: false,
   baseFollowingIds: [],
