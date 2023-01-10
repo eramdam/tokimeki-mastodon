@@ -126,11 +126,11 @@ export function Status(props: StatusProps) {
           )}
         </div>
 
-        <div className="mb-2 flex flex-col gap-1 truncate dark:text-neutral-200">
-          <span className="truncate text-base leading-normal">
+        <div className="mb-2 flex flex-col truncate dark:text-neutral-200">
+          <span className="truncate text-base leading-tight">
             {renderWithEmoji(status.account.emojis, status.account.displayName)}
           </span>
-          <span className="truncate text-xs leading-normal">
+          <span className="truncate text-xs leading-tight">
             {status.account.acct}
           </span>
         </div>
