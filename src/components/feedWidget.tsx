@@ -40,7 +40,7 @@ export function FeedWidget(props: FeedWidgetProps) {
     }
     if (statuses.length === 0) {
       return (
-        <p className="custom-prose">
+        <p className="custom-prose p-2">
           It seems this user has not posted anything yet!
         </p>
       );
