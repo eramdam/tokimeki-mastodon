@@ -7,6 +7,7 @@ import type { TokimekiAccount, TokimekiRelationship } from "../store";
 import {
   useCurrentIndex,
   useFollowingIds,
+  useInstanceUrl,
   useSettings,
 } from "../store/selectors";
 import { SmallButton } from "./button";
@@ -33,6 +34,7 @@ export function ReviewerFooter(props: ReviewerFooterProps) {
   const followingIndex = useCurrentIndex();
   const followings = useFollowingIds();
   const { showFollowLabel } = useSettings();
+  const instanceUrl = useInstanceUrl();
 
   const renderTitle = () => {
     if (followingIndex === followings.length - 1) {
@@ -67,7 +69,7 @@ export function ReviewerFooter(props: ReviewerFooterProps) {
             </strong>
           )}{" "}
           <a
-            href={account.url}
+            href={`${instanceUrl}/@${account.acct}`}
             target="_blank"
             className="text-sm text-neutral-400 hover:underline"
             rel="noreferrer noopener"
