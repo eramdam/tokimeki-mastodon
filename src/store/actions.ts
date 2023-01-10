@@ -206,25 +206,28 @@ export async function goToNextAccount(
     return;
   }
 
-  const newNextAccount = await client.v1.accounts.fetch(nextAccountId);
-  const newNextRelationship = await client.v1.accounts.fetchRelationships([
-    nextAccountId,
-  ]);
-  const newNextRelationshipPicked = newNextRelationship[0]
-    ? pick(newNextRelationship[0], ["followedBy", "note"])
-    : undefined;
-
-  usePersistedStore.setState({
-    nextAccount: pick(newNextAccount, [
-      "id",
-      "acct",
-      "note",
-      "displayName",
-      "url",
-      "emojis",
-    ]),
-    nextRelationship: newNextRelationshipPicked,
+  client.v1.accounts.fetch(nextAccountId).then((newNextAccount) => {
+    usePersistedStore.setState({
+      nextAccount: pick(newNextAccount, [
+        "id",
+        "acct",
+        "note",
+        "displayName",
+        "url",
+        "emojis",
+      ]),
+    });
   });
+  client.v1.accounts
+    .fetchRelationships([nextAccountId])
+    .then((newNextRelationship) => {
+      const newNextRelationshipPicked = newNextRelationship[0]
+        ? pick(newNextRelationship[0], ["followedBy", "note"])
+        : undefined;
+      usePersistedStore.setState({
+        nextRelationship: newNextRelationshipPicked,
+      });
+    });
 }
 export function markAsFinished(): void {
   usePersistedStore.setState({ isFinished: true });
