@@ -3,6 +3,7 @@
 ## Bug fixes
 
 - Fix the "Login" button not doing anything in a mobile browser
+- Avoid trailing slash in instance URL
 
 ## Improvements
 
