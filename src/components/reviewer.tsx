@@ -44,11 +44,14 @@ export function Reviewer(props: ReviewerProps) {
   const [animationState, setAnimated] = useState(AnimationState.Idle);
   const isVisible = animationState === AnimationState.Idle;
   const { skipConfirmation } = useSettings();
+  const [isFetching, setIsFetching] = useState(false);
 
   const onNextClick = async (forceUnfollow?: boolean) => {
-    if (!client || !currentAccount) {
+    if (!client || !currentAccount || isFetching) {
       return;
     }
+
+    setIsFetching(true);
 
     const shouldUnfollow =
       forceUnfollow ?? animationState === AnimationState.Unfollow;
@@ -71,6 +74,7 @@ export function Reviewer(props: ReviewerProps) {
       (currentAccount &&
         currentAccount.id === followings[followings.length - 1])
     ) {
+      setIsFetching(false);
       props.onFinished();
       return;
     }
@@ -78,6 +82,7 @@ export function Reviewer(props: ReviewerProps) {
     setAnimated(AnimationState.Idle);
     setCurrentAccountEmpty();
     await goToNextAccount(client, currentAccount);
+    setIsFetching(false);
   };
 
   const onUndoClick = () => setAnimated(AnimationState.Idle);
@@ -160,6 +165,7 @@ export function Reviewer(props: ReviewerProps) {
               onNextClick={onNextClick}
               isVisible={isVisible}
               shouldSkipConfirmation={skipConfirmation}
+              isFetching={isFetching}
             />
           </>
         ) : (

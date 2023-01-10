@@ -7,6 +7,7 @@ interface ReviewerButtonsProps {
   onNextClick: () => void;
   isVisible: boolean;
   shouldSkipConfirmation: boolean;
+  isFetching: boolean;
 }
 export function ReviewerButtons(props: ReviewerButtonsProps) {
   const {
@@ -16,16 +17,25 @@ export function ReviewerButtons(props: ReviewerButtonsProps) {
     onUndoClick,
     onUnfollowClick,
     shouldSkipConfirmation,
+    isFetching,
   } = props;
 
   function renderContent() {
     if (isVisible) {
       return (
         <>
-          <Button variant="secondary" onPress={() => onUnfollowClick()}>
+          <Button
+            variant="secondary"
+            onPress={() => onUnfollowClick()}
+            isDisabled={isFetching}
+          >
             Unfollow
           </Button>
-          <Button onPress={() => onKeepClick()} variant="secondary">
+          <Button
+            onPress={() => onKeepClick()}
+            variant="secondary"
+            isDisabled={isFetching}
+          >
             Keep
           </Button>
         </>
@@ -34,10 +44,18 @@ export function ReviewerButtons(props: ReviewerButtonsProps) {
 
     return (
       <>
-        <Button variant="secondary" onPress={() => onUndoClick()}>
+        <Button
+          variant="secondary"
+          onPress={() => onUndoClick()}
+          isDisabled={isFetching}
+        >
           Undo
         </Button>
-        <Button onPress={() => onNextClick()} variant="secondary">
+        <Button
+          onPress={() => onNextClick()}
+          variant="secondary"
+          isDisabled={isFetching}
+        >
           Next
         </Button>
       </>
