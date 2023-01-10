@@ -109,11 +109,11 @@ export function Status(props: StatusProps) {
         </div>
       )}
       <div className={clsx("flex items-center gap-3", booster && "pt-2")}>
-        <div className="relative">
+        <div className="relative -mt-2 ml-1 h-8 w-8 flex-shrink-0">
           <img
             alt={status.account.displayName}
             src={status.account.avatar}
-            className="-mt-2 h-8 w-8 rounded-md bg-white"
+            className="h-8 w-8 rounded-md bg-white"
           />
           {booster && (
             <img
@@ -137,7 +137,7 @@ export function Status(props: StatusProps) {
 
         <div className="flex-1 flex-shrink"></div>
 
-        <div className="self-start">
+        <div className="flex-shrink-0 self-start">
           <relative-time
             // @ts-expect-error - relative-time-element is not typed properly
             class="text-xs leading-normal dark:text-neutral-400"
