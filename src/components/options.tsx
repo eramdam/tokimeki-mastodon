@@ -1,11 +1,16 @@
+import { useState } from "react";
+
 import { SortOrders } from "../store";
 import { reorderFollowings, updateSettings } from "../store/actions";
 import { useSettings } from "../store/selectors";
+import { LinkButton } from "./linkButton";
 import { Radio, RadioGroup } from "./radioGroup";
 
 export function Options() {
   const { showBio, sortOrder, showFollowLabel, showNote, skipConfirmation } =
     useSettings();
+
+  const [showAdvanced, setShowAdvanced] = useState(false);
 
   return (
     <div className="custom-prose w-full ">
@@ -40,7 +45,7 @@ export function Options() {
               });
             }}
           />{" "}
-          <strong>Show account notes</strong>
+          <strong>Show account notes</strong> (Recommended: off)
         </label>
         <p className="!mt-0">
           Account notes can be useful to remember why you followed someone. Hide
@@ -87,25 +92,41 @@ export function Options() {
           Newest first, reverse chronological order
         </Radio>
       </RadioGroup>
-      <div>
-        <label>
-          <input
-            type="checkbox"
-            checked={Boolean(skipConfirmation)}
-            onChange={() => {
-              updateSettings({
-                skipConfirmation: !skipConfirmation,
-              });
-            }}
-          />{" "}
-          <strong>Skip confirmation/undo step</strong> (Recommended: off)
-        </label>
-        <p className="!mt-0">
-          Turn this on to skip the confirmation step after you click
-          Unfollow/Keep. This will make the process faster, but you won&apos;t
-          be able to undo your actions.
-        </p>
-      </div>
+
+      {!showAdvanced && (
+        <LinkButton
+          className="text-accentColor"
+          onPress={() => {
+            setShowAdvanced(true);
+          }}
+        >
+          Show advanced options...
+        </LinkButton>
+      )}
+      {showAdvanced && (
+        <>
+          <h5 className="!mt-2">Advanced</h5>
+          <div>
+            <label>
+              <input
+                type="checkbox"
+                checked={Boolean(skipConfirmation)}
+                onChange={() => {
+                  updateSettings({
+                    skipConfirmation: !skipConfirmation,
+                  });
+                }}
+              />{" "}
+              <strong>Skip confirmation/undo step</strong> (Recommended: off)
+            </label>
+            <p className="!mt-0">
+              Turn this on to skip the confirmation step after you click
+              Unfollow/Keep. This will make the process faster, but you
+              won&apos;t be able to undo your actions.
+            </p>
+          </div>
+        </>
+      )}
     </div>
   );
 }
