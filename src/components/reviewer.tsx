@@ -100,6 +100,10 @@ export function Reviewer(props: ReviewerProps) {
     }
   };
 
+  const { showBio: initialShowBio, showNote: initialShowNote } = useSettings();
+  const [showBio, setShowBio] = useState(initialShowBio);
+  const [showNote, setShowNote] = useState(initialShowNote);
+
   if (followings?.length === 0) {
     return <FollowingsLoadingIndicator />;
   }
@@ -136,6 +140,10 @@ export function Reviewer(props: ReviewerProps) {
           <>
             {isVisible && (
               <ReviewerFooter
+                showBio={showBio}
+                setShowBio={setShowBio}
+                showNote={showNote}
+                setShowNote={setShowNote}
                 account={currentAccount}
                 accountRelationship={currentAccountRelationship}
               />

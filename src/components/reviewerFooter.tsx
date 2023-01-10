@@ -1,6 +1,7 @@
 import clsx from "clsx";
 import parse from "html-react-parser";
-import { useMemo, useState } from "react";
+import type { Dispatch, SetStateAction } from "react";
+import { useMemo } from "react";
 
 import type { TokimekiAccount, TokimekiRelationship } from "../store";
 import {
@@ -15,19 +16,23 @@ import { getParserOptions } from "./htmlReactParserOptions";
 interface ReviewerFooterProps {
   account: TokimekiAccount;
   accountRelationship: TokimekiRelationship | undefined;
+  showBio: boolean;
+  setShowBio: Dispatch<SetStateAction<boolean>>;
+  showNote: boolean;
+  setShowNote: Dispatch<SetStateAction<boolean>>;
 }
 export function ReviewerFooter(props: ReviewerFooterProps) {
-  const { account, accountRelationship } = props;
+  const {
+    account,
+    accountRelationship,
+    showBio,
+    setShowBio,
+    showNote,
+    setShowNote,
+  } = props;
   const followingIndex = useCurrentIndex();
   const followings = useFollowingIds();
-
-  const {
-    showBio: initialShowBio,
-    showFollowLabel,
-    showNote: initialShowNote,
-  } = useSettings();
-  const [showBio, setShowBio] = useState(initialShowBio);
-  const [showNote, setShowNote] = useState(initialShowNote);
+  const { showFollowLabel } = useSettings();
 
   const renderTitle = () => {
     if (followingIndex === followings.length - 1) {
