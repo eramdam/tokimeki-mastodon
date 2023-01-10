@@ -5,6 +5,7 @@ import Head from "next/head";
 import { useRouter } from "next/router";
 import { useCallback, useEffect, useMemo, useState } from "react";
 
+import packageJson from "../../package.json";
 import { Block } from "../components/block";
 import { Button } from "../components/button";
 import { TextInput } from "../components/textField";
@@ -208,6 +209,9 @@ const Home: NextPage = () => {
             <a href="https://octodon.social/@eramdam">eramdam@octodon.social</a>
             !
           </p>
+          <small className="inline-block w-full pb-2 text-center">
+            Version {packageJson.version}
+          </small>
         </div>
       </Block>
     </>

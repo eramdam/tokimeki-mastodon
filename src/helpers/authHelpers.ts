@@ -1,5 +1,7 @@
 import { login } from "masto";
 
+import { env } from "../env/client.mjs";
+
 const OAUTH_SCOPES = [
   "read:follows",
   "write:follows",
@@ -13,8 +15,7 @@ export async function registerApplication(instanceURL: string, origin: string) {
   });
 
   return await masto.v1.apps.create({
-    clientName: process.env.NEXT_PUBLIC_CLIENT_NAME || "",
-    // redirectUris: "urn:ietf:wg:oauth:2.0:oob",
+    clientName: env.NEXT_PUBLIC_CLIENT_NAME || "",
     redirectUris: `${origin}`,
     scopes: OAUTH_SCOPES,
     website: origin,
