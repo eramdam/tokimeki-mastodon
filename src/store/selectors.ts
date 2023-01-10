@@ -16,7 +16,7 @@ export const useSettings = () => usePersistedStore((state) => state.settings);
 export const useStartCount = () =>
   usePersistedStore((state) => state.startCount || 0);
 export const useInstanceUrl = () =>
-  usePersistedStore((state) => state.instanceUrl);
+  usePersistedStore((state) => state.instanceUrl?.replace(/\/$/, ""));
 export const useAccessToken = () =>
   usePersistedStore((state) => state.accessToken);
 export const useOAuthCodeDependencies = () =>
