@@ -151,7 +151,7 @@ const Home: NextPage = () => {
           className="my-10 mb-2 flex w-full max-w-lg flex-col gap-5"
         >
           <TextInput
-            label="Instance URL"
+            label="Instance domain"
             placeholder="https://"
             type={"url"}
             className="custom-prose flex flex-col gap-2 text-center "
@@ -177,9 +177,13 @@ const Home: NextPage = () => {
             </Button>
           </div>
         </form>
+        <p className="custom-prose !w-full !max-w-full !text-sm opacity-60">
+          This tool uses your Mastodon&apos;s account authorization to fetch
+          your followings, their toots and unfollow accounts.
+        </p>
       </Block>
       <Block className="lg:py-0">
-        <div className="custom-prose opacity-60">
+        <div className="custom-prose !max-w-full !text-sm !leading-relaxed opacity-60">
           <p>
             P.S. Tokimeki is the original word that was translated to
             &quot;spark joy&quot; in English. &quot;Spark joy&quot; doesn&apos;t
@@ -191,9 +195,7 @@ const Home: NextPage = () => {
           </p>
           <p>
             P.P.S. This tool uses your browser&apos;s local storage (not
-            cookies) to store your progress. This tool uses your Mastodon&apos;s
-            account authorization to fetch your followings, their toots and
-            unfollow accounts. The code is{" "}
+            cookies) to store your progress. The code is{" "}
             <a href="https://github.com/eramdam/tokimeki-mastodon">
               open source and hosted on GitHub.
             </a>
@@ -202,7 +204,6 @@ const Home: NextPage = () => {
             Based off{" "}
             <a href="https://tokimeki-unfollow.glitch.me/">Tokimeki Unfollow</a>{" "}
             by <a href="https://tarng.com/">Julius Tarng</a>.
-            <br />
             <br />
             Made by <a href="https://erambert.me">Damien Erambert</a>. Find me
             at{" "}
