@@ -6,7 +6,6 @@ import { useMastodon } from "../helpers/mastodonContext";
 import {
   goToNextAccount,
   keepAccount,
-  setCurrentAccountEmpty,
   unfollowAccount,
 } from "../store/actions";
 import {
@@ -46,7 +45,13 @@ export function Reviewer(props: ReviewerProps) {
   const { skipConfirmation } = useSettings();
   const [isFetching, setIsFetching] = useState(false);
 
-  const onNextClick = async (forceUnfollow?: boolean) => {
+  const onNextClick = async ({
+    forceUnfollow,
+    dontHide,
+  }: {
+    forceUnfollow?: boolean;
+    dontHide?: boolean;
+  }) => {
     if (!client || !currentAccount || isFetching) {
       return;
     }
@@ -67,7 +72,9 @@ export function Reviewer(props: ReviewerProps) {
       }
     }
 
-    setAnimated(AnimationState.Hidden);
+    if (!dontHide) {
+      setAnimated(AnimationState.Hidden);
+    }
 
     if (
       filteredFollowings.length < 1 ||
@@ -80,7 +87,6 @@ export function Reviewer(props: ReviewerProps) {
     }
 
     setAnimated(AnimationState.Idle);
-    setCurrentAccountEmpty();
     await goToNextAccount(client, currentAccount);
     setIsFetching(false);
   };
@@ -89,8 +95,8 @@ export function Reviewer(props: ReviewerProps) {
   const onUnfollowClick = async () => {
     if (skipConfirmation) {
       setAnimated(AnimationState.Hidden);
-      await delayAsync(350);
-      onNextClick(true);
+      await delayAsync(100);
+      onNextClick({ forceUnfollow: true, dontHide: true });
     } else {
       setAnimated(AnimationState.Unfollow);
     }
@@ -98,8 +104,8 @@ export function Reviewer(props: ReviewerProps) {
   const onKeepClick = async () => {
     if (skipConfirmation) {
       setAnimated(AnimationState.Hidden);
-      await delayAsync(350);
-      onNextClick(false);
+      await delayAsync(100);
+      onNextClick({ forceUnfollow: false, dontHide: true });
     } else {
       setAnimated(AnimationState.Keep);
     }
@@ -165,7 +171,7 @@ export function Reviewer(props: ReviewerProps) {
               onUndoClick={onUndoClick}
               onUnfollowClick={onUnfollowClick}
               onKeepClick={onKeepClick}
-              onNextClick={onNextClick}
+              onNextClick={() => onNextClick({})}
               isVisible={isVisible}
               shouldSkipConfirmation={skipConfirmation}
               isFetching={isFetching}
