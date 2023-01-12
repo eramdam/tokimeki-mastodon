@@ -1,6 +1,6 @@
 import clsx from "clsx";
 import type { mastodon } from "masto";
-import { useEffect, useMemo, useRef, useState } from "react";
+import { useEffect, useMemo, useState } from "react";
 
 import { useMastodon } from "../helpers/mastodonContext";
 import type { TokimekiAccount } from "../store";
