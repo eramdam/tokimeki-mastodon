@@ -1,5 +1,6 @@
 import type { PropsWithChildren, ReactNode } from "react";
 
+import { makeAccountName } from "../helpers/mastodonHelpers";
 import type { TokimekiAccount } from "../store";
 import { renderWithEmoji } from "./emojify";
 import { AnimationState } from "./reviewer";
@@ -12,18 +13,14 @@ export const ReviewerPrompt = (
   }>
 ) => {
   const { animationState, account } = props;
+  const accountName = makeAccountName(account);
 
   function renderContent() {
     if (animationState === AnimationState.Keep) {
       return (
         <>
           Glad to hear{" "}
-          <strong>
-            {renderWithEmoji(
-              account.emojis,
-              account.displayName.trim() || account.acct
-            )}
-          </strong>
+          <strong>{renderWithEmoji(account.emojis, accountName)}</strong>
           &apos;s toots are still important to you.
         </>
       );
@@ -31,13 +28,8 @@ export const ReviewerPrompt = (
       return (
         <>
           Great, unfollowed! Let&apos;s thank{" "}
-          <strong>
-            {renderWithEmoji(
-              account.emojis,
-              account.displayName.trim() || account.acct
-            )}
-          </strong>{" "}
-          for all the toots you&apos;ve enjoyed before.{" "}
+          <strong>{renderWithEmoji(account.emojis, accountName)}</strong> for
+          all the toots you&apos;ve enjoyed before.{" "}
         </>
       );
     }

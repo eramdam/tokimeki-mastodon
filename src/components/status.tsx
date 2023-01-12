@@ -9,6 +9,7 @@ import { useMemo, useRef, useState } from "react";
 import { useButton } from "react-aria";
 
 import { isElement } from "../helpers/domHelpers";
+import { makeAccountName } from "../helpers/mastodonHelpers";
 import { BlurhashImage } from "./blurhashImage";
 import { SmallButton } from "./button";
 import { renderWithEmoji } from "./emojify";
@@ -105,19 +106,19 @@ export function Status(props: StatusProps) {
     >
       {booster && (
         <div className="text-xs text-neutral-500 dark:text-neutral-400">
-          🔁 {booster.displayName} boosted
+          🔁 {makeAccountName(booster)} boosted
         </div>
       )}
       <div className={clsx("flex items-center gap-3", booster && "pt-2")}>
         <div className="relative">
           <img
-            alt={status.account.displayName}
+            alt={makeAccountName(status.account)}
             src={status.account.avatar}
             className="-mt-2 h-8 w-8 rounded-md bg-white"
           />
           {booster && (
             <img
-              alt={booster.displayName}
+              alt={makeAccountName(booster)}
               src={booster.avatar}
               className="absolute -bottom-2 -right-2 -mt-2 h-6 w-6 rounded-md border-2 border-white bg-white dark:border-neutral-800 dark:bg-neutral-800
               
@@ -128,7 +129,10 @@ export function Status(props: StatusProps) {
 
         <div className="mb-2 flex flex-col truncate dark:text-neutral-200">
           <span className="truncate text-base leading-tight">
-            {renderWithEmoji(status.account.emojis, status.account.displayName)}
+            {renderWithEmoji(
+              status.account.emojis,
+              makeAccountName(status.account)
+            )}
           </span>
           <span className="truncate text-xs leading-tight">
             {status.account.acct}

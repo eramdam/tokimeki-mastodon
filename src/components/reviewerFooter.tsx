@@ -3,6 +3,7 @@ import parse from "html-react-parser";
 import type { Dispatch, SetStateAction } from "react";
 import { useMemo } from "react";
 
+import { makeAccountName } from "../helpers/mastodonHelpers";
 import type { TokimekiAccount, TokimekiRelationship } from "../store";
 import {
   useCurrentIndex,
@@ -63,9 +64,9 @@ export function ReviewerFooter(props: ReviewerFooterProps) {
       <div className="flex w-full items-center justify-between">
         <p className="custom-prose break-words text-left leading-normal ">
           {renderTitle()}
-          {account.displayName && (
+          {makeAccountName(account) && (
             <strong className="inline-block">
-              {renderWithEmoji(account.emojis, account.displayName.trim())}
+              {renderWithEmoji(account.emojis, makeAccountName(account).trim())}
             </strong>
           )}{" "}
           <a
