@@ -168,7 +168,7 @@ const Home: NextPage = () => {
             <Button
               variant="primary"
               type="submit"
-              onPress={(e) => {
+              onPress={() => {
                 onLogin();
               }}
               isDisabled={isInstanceValid === "invalid" || isLoading}
