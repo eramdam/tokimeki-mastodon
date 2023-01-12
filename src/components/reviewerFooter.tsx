@@ -49,7 +49,7 @@ export function ReviewerFooter(props: ReviewerFooterProps) {
       getParserOptions({
         emojiArray: account.emojis || [],
         classNames: {
-          p: "inline-block first-of-type:mt-0 text-sm !mt-1 lg:!mt-2",
+          p: "first-of-type:mt-0 text-sm !mt-1 lg:!mt-2",
         },
       }),
     [account.emojis]
