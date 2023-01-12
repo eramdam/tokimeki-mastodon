@@ -1,4 +1,4 @@
-import { omit } from "lodash-es";
+import { omit, pick } from "lodash-es";
 import type { mastodon } from "masto";
 import create from "zustand";
 import { devtools, persist } from "zustand/middleware";
@@ -14,8 +14,23 @@ export interface TokimekiAccount {
   acct: string;
   note: string;
   displayName: string;
+  username: string;
   url: string;
   emojis: mastodon.v1.CustomEmoji[];
+}
+
+export function pickTokimekiAccount(
+  account: mastodon.v1.Account | TokimekiAccount
+): TokimekiAccount {
+  return pick(account, [
+    "id",
+    "acct",
+    "note",
+    "displayName",
+    "username",
+    "url",
+    "emojis",
+  ]);
 }
 
 export interface TokimekiRelationship {

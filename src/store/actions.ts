@@ -2,6 +2,7 @@ import { compact, pick, uniq } from "lodash-es";
 import type { mastodon } from "masto";
 
 import type { SortOrders, TokimekiAccount, TokimekiState } from ".";
+import { pickTokimekiAccount } from ".";
 import { initialPersistedState, usePersistedStore } from ".";
 import { filterFollowingIds, sortFollowings } from "./selectors";
 
@@ -124,27 +125,9 @@ export async function fetchFollowings(
     baseFollowingIds: accountIds,
     followingIds: sortedFollowings,
     currentAccount:
-      (firstAccount &&
-        pick(firstAccount, [
-          "id",
-          "acct",
-          "note",
-          "displayName",
-          "url",
-          "emojis",
-        ])) ||
-      undefined,
+      (firstAccount && pickTokimekiAccount(firstAccount)) || undefined,
     nextAccount:
-      (secondAccount &&
-        pick(secondAccount, [
-          "id",
-          "acct",
-          "note",
-          "displayName",
-          "url",
-          "emojis",
-        ])) ||
-      undefined,
+      (secondAccount && pickTokimekiAccount(secondAccount)) || undefined,
   });
 
   const relationships = await client.v1.accounts.fetchRelationships(
@@ -189,14 +172,7 @@ export async function goToNextAccount(
     : undefined;
 
   usePersistedStore.setState({
-    currentAccount: pick(newAccount, [
-      "id",
-      "acct",
-      "note",
-      "displayName",
-      "url",
-      "emojis",
-    ]),
+    currentAccount: pickTokimekiAccount(newAccount),
     currentRelationship,
   });
 
@@ -208,14 +184,7 @@ export async function goToNextAccount(
 
   client.v1.accounts.fetch(nextAccountId).then((newNextAccount) => {
     usePersistedStore.setState({
-      nextAccount: pick(newNextAccount, [
-        "id",
-        "acct",
-        "note",
-        "displayName",
-        "url",
-        "emojis",
-      ]),
+      nextAccount: pickTokimekiAccount(newNextAccount),
     });
   });
   client.v1.accounts
