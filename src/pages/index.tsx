@@ -14,6 +14,7 @@ import {
   getAuthURL,
   registerApplication,
 } from "../helpers/authHelpers";
+import { MastodonWrapper } from "../helpers/mastodonHelpers";
 import { saveAfterOAuthCode, saveLoginCredentials } from "../store/actions";
 import { useAccountId, useOAuthCodeDependencies } from "../store/selectors";
 
@@ -61,12 +62,13 @@ const Home: NextPage = () => {
         return;
       }
 
-      const masto = await login({
+      const mastoClient = await login({
         url: storedInstanceUrl,
         accessToken: access_token,
         timeout: 30_000,
       });
-      const account = await masto.v1.accounts.verifyCredentials();
+      const masto = new MastodonWrapper(mastoClient);
+      const account = await masto.verifyCredentials();
       saveAfterOAuthCode({
         accessToken: access_token,
         account,

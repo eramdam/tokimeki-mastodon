@@ -1,6 +1,7 @@
 import { compact, pick, uniq } from "lodash-es";
 import type { mastodon } from "masto";
 
+import type { MastodonWrapper } from "../helpers/mastodonHelpers";
 import type { SortOrders, TokimekiAccount, TokimekiState } from ".";
 import { pickTokimekiAccount } from ".";
 import { initialPersistedState, usePersistedStore } from ".";
@@ -58,7 +59,7 @@ export function keepAccount(accountId: string): void {
 }
 export async function fetchFollowings(
   accountId: string,
-  client: mastodon.Client
+  client: MastodonWrapper
 ) {
   usePersistedStore.setState({ isFetching: true });
   const persistedState = usePersistedStore.getState();
@@ -83,10 +84,9 @@ export async function fetchFollowings(
     const [firstAccountId, secondAccountId] = sortedFollowings;
     const idsToFetch = compact([firstAccountId, secondAccountId]);
     const accountPromises = idsToFetch.map((id) => {
-      return client.v1.accounts.fetch(id);
+      return client.fetchAccount(id);
     });
-    const relationshipsPromises =
-      client.v1.accounts.fetchRelationships(idsToFetch);
+    const relationshipsPromises = client.fetchRelationships(idsToFetch);
     const [currentAccount, nextAccount] = await Promise.all(accountPromises);
     const [currentRelationship, nextRelationship] = await relationshipsPromises;
 
@@ -100,15 +100,9 @@ export async function fetchFollowings(
     return;
   }
 
-  const accounts: mastodon.v1.Account[] = [];
-
-  if (accounts.length === 0) {
-    for await (const followings of client.v1.accounts.listFollowing(accountId, {
-      limit: 80,
-    })) {
-      accounts.push(...followings);
-    }
-  }
+  const accounts: mastodon.v1.Account[] = await client.listAllFollowings(
+    accountId
+  );
 
   const accountIds = accounts.map((a) => a.id);
   const sortedFollowings = sortFollowings(
@@ -130,7 +124,7 @@ export async function fetchFollowings(
       (secondAccount && pickTokimekiAccount(secondAccount)) || undefined,
   });
 
-  const relationships = await client.v1.accounts.fetchRelationships(
+  const relationships = await client.fetchRelationships(
     compact([firstAccount?.id])
   );
   const currentRelationship = relationships[0]
@@ -153,7 +147,7 @@ export async function setCurrentAccountEmpty() {
   });
 }
 export async function goToNextAccount(
-  client: mastodon.Client,
+  client: MastodonWrapper,
   currentAccount: TokimekiAccount
 ) {
   const { followingIds, nextAccount, nextRelationship } =
@@ -163,10 +157,10 @@ export async function goToNextAccount(
   const newAccountId =
     nextAccount?.id ?? (followingIds[currentIndex + 1] || followingIds[0]);
   const newAccount =
-    nextAccount ?? (await client.v1.accounts.fetch(newAccountId || ""));
+    nextAccount ?? (await client.fetchAccount(newAccountId || ""));
   const relationships = nextRelationship
     ? [nextRelationship]
-    : await client.v1.accounts.fetchRelationships(compact([newAccountId]));
+    : await client.fetchRelationships(compact([newAccountId]));
   const currentRelationship = relationships[0]
     ? pick(relationships[0], ["followedBy", "note"])
     : undefined;
@@ -182,21 +176,19 @@ export async function goToNextAccount(
     return;
   }
 
-  client.v1.accounts.fetch(nextAccountId).then((newNextAccount) => {
+  client.fetchAccount(nextAccountId).then((newNextAccount) => {
     usePersistedStore.setState({
       nextAccount: pickTokimekiAccount(newNextAccount),
     });
   });
-  client.v1.accounts
-    .fetchRelationships([nextAccountId])
-    .then((newNextRelationship) => {
-      const newNextRelationshipPicked = newNextRelationship[0]
-        ? pick(newNextRelationship[0], ["followedBy", "note"])
-        : undefined;
-      usePersistedStore.setState({
-        nextRelationship: newNextRelationshipPicked,
-      });
+  client.fetchRelationships([nextAccountId]).then((newNextRelationship) => {
+    const newNextRelationshipPicked = newNextRelationship[0]
+      ? pick(newNextRelationship[0], ["followedBy", "note"])
+      : undefined;
+    usePersistedStore.setState({
+      nextRelationship: newNextRelationshipPicked,
     });
+  });
 }
 export function markAsFinished(): void {
   usePersistedStore.setState({ isFinished: true });

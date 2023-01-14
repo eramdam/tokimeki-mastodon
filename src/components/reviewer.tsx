@@ -64,7 +64,7 @@ export function Reviewer(props: ReviewerProps) {
       if (shouldUnfollow) {
         console.log("Will unfollow", currentAccount.acct);
         if (process.env.NODE_ENV !== "development") {
-          await client.v1.accounts.unfollow(currentAccount.id);
+          await client.unfollow(currentAccount.id);
         }
         unfollowAccount(currentAccount.id);
       } else {

@@ -8,9 +8,10 @@ import {
   useAccountId,
   useInstanceUrl,
 } from "../store/selectors";
+import { MastodonWrapper } from "./mastodonHelpers";
 
 const MastodonContext = createContext<{
-  client: mastodon.Client | undefined;
+  client: MastodonWrapper | undefined;
   accountId: string | null;
 }>({ client: undefined, accountId: null });
 
@@ -18,7 +19,7 @@ export const MastodonProvider = (props: PropsWithChildren<object>) => {
   const accessToken = useAccessToken();
   const accountId = useAccountId();
   const instanceUrl = useInstanceUrl();
-  const [masto, setMasto] = useState<mastodon.Client | undefined>();
+  const [masto, setMasto] = useState<MastodonWrapper | undefined>();
 
   useEffect(() => {
     if (!accessToken || !instanceUrl) {
@@ -29,7 +30,7 @@ export const MastodonProvider = (props: PropsWithChildren<object>) => {
       url: instanceUrl,
       accessToken: accessToken,
     }).then((mastoClient) => {
-      setMasto(mastoClient);
+      setMasto(new MastodonWrapper(mastoClient));
     });
   }, [accessToken, instanceUrl]);
 

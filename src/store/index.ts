@@ -19,20 +19,6 @@ export interface TokimekiAccount {
   emojis: mastodon.v1.CustomEmoji[];
 }
 
-export function pickTokimekiAccount(
-  account: mastodon.v1.Account | TokimekiAccount
-): TokimekiAccount {
-  return pick(account, [
-    "id",
-    "acct",
-    "note",
-    "displayName",
-    "username",
-    "url",
-    "emojis",
-  ]);
-}
-
 export interface TokimekiRelationship {
   followedBy: boolean;
   note?: string | null;

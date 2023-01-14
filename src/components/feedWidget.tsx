@@ -28,7 +28,7 @@ export function FeedWidget(props: FeedWidgetProps) {
       return;
     }
 
-    const statusesPromise = client.v1.accounts.listStatuses(account.id, {
+    const statusesPromise = client.listStatuses(account.id, {
       limit: 40,
       excludeReplies: true,
       excludeReblogs: false,

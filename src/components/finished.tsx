@@ -30,7 +30,7 @@ export function Finished() {
       return [];
     }
 
-    const accounts = await client.v1.accounts.listFollowing(accountId, {
+    const accounts = await client.listFollowing(accountId, {
       limit: 80,
     });
     return accounts.map((a) => pick(a, ["id", "avatar", "displayName"]));
