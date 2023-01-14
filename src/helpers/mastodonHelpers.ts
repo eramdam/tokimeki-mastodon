@@ -1,3 +1,4 @@
+import { pick } from "lodash-es";
 import type { mastodon } from "masto";
 import type { AbortSignal as NodeFetchSignal } from "node-fetch/externals";
 
@@ -24,13 +25,20 @@ export class MastodonWrapper {
     );
   }
 
-  async fetchAccount(id: string) {
-    return this.client.http.get<mastodon.v1.Account>(`/api/v1/accounts/${id}`);
+  async fetchAccount(id: string, signal?: Signal) {
+    return this.client.http.get<mastodon.v1.Account>(
+      `/api/v1/accounts/${id}`,
+      {},
+      { signal }
+    );
   }
-  async fetchRelationships(ids: readonly string[]) {
+  async fetchRelationships(ids: readonly string[], signal?: Signal) {
     return this.client.http.get<mastodon.v1.Relationship[]>(
       `/api/v1/accounts/relationships`,
-      { ids }
+      { ids },
+      {
+        signal,
+      }
     );
   }
 
@@ -65,4 +73,18 @@ export class MastodonWrapper {
   unfollow(...args: Parameters<typeof this.client.v1.accounts.unfollow>) {
     return this.client.v1.accounts.unfollow(...args);
   }
+}
+
+export function pickTokimekiAccount(
+  account: mastodon.v1.Account | TokimekiAccount
+): TokimekiAccount {
+  return pick(account, [
+    "id",
+    "acct",
+    "note",
+    "displayName",
+    "username",
+    "url",
+    "emojis",
+  ]);
 }
