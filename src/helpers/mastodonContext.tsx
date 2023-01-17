@@ -1,4 +1,3 @@
-import type { mastodon } from "masto";
 import { login } from "masto";
 import type { PropsWithChildren } from "react";
 import { createContext, useContext, useEffect, useMemo, useState } from "react";
