@@ -93,7 +93,7 @@ export function pickTokimekiRelationship(
 export function pickTokimekiAccount(
   account: mastodon.v1.Account | TokimekiAccount
 ): TokimekiAccount {
-  return pick(account, [
+  const base = pick(account, [
     "id",
     "acct",
     "note",
@@ -103,4 +103,8 @@ export function pickTokimekiAccount(
     "url",
     "emojis",
   ]);
+  return {
+    ...base,
+    emojis: base.emojis.map((e) => pick(e, ["shortcode", "url"])),
+  };
 }

@@ -2,13 +2,13 @@ import clsx from "clsx";
 import type { Text } from "domhandler";
 import type { HTMLReactParserOptions } from "html-react-parser";
 import { attributesToProps, domToReact, Element } from "html-react-parser";
-import type { mastodon } from "masto";
 import { mergeProps } from "react-aria";
 
+import type { TokimekiEmoji } from "../store";
 import { renderWithEmoji } from "./emojify";
 
 interface GetParserOptionsProps {
-  emojiArray: mastodon.v1.CustomEmoji[];
+  emojiArray: TokimekiEmoji[];
   classNames?: {
     p?: string;
     a?: string;

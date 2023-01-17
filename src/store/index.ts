@@ -1,5 +1,4 @@
 import { omit } from "lodash-es";
-import type { mastodon } from "masto";
 import create from "zustand";
 import { devtools, persist } from "zustand/middleware";
 
@@ -17,7 +16,12 @@ export interface TokimekiAccount {
   displayName: string;
   username: string;
   url: string;
-  emojis: mastodon.v1.CustomEmoji[];
+  emojis: TokimekiEmoji[];
+}
+
+export interface TokimekiEmoji {
+  shortcode: string;
+  url: string;
 }
 
 export interface TokimekiRelationship {
