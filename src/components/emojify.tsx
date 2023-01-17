@@ -1,9 +1,9 @@
 /* eslint-disable @next/next/no-img-element */
 import { isString, keyBy } from "lodash-es";
 
-import type { TokimekiEmoji } from "../store";
+import type { TK_Emoji } from "../store";
 
-export function renderWithEmoji(emojiArray: TokimekiEmoji[], text: string) {
+export function renderWithEmoji(emojiArray: TK_Emoji[], text: string) {
   const emojiMap = keyBy(emojiArray, (e) => e.shortcode);
   const shortcodes = Object.keys(emojiMap).map((s) => `:${s}:`);
 

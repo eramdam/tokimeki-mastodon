@@ -1,14 +1,14 @@
 import type { PropsWithChildren, ReactNode } from "react";
 
 import { makeAccountName } from "../helpers/mastodonHelpers";
-import type { TokimekiAccount } from "../store";
+import type { TK_Account } from "../store";
 import { renderWithEmoji } from "./emojify";
 import { AnimationState } from "./reviewer";
 
 export const ReviewerPrompt = (
   props: PropsWithChildren<{
     animationState: AnimationState;
-    account: TokimekiAccount;
+    account: TK_Account;
     loadingRender: ReactNode;
   }>
 ) => {

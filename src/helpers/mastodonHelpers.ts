@@ -2,9 +2,9 @@ import { pick } from "lodash-es";
 import type { mastodon } from "masto";
 import type { AbortSignal as NodeFetchSignal } from "node-fetch/externals";
 
-import type { TokimekiAccount, TokimekiRelationship } from "../store";
+import type { TK_Account, TK_Relationship } from "../store";
 
-export function makeAccountName(account: TokimekiAccount) {
+export function makeAccountName(account: TK_Account) {
   return (
     account.displayName.trim() || account.username.trim() || account.acct.trim()
   );
@@ -85,14 +85,14 @@ export class MastodonWrapper {
 }
 
 export function pickTokimekiRelationship(
-  relationship: mastodon.v1.Relationship | TokimekiRelationship
-): TokimekiRelationship {
+  relationship: mastodon.v1.Relationship | TK_Relationship
+): TK_Relationship {
   return pick(relationship, ["followedBy", "note"]);
 }
 
 export function pickTokimekiAccount(
-  account: mastodon.v1.Account | TokimekiAccount
-): TokimekiAccount {
+  account: mastodon.v1.Account | TK_Account
+): TK_Account {
   const base = pick(account, [
     "id",
     "acct",

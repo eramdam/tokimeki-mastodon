@@ -4,7 +4,7 @@ import type { Dispatch, SetStateAction } from "react";
 import { useMemo } from "react";
 
 import { makeAccountName } from "../helpers/mastodonHelpers";
-import type { TokimekiAccount, TokimekiRelationship } from "../store";
+import type { TK_Account, TK_Relationship } from "../store";
 import {
   useCurrentIndex,
   useFollowingIds,
@@ -16,8 +16,8 @@ import { renderWithEmoji } from "./emojify";
 import { getParserOptions } from "./htmlReactParserOptions";
 
 interface ReviewerFooterProps {
-  account: TokimekiAccount;
-  accountRelationship: TokimekiRelationship | undefined;
+  account: TK_Account;
+  accountRelationship: TK_Relationship | undefined;
   showBio: boolean;
   setShowBio: Dispatch<SetStateAction<boolean>>;
   showNote: boolean;

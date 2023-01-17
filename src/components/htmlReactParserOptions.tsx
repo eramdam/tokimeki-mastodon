@@ -4,11 +4,11 @@ import type { HTMLReactParserOptions } from "html-react-parser";
 import { attributesToProps, domToReact, Element } from "html-react-parser";
 import { mergeProps } from "react-aria";
 
-import type { TokimekiEmoji } from "../store";
+import type { TK_Emoji } from "../store";
 import { renderWithEmoji } from "./emojify";
 
 interface GetParserOptionsProps {
-  emojiArray: TokimekiEmoji[];
+  emojiArray: TK_Emoji[];
   classNames?: {
     p?: string;
     a?: string;

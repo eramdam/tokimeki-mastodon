@@ -3,7 +3,7 @@ import type { mastodon } from "masto";
 
 import type { MastodonWrapper } from "../helpers/mastodonHelpers";
 import { pickTokimekiAccount } from "../helpers/mastodonHelpers";
-import type { SortOrders, TokimekiAccount, TokimekiState } from ".";
+import type { SortOrders, TK_Account, TK_State } from ".";
 import { initialPersistedState, usePersistedStore } from ".";
 import { filterFollowingIds, sortFollowings } from "./selectors";
 
@@ -37,9 +37,7 @@ export function saveAfterOAuthCode(payload: {
   });
 }
 
-export function updateSettings(
-  payload: Partial<TokimekiState["settings"]>
-): void {
+export function updateSettings(payload: Partial<TK_State["settings"]>): void {
   usePersistedStore.setState((state) => ({
     settings: {
       ...state.settings,
@@ -146,7 +144,7 @@ export async function setCurrentAccountEmpty() {
 }
 export async function goToNextAccount(
   client: MastodonWrapper,
-  currentAccount: TokimekiAccount
+  currentAccount: TK_Account
 ) {
   const { followingIds, nextAccount, nextRelationship } =
     usePersistedStore.getState();

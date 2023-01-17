@@ -8,7 +8,7 @@ export enum SortOrders {
   NEWEST = "newest",
 }
 
-export interface TokimekiAccount {
+export interface TK_Account {
   id: string;
   acct: string;
   avatar: string;
@@ -16,20 +16,20 @@ export interface TokimekiAccount {
   displayName: string;
   username: string;
   url: string;
-  emojis: TokimekiEmoji[];
+  emojis: TK_Emoji[];
 }
 
-export interface TokimekiEmoji {
+export interface TK_Emoji {
   shortcode: string;
   url: string;
 }
 
-export interface TokimekiRelationship {
+export interface TK_Relationship {
   followedBy: boolean;
   note?: string | null;
 }
 
-export interface TokimekiState {
+export interface TK_State {
   clientId?: string;
   clientSecret?: string;
   instanceUrl?: string;
@@ -47,16 +47,16 @@ export interface TokimekiState {
     skipConfirmation: boolean;
   };
   isFetching: boolean;
-  currentAccount?: TokimekiAccount;
-  nextAccount?: TokimekiAccount;
+  currentAccount?: TK_Account;
+  nextAccount?: TK_Account;
   baseFollowingIds: string[];
   followingIds: string[];
   isFinished: boolean;
-  currentRelationship?: TokimekiRelationship;
-  nextRelationship?: TokimekiRelationship;
+  currentRelationship?: TK_Relationship;
+  nextRelationship?: TK_Relationship;
 }
 
-export const initialPersistedState: TokimekiState = {
+export const initialPersistedState: TK_State = {
   settings: {
     sortOrder: SortOrders.OLDEST,
     showBio: false,
@@ -72,7 +72,7 @@ export const initialPersistedState: TokimekiState = {
   followingIds: [],
 };
 
-export const usePersistedStore = create<TokimekiState>()(
+export const usePersistedStore = create<TK_State>()(
   devtools(
     persist(() => initialPersistedState, {
       name: "tokimeki-mastodon", // name of the item in the storage (must be unique)

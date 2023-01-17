@@ -3,12 +3,12 @@ import type { mastodon } from "masto";
 import { useEffect, useMemo, useState } from "react";
 
 import { useMastodon } from "../helpers/mastodonContext";
-import type { TokimekiAccount } from "../store";
+import type { TK_Account } from "../store";
 import { useInstanceUrl } from "../store/selectors";
 import { Status } from "./status";
 
 interface FeedWidgetProps {
-  account?: TokimekiAccount;
+  account?: TK_Account;
   className?: string;
 }
 
