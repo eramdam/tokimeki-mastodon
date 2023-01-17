@@ -2,7 +2,7 @@ import { compact, uniq } from "lodash-es";
 import type { mastodon } from "masto";
 
 import type { MastodonWrapper } from "../helpers/mastodonHelpers";
-import { pickTokimekiAccount } from "../helpers/mastodonHelpers";
+import { pickTKAccount } from "../helpers/mastodonHelpers";
 import type { SortOrders, TK_Account, TK_State } from ".";
 import { initialPersistedState, usePersistedStore } from ".";
 import { filterFollowingIds, sortFollowings } from "./selectors";
@@ -116,10 +116,8 @@ export async function fetchFollowings(
   usePersistedStore.setState({
     baseFollowingIds: accountIds,
     followingIds: sortedFollowings,
-    currentAccount:
-      (firstAccount && pickTokimekiAccount(firstAccount)) || undefined,
-    nextAccount:
-      (secondAccount && pickTokimekiAccount(secondAccount)) || undefined,
+    currentAccount: (firstAccount && pickTKAccount(firstAccount)) || undefined,
+    nextAccount: (secondAccount && pickTKAccount(secondAccount)) || undefined,
   });
 
   const relationships = await client.fetchRelationships(
@@ -160,7 +158,7 @@ export async function goToNextAccount(
   const currentRelationship = relationships[0] || undefined;
 
   usePersistedStore.setState({
-    currentAccount: pickTokimekiAccount(newAccount),
+    currentAccount: pickTKAccount(newAccount),
     currentRelationship,
   });
 

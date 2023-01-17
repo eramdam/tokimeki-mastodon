@@ -26,7 +26,7 @@ export class MastodonWrapper {
   }
 
   async fetchAccount(id: string, signal?: Signal) {
-    return pickTokimekiAccount(
+    return pickTKAccount(
       await this.client.http.get<mastodon.v1.Account>(
         `/api/v1/accounts/${id}`,
         {},
@@ -43,7 +43,7 @@ export class MastodonWrapper {
           signal,
         }
       )),
-    ].map((i) => pickTokimekiRelationship(i));
+    ].map((i) => pickTKRelationship(i));
   }
 
   async listFollowing(
@@ -51,7 +51,7 @@ export class MastodonWrapper {
     params: mastodon.DefaultPaginationParams = {}
   ) {
     return [...(await this.client.v1.accounts.listFollowing(id, params))].map(
-      (i) => pickTokimekiAccount(i)
+      (i) => pickTKAccount(i)
     );
   }
 
@@ -84,13 +84,13 @@ export class MastodonWrapper {
   }
 }
 
-export function pickTokimekiRelationship(
+export function pickTKRelationship(
   relationship: mastodon.v1.Relationship | TK_Relationship
 ): TK_Relationship {
   return pick(relationship, ["followedBy", "note"]);
 }
 
-export function pickTokimekiAccount(
+export function pickTKAccount(
   account: mastodon.v1.Account | TK_Account
 ): TK_Account {
   const base = pick(account, [
