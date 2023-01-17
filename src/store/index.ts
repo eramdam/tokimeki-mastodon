@@ -1,4 +1,4 @@
-import { omit, pick } from "lodash-es";
+import { omit } from "lodash-es";
 import type { mastodon } from "masto";
 import create from "zustand";
 import { devtools, persist } from "zustand/middleware";
@@ -12,6 +12,7 @@ export enum SortOrders {
 export interface TokimekiAccount {
   id: string;
   acct: string;
+  avatar: string;
   note: string;
   displayName: string;
   username: string;

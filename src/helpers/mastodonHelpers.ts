@@ -2,7 +2,7 @@ import { pick } from "lodash-es";
 import type { mastodon } from "masto";
 import type { AbortSignal as NodeFetchSignal } from "node-fetch/externals";
 
-import type { TokimekiAccount } from "../store";
+import type { TokimekiAccount, TokimekiRelationship } from "../store";
 
 export function makeAccountName(account: TokimekiAccount) {
   return (
@@ -26,24 +26,33 @@ export class MastodonWrapper {
   }
 
   async fetchAccount(id: string, signal?: Signal) {
-    return this.client.http.get<mastodon.v1.Account>(
-      `/api/v1/accounts/${id}`,
-      {},
-      { signal }
+    return pickTokimekiAccount(
+      await this.client.http.get<mastodon.v1.Account>(
+        `/api/v1/accounts/${id}`,
+        {},
+        { signal }
+      )
     );
   }
   async fetchRelationships(ids: readonly string[], signal?: Signal) {
-    return this.client.http.get<mastodon.v1.Relationship[]>(
-      `/api/v1/accounts/relationships`,
-      { ids },
-      {
-        signal,
-      }
-    );
+    return [
+      ...(await this.client.http.get<mastodon.v1.Relationship[]>(
+        `/api/v1/accounts/relationships`,
+        { ids },
+        {
+          signal,
+        }
+      )),
+    ].map((i) => pickTokimekiRelationship(i));
   }
 
-  listFollowing(id: string, params: mastodon.DefaultPaginationParams = {}) {
-    return this.client.v1.accounts.listFollowing(id, params);
+  async listFollowing(
+    id: string,
+    params: mastodon.DefaultPaginationParams = {}
+  ) {
+    return [...(await this.client.v1.accounts.listFollowing(id, params))].map(
+      (i) => pickTokimekiAccount(i)
+    );
   }
 
   async listAllFollowings(
@@ -70,9 +79,15 @@ export class MastodonWrapper {
     return this.client.v1.accounts.listStatuses(...args);
   }
 
-  unfollow(...args: Parameters<typeof this.client.v1.accounts.unfollow>) {
-    return this.client.v1.accounts.unfollow(...args);
+  unfollow(id: string) {
+    return this.client.v1.accounts.unfollow(id);
   }
+}
+
+export function pickTokimekiRelationship(
+  relationship: mastodon.v1.Relationship | TokimekiRelationship
+): TokimekiRelationship {
+  return pick(relationship, ["followedBy", "note"]);
 }
 
 export function pickTokimekiAccount(
@@ -82,6 +97,7 @@ export function pickTokimekiAccount(
     "id",
     "acct",
     "note",
+    "avatar",
     "displayName",
     "username",
     "url",

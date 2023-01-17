@@ -1,4 +1,4 @@
-import { compact, pick, uniq } from "lodash-es";
+import { compact, uniq } from "lodash-es";
 import type { mastodon } from "masto";
 
 import type { MastodonWrapper } from "../helpers/mastodonHelpers";
@@ -127,9 +127,7 @@ export async function fetchFollowings(
   const relationships = await client.fetchRelationships(
     compact([firstAccount?.id])
   );
-  const currentRelationship = relationships[0]
-    ? pick(relationships[0], ["followedBy", "note"])
-    : undefined;
+  const currentRelationship = relationships[0] || undefined;
 
   usePersistedStore.setState({
     isFetching: false,
@@ -161,9 +159,7 @@ export async function goToNextAccount(
   const relationships = nextRelationship
     ? [nextRelationship]
     : await client.fetchRelationships(compact([newAccountId]));
-  const currentRelationship = relationships[0]
-    ? pick(relationships[0], ["followedBy", "note"])
-    : undefined;
+  const currentRelationship = relationships[0] || undefined;
 
   usePersistedStore.setState({
     currentAccount: pickTokimekiAccount(newAccount),
@@ -178,13 +174,11 @@ export async function goToNextAccount(
 
   client.fetchAccount(nextAccountId).then((newNextAccount) => {
     usePersistedStore.setState({
-      nextAccount: pickTokimekiAccount(newNextAccount),
+      nextAccount: newNextAccount,
     });
   });
   client.fetchRelationships([nextAccountId]).then((newNextRelationship) => {
-    const newNextRelationshipPicked = newNextRelationship[0]
-      ? pick(newNextRelationship[0], ["followedBy", "note"])
-      : undefined;
+    const newNextRelationshipPicked = newNextRelationship[0] || undefined;
     usePersistedStore.setState({
       nextRelationship: newNextRelationshipPicked,
     });
