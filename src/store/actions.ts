@@ -201,3 +201,9 @@ export async function goToNextAccount(
 export function markAsFinished(): void {
   usePersistedStore.setState({ isFinished: true });
 }
+
+export async function fetchLists(client: mastodon.Client) {
+  const lists = await client.v1.lists.list();
+  console.log({ lists });
+  usePersistedStore.setState({ lists });
+}

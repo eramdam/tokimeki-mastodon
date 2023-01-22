@@ -7,6 +7,8 @@ const OAUTH_SCOPES = [
   "write:follows",
   "read:accounts",
   "read:statuses",
+  "read:lists",
+  "write:lists",
 ].join(" ");
 
 export async function registerApplication(instanceURL: string, origin: string) {

@@ -63,6 +63,7 @@ export interface TokimekiState {
   isFinished: boolean;
   currentRelationship?: TokimekiRelationship;
   nextRelationship?: TokimekiRelationship;
+  lists: mastodon.v1.List[];
 }
 
 export const initialPersistedState: TokimekiState = {
@@ -79,6 +80,7 @@ export const initialPersistedState: TokimekiState = {
   isFetching: false,
   baseFollowingIds: [],
   followingIds: [],
+  lists: [],
 };
 
 export const usePersistedStore = create<TokimekiState>()(
@@ -88,7 +90,7 @@ export const usePersistedStore = create<TokimekiState>()(
       partialize(state) {
         return omit(state, ["actions", "nextAccount", "nextRelationship"]);
       },
-      version: 1,
+      version: 2,
     }),
     { name: "main-store" }
   )
