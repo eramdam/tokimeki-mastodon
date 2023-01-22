@@ -1,6 +1,7 @@
 import type { AriaMenuProps, MenuTriggerProps } from "@react-types/menu";
 import type { Node } from "@react-types/shared";
 import clsx from "clsx";
+import type { CSSProperties } from "react";
 import React, { useRef } from "react";
 import {
   useMenu,
@@ -48,6 +49,11 @@ export function MenuButton<T extends object>(props: MenuButtonProps<T>) {
             {...props}
             autoFocus={state.focusStrategy || true}
             onClose={() => state.close()}
+            style={{
+              minWidth: ref.current?.clientWidth
+                ? ref.current?.clientWidth + 10
+                : "",
+            }}
           />
         </Popover>
       )}
@@ -57,6 +63,7 @@ export function MenuButton<T extends object>(props: MenuButtonProps<T>) {
 
 interface MenuProps<T extends object> extends AriaMenuProps<T> {
   onClose: () => void;
+  style?: CSSProperties;
 }
 
 function Menu<T extends object>(props: MenuProps<T>) {
@@ -68,7 +75,12 @@ function Menu<T extends object>(props: MenuProps<T>) {
   const { menuProps } = useMenu(props, state, ref);
 
   return (
-    <ul {...menuProps} ref={ref} className="max-w-md focus:outline-none">
+    <ul
+      {...menuProps}
+      ref={ref}
+      className="max-w-md focus:outline-none"
+      style={props.style}
+    >
       {Array.from(state.collection).map((item) => (
         <MenuSection
           key={item.key}
