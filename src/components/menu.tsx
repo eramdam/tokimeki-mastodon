@@ -11,6 +11,7 @@ import {
 import type { TreeState } from "react-stately";
 import { useMenuTriggerState, useTreeState } from "react-stately";
 
+import { useOverlayBugWorkaround } from "../helpers/overlayBugWorkaround";
 import { Button } from "./button";
 import { Popover } from "./popover";
 
@@ -23,6 +24,7 @@ interface MenuButtonProps<T extends object>
 export function MenuButton<T extends object>(props: MenuButtonProps<T>) {
   // Create state based on the incoming props
   const state = useMenuTriggerState(props);
+  const menuBugWorkaround = useOverlayBugWorkaround(state);
 
   // Get props for the menu trigger and menu elements
   const ref = useRef<HTMLButtonElement>(null);
@@ -30,6 +32,7 @@ export function MenuButton<T extends object>(props: MenuButtonProps<T>) {
 
   return (
     <div style={{ position: "relative", display: "inline-block" }}>
+      {menuBugWorkaround}
       <Button
         {...menuTriggerProps}
         isPressed={state.isOpen}
