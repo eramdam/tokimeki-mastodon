@@ -207,3 +207,13 @@ export async function fetchLists(client: mastodon.Client) {
   console.log({ lists });
   usePersistedStore.setState({ lists });
 }
+
+export async function createList(client: mastodon.Client, name: string) {
+  const newList = await client.v1.lists.create({
+    title: name,
+  });
+  const currentLists = usePersistedStore.getState().lists;
+  usePersistedStore.setState({
+    lists: [...currentLists, newList],
+  });
+}

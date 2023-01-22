@@ -1,5 +1,5 @@
 import { Fragment, useEffect, useReducer } from "react";
-import type { MenuTriggerState } from "react-stately";
+import type { MenuTriggerState, OverlayTriggerState } from "react-stately";
 
 /**
  * Work around a bug that prevents overlay menus from opening
@@ -21,7 +21,9 @@ import type { MenuTriggerState } from "react-stately";
  * @param state The OverlayTriggerState controlling your overlay (i.e. whose `isOpen` property you pass to `useOverlayPosition`)
  * @returns An invisible element to include next to your overlay trigger
  */
-export const useOverlayBugWorkaround = (state: MenuTriggerState) => {
+export const useOverlayBugWorkaround = (
+  state: MenuTriggerState | OverlayTriggerState
+) => {
   const [renderCount, triggerRerender] = useReducer(
     (renders) => renders + 1,
     0

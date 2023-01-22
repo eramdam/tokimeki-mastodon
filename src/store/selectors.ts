@@ -70,6 +70,9 @@ export const useKeptAccounts = () => {
 };
 
 export const useLists = () => usePersistedStore((state) => state.lists);
+export const useListById = (id: string | undefined) => {
+  return usePersistedStore((state) => state.lists.find((l) => l.id === id));
+};
 
 /*
  * Helpers.
