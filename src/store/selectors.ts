@@ -68,6 +68,9 @@ export const useKeptAccounts = () => {
     [baseFollowings, keptIds]
   );
 };
+
+export const useLists = () => usePersistedStore((state) => state.lists);
+
 /*
  * Helpers.
  */

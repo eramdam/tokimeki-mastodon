@@ -1,4 +1,8 @@
+import { Item, Section } from "react-stately";
+
+import { useLists } from "../store/selectors";
 import { Button } from "./button";
+import { MenuButton } from "./menu";
 
 interface ReviewerButtonsProps {
   onUnfollowClick: () => void;
@@ -19,6 +23,7 @@ export function ReviewerButtons(props: ReviewerButtonsProps) {
     shouldSkipConfirmation,
     isFetching,
   } = props;
+  const lists = useLists();
 
   function renderContent() {
     if (isVisible) {
@@ -31,6 +36,17 @@ export function ReviewerButtons(props: ReviewerButtonsProps) {
           >
             Unfollow
           </Button>
+          <MenuButton label="Add to list" onAction={(key) => alert(key)}>
+            <Section key={"lists"}>
+              {lists.map((list) => {
+                return <Item key={list.id}>{list.title}</Item>;
+              })}
+            </Section>
+            <Section key={"actions"}>
+              <Item key="create-list">Create new list...</Item>
+              <Item key="cancel">Cancel</Item>
+            </Section>
+          </MenuButton>
           <Button
             onPress={() => onKeepClick()}
             variant="secondary"
