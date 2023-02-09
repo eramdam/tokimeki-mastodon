@@ -28,6 +28,7 @@ export const MastodonProvider = (props: PropsWithChildren<object>) => {
     login({
       url: instanceUrl,
       accessToken: accessToken,
+      disableVersionCheck: true,
     }).then((mastoClient) => {
       setMasto(mastoClient);
     });

@@ -12,6 +12,7 @@ const OAUTH_SCOPES = [
 export async function registerApplication(instanceURL: string, origin: string) {
   const masto = await login({
     url: instanceURL,
+    disableVersionCheck: true,
   });
 
   return await masto.v1.apps.create({
