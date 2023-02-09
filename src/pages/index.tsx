@@ -65,6 +65,7 @@ const Home: NextPage = () => {
         url: storedInstanceUrl,
         accessToken: access_token,
         timeout: 30_000,
+        disableVersionCheck: true,
       });
       const account = await masto.v1.accounts.verifyCredentials();
       saveAfterOAuthCode({
