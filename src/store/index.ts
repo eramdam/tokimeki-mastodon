@@ -57,12 +57,14 @@ export interface TokimekiState {
   };
   isFetching: boolean;
   currentAccount?: TokimekiAccount;
+  currentAccountListIds?: string[];
+  currentRelationship?: TokimekiRelationship;
   nextAccount?: TokimekiAccount;
+  nextAccountListIds?: string[];
+  nextRelationship?: TokimekiRelationship;
   baseFollowingIds: string[];
   followingIds: string[];
   isFinished: boolean;
-  currentRelationship?: TokimekiRelationship;
-  nextRelationship?: TokimekiRelationship;
   lists: mastodon.v1.List[];
 }
 

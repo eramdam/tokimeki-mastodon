@@ -43,6 +43,8 @@ export const useFilteredFollowings = () => {
   );
 };
 
+export const useCurrentAccountListIds = () =>
+  usePersistedStore((state) => state.currentAccountListIds);
 export const useCurrentAccountRelationship = () =>
   usePersistedStore((state) => state.currentRelationship);
 export const useCurrentAccount = () =>

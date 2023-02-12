@@ -4,7 +4,7 @@ import { Item, Section } from "react-stately";
 
 import { useMastodon } from "../helpers/mastodonContext";
 import { createList } from "../store/actions";
-import { useLists } from "../store/selectors";
+import { useCurrentAccountListIds, useLists } from "../store/selectors";
 import { Button, SmallButton } from "./button";
 import { MenuButton } from "./menu";
 import { PopoverButton } from "./popover";
@@ -37,6 +37,7 @@ export function ReviewerButtons(props: ReviewerButtonsProps) {
     isFetching,
   } = props;
   const lists = useLists();
+  const currentAccountListIds = useCurrentAccountListIds();
   const [isCreatingList, setIsCreatingList] = useState(false);
   const [isAddingToList, setIsAddingTolist] = useState(false);
   const [listName, setListName] = useState("");
@@ -103,7 +104,14 @@ export function ReviewerButtons(props: ReviewerButtonsProps) {
       >
         <Section>
           {lists.map((list) => {
-            return <Item key={list.id}>{list.title}</Item>;
+            return (
+              <Item key={list.id}>
+                {list.title}
+                {currentAccountListIds?.includes(list.id) && (
+                  <span className="ml-3 align-middle">✅</span>
+                )}
+              </Item>
+            );
           })}
         </Section>
         <Section>

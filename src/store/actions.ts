@@ -74,9 +74,11 @@ export async function fetchFollowings(
     );
     usePersistedStore.setState({
       currentAccount: undefined,
+      currentAccountListIds: undefined,
       currentRelationship: undefined,
       nextAccount: undefined,
       nextRelationship: undefined,
+      nextAccountListIds: undefined,
       followingIds: sortedFollowings,
     });
 
@@ -89,12 +91,20 @@ export async function fetchFollowings(
       client.v1.accounts.fetchRelationships(idsToFetch);
     const [currentAccount, nextAccount] = await Promise.all(accountPromises);
     const [currentRelationship, nextRelationship] = await relationshipsPromises;
+    const listPromises = idsToFetch.map((id) => {
+      return client.v1.accounts.listLists(id);
+    });
+    const [currentAccountListIds, nextAccountListIds] = (
+      await Promise.all(listPromises)
+    ).map((listsList) => listsList.map((l) => l.id));
 
     usePersistedStore.setState({
       currentAccount,
       currentRelationship,
+      currentAccountListIds,
       nextAccount,
       nextRelationship,
+      nextAccountListIds,
     });
 
     return;
@@ -120,14 +130,22 @@ export async function fetchFollowings(
   const firstAccount = accounts.find((a) => a.id === firstId);
   const secondId = sortedFollowings[1] || "";
   const secondAccount = accounts.find((a) => a.id === secondId);
+  const listPromises = [firstId, secondId].map((id) => {
+    return client.v1.accounts.listLists(id);
+  });
+  const [currentAccountListIds, nextAccountListIds] = (
+    await Promise.all(listPromises)
+  ).map((listsList) => listsList.map((l) => l.id));
 
   usePersistedStore.setState({
     baseFollowingIds: accountIds,
     followingIds: sortedFollowings,
     currentAccount:
       (firstAccount && pickTokimekiAccount(firstAccount)) || undefined,
+    currentAccountListIds,
     nextAccount:
       (secondAccount && pickTokimekiAccount(secondAccount)) || undefined,
+    nextAccountListIds,
   });
 
   const relationships = await client.v1.accounts.fetchRelationships(
@@ -171,9 +189,14 @@ export async function goToNextAccount(
     ? pick(relationships[0], ["followedBy", "note"])
     : undefined;
 
+  const currentAccountListIds = (
+    await client.v1.accounts.listLists(newAccount.id)
+  ).map((l) => l.id);
+
   usePersistedStore.setState({
     currentAccount: pickTokimekiAccount(newAccount),
     currentRelationship,
+    currentAccountListIds,
   });
 
   const nextAccountId = followingIds[currentIndex + 2];
@@ -215,5 +238,21 @@ export async function createList(client: mastodon.Client, name: string) {
   const currentLists = usePersistedStore.getState().lists;
   usePersistedStore.setState({
     lists: [...currentLists, newList],
+  });
+}
+
+export async function addToList(
+  client: mastodon.Client,
+  listId: string,
+  accountId: string
+) {
+  await client.v1.lists.addAccount(listId, {
+    accountIds: compact([accountId]),
+  });
+  usePersistedStore.setState({
+    currentAccountListIds: [
+      ...(usePersistedStore.getState().currentAccountListIds || []),
+      listId,
+    ],
   });
 }

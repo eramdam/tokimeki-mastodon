@@ -40,7 +40,7 @@ export function Popover(props: PopoverProps) {
         {...popoverProps}
         ref={ref}
         className={clsx(
-          "z-10 mt-2 rounded-xl border border-violet-300 shadow-lg shadow-black/30",
+          "z-10 mt-2 rounded-xl border-2 border-violet-800 shadow-lg shadow-black/30 dark:border-violet-500",
           "bg-white",
           "dark:bg-neutral-800"
         )}
