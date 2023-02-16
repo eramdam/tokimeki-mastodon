@@ -13,6 +13,7 @@
   },
   "dependencies": {
     "@github/relative-time-element": "^4.1.5",
+    "@react-types/shared": "^3.16.0",
     "@types/lodash-es": "^4.17.6",
     "@types/zen-observable": "^0.8.3",
     "blurhash": "^2.0.4",
@@ -28,7 +29,8 @@
     "react-aria": "^3.22.0",
     "react-blurhash": "^0.3.0",
     "react-dom": "18.2.0",
-    "react-stately": "^3.20.0",
+    "react-merge-refs": "^2.0.1",
+    "react-stately": "3.20.0",
     "swr": "^2.0.0",
     "tsx": "^3.12.2",
     "zen-observable": "^0.10.0",

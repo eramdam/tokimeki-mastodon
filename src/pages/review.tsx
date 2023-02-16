@@ -9,7 +9,12 @@ import { LinkButton } from "../components/linkButton";
 import { Options } from "../components/options";
 import { Reviewer } from "../components/reviewer";
 import { MastodonProvider, useMastodon } from "../helpers/mastodonContext";
-import { fetchFollowings, markAsFinished, resetState } from "../store/actions";
+import {
+  fetchFollowings,
+  fetchLists,
+  markAsFinished,
+  resetState,
+} from "../store/actions";
 import {
   useAccountId,
   useAccountUsername,
@@ -65,6 +70,7 @@ const ReviewContent = () => {
     }
 
     fetchFollowings(accountId, client);
+    fetchLists(client);
   }, [accountId, client, isReviewing]);
 
   if (isFinished) {

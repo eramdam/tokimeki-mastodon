@@ -43,6 +43,8 @@ export const useFilteredFollowings = () => {
   );
 };
 
+export const useCurrentAccountListIds = () =>
+  usePersistedStore((state) => state.currentAccountListIds);
 export const useCurrentAccountRelationship = () =>
   usePersistedStore((state) => state.currentRelationship);
 export const useCurrentAccount = () =>
@@ -68,6 +70,12 @@ export const useKeptAccounts = () => {
     [baseFollowings, keptIds]
   );
 };
+
+export const useLists = () => usePersistedStore((state) => state.lists);
+export const useListById = (id: string | undefined) => {
+  return usePersistedStore((state) => state.lists.find((l) => l.id === id));
+};
+
 /*
  * Helpers.
  */
