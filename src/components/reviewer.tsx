@@ -1,4 +1,5 @@
 import clsx from "clsx";
+import { compact } from "lodash-es";
 import { useState } from "react";
 
 import { delayAsync } from "../helpers/asyncHelpers";
@@ -44,6 +45,9 @@ export function Reviewer(props: ReviewerProps) {
   const isVisible = animationState === AnimationState.Idle;
   const { skipConfirmation } = useSettings();
   const [isFetching, setIsFetching] = useState(false);
+  const [addedToListId, setAddedToListId] = useState<string | undefined>(
+    undefined
+  );
 
   const onNextClick = async ({
     forceUnfollow,
@@ -86,6 +90,7 @@ export function Reviewer(props: ReviewerProps) {
       return;
     }
 
+    setAddedToListId(undefined);
     setAnimated(AnimationState.Idle);
     await goToNextAccount(client, currentAccount);
     setIsFetching(false);
@@ -109,6 +114,15 @@ export function Reviewer(props: ReviewerProps) {
     } else {
       setAnimated(AnimationState.Keep);
     }
+  };
+  const onAddToList = async (listId: string) => {
+    if (!client) {
+      return;
+    }
+    await client.v1.lists.addAccount(listId, {
+      accountIds: compact([currentAccount?.id ?? ""]),
+    });
+    setAddedToListId(listId);
   };
 
   const { showBio: initialShowBio, showNote: initialShowNote } = useSettings();
@@ -160,6 +174,7 @@ export function Reviewer(props: ReviewerProps) {
                 setShowNote={setShowNote}
                 account={currentAccount}
                 accountRelationship={currentAccountRelationship}
+                addedToListId={addedToListId}
               />
             )}
             <ReviewerPrompt
@@ -171,6 +186,7 @@ export function Reviewer(props: ReviewerProps) {
               onUndoClick={onUndoClick}
               onUnfollowClick={onUnfollowClick}
               onKeepClick={onKeepClick}
+              onAddToList={onAddToList}
               onNextClick={() => onNextClick({})}
               isVisible={isVisible}
               shouldSkipConfirmation={skipConfirmation}
