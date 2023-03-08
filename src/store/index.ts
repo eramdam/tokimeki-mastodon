@@ -58,12 +58,15 @@ export interface TokimekiState {
   };
   isFetching: boolean;
   currentAccount?: TokimekiAccount;
+  currentAccountListIds?: string[];
+  currentRelationship?: TokimekiRelationship;
   nextAccount?: TokimekiAccount;
+  nextAccountListIds?: string[];
+  nextRelationship?: TokimekiRelationship;
   baseFollowingIds: string[];
   followingIds: string[];
   isFinished: boolean;
-  currentRelationship?: TokimekiRelationship;
-  nextRelationship?: TokimekiRelationship;
+  lists: mastodon.v1.List[];
 }
 
 export const initialPersistedState: TokimekiState = {
@@ -80,6 +83,7 @@ export const initialPersistedState: TokimekiState = {
   isFetching: false,
   baseFollowingIds: [],
   followingIds: [],
+  lists: [],
 };
 
 export const usePersistedStore = create<TokimekiState>()(

@@ -9,6 +9,7 @@ import {
   useCurrentIndex,
   useFollowingIds,
   useInstanceUrl,
+  useListById,
   useSettings,
 } from "../store/selectors";
 import { SmallButton } from "./button";
@@ -22,6 +23,7 @@ interface ReviewerFooterProps {
   setShowBio: Dispatch<SetStateAction<boolean>>;
   showNote: boolean;
   setShowNote: Dispatch<SetStateAction<boolean>>;
+  addedToListId: string | undefined;
 }
 export function ReviewerFooter(props: ReviewerFooterProps) {
   const {
@@ -36,6 +38,7 @@ export function ReviewerFooter(props: ReviewerFooterProps) {
   const followings = useFollowingIds();
   const { showFollowLabel } = useSettings();
   const instanceUrl = useInstanceUrl();
+  const list = useListById(props.addedToListId);
 
   const renderTitle = () => {
     if (followingIndex === followings.length - 1) {
@@ -62,7 +65,13 @@ export function ReviewerFooter(props: ReviewerFooterProps) {
   return (
     <>
       <div className="flex w-full items-center justify-between">
-        <p className="custom-prose break-words text-left leading-normal ">
+        <p className="custom-prose break-words text-left leading-normal">
+          {list && (
+            <>
+              Added to <strong>{list.title}</strong>!
+              <br />
+            </>
+          )}
           {renderTitle()}
           {makeAccountName(account) && (
             <strong className="inline-block">
