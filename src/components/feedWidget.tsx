@@ -28,16 +28,14 @@ export function FeedWidget(props: FeedWidgetProps) {
 
   useEffect(() => {
     setIsLoading(true);
-    if (!client || !account) {
+    if (!client || !account || !currentAccountRelationship) {
       return;
     }
 
     const statusesPromise = client.v1.accounts.listStatuses(account.id, {
       limit: 40,
       excludeReplies: true,
-      excludeReblogs: currentAccountRelationship?.showingReblogs
-        ? !currentAccountRelationship.showingReblogs
-        : false,
+      excludeReblogs: !currentAccountRelationship.showingReblogs,
     });
 
     statusesPromise.then((res) => {
