@@ -4,7 +4,10 @@ import { useEffect, useMemo, useState } from "react";
 
 import { useMastodon } from "../helpers/mastodonContext";
 import type { TokimekiAccount } from "../store";
-import { useInstanceUrl } from "../store/selectors";
+import {
+  useCurrentAccountRelationship,
+  useInstanceUrl,
+} from "../store/selectors";
 import { Status } from "./status";
 
 interface FeedWidgetProps {
@@ -16,6 +19,7 @@ export function FeedWidget(props: FeedWidgetProps) {
   const { account } = props;
   const { client } = useMastodon();
   const [isLoading, setIsLoading] = useState(true);
+  const currentAccountRelationship = useCurrentAccountRelationship();
   const [statuses, setStatuses] = useState<mastodon.v1.Status[]>([]);
   const instanceUrl = useInstanceUrl();
   const isRemote = useMemo(() => {
@@ -31,14 +35,16 @@ export function FeedWidget(props: FeedWidgetProps) {
     const statusesPromise = client.v1.accounts.listStatuses(account.id, {
       limit: 40,
       excludeReplies: true,
-      excludeReblogs: false,
+      excludeReblogs: currentAccountRelationship?.showingReblogs
+        ? !currentAccountRelationship.showingReblogs
+        : false,
     });
 
     statusesPromise.then((res) => {
       setStatuses(res.slice(0, 20));
       setIsLoading(false);
     });
-  }, [account, client]);
+  }, [account, client, currentAccountRelationship]);
 
   function renderContent() {
     if (isLoading || !account) {
