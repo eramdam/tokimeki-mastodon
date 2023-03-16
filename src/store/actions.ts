@@ -152,7 +152,7 @@ export async function fetchFollowings(
     compact([firstAccount?.id])
   );
   const currentRelationship = relationships[0]
-    ? pick(relationships[0], ["followedBy", "note"])
+    ? pick(relationships[0], ["followedBy", "note", "showingReblogs"])
     : undefined;
 
   usePersistedStore.setState({
@@ -186,7 +186,7 @@ export async function goToNextAccount(
     ? [nextRelationship]
     : await client.v1.accounts.fetchRelationships(compact([newAccountId]));
   const currentRelationship = relationships[0]
-    ? pick(relationships[0], ["followedBy", "note"])
+    ? pick(relationships[0], ["followedBy", "note", "showingReblogs"])
     : undefined;
 
   const currentAccountListIds = (
@@ -214,7 +214,7 @@ export async function goToNextAccount(
     .fetchRelationships([nextAccountId])
     .then((newNextRelationship) => {
       const newNextRelationshipPicked = newNextRelationship[0]
-        ? pick(newNextRelationship[0], ["followedBy", "note"])
+        ? pick(newNextRelationship[0], ["followedBy", "note", "showingReblogs"])
         : undefined;
       usePersistedStore.setState({
         nextRelationship: newNextRelationshipPicked,

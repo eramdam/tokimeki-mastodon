@@ -36,6 +36,7 @@ export function pickTokimekiAccount(
 export interface TokimekiRelationship {
   followedBy: boolean;
   note?: string | null;
+  showingReblogs: boolean;
 }
 
 export interface TokimekiState {
@@ -92,7 +93,7 @@ export const usePersistedStore = create<TokimekiState>()(
       partialize(state) {
         return omit(state, ["actions", "nextAccount", "nextRelationship"]);
       },
-      version: 2,
+      version: 3,
     }),
     { name: "main-store" }
   )
