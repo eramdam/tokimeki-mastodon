@@ -9,6 +9,11 @@ const MyApp: AppType = ({ Component, pageProps }) => {
     <SSRProvider>
       <Head>
         <title>Tokimeki Mastodon</title>
+        <script
+          defer
+          data-domain="tokimeki-mastodon.vercel.app"
+          src="https://plausible.io/js/script.js"
+        ></script>
       </Head>
       <Component {...pageProps} />
     </SSRProvider>
