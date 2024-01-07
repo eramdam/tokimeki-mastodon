@@ -1,6 +1,6 @@
 import { createRestAPIClient } from "masto";
 import type { PropsWithChildren } from "react";
-import { createContext, useContext, useEffect, useMemo, useState } from "react";
+import { createContext, useContext, useEffect, useRef } from "react";
 
 import {
   useAccessToken,
@@ -18,32 +18,27 @@ export const MastodonProvider = (props: PropsWithChildren<object>) => {
   const accessToken = useAccessToken();
   const accountId = useAccountId();
   const instanceUrl = useInstanceUrl();
-  const [masto, setMasto] = useState<MastodonClient | undefined>();
+  const clientRef = useRef<MastodonClient | null>(null);
 
   useEffect(() => {
-    if (!accessToken || !instanceUrl) {
+    if (!accessToken || !instanceUrl || clientRef.current) {
       return;
     }
 
-    console.log({
-      url: instanceUrl,
-      accessToken: accessToken,
-    });
     const client = createRestAPIClient({
       url: instanceUrl,
       accessToken: accessToken,
     });
+    clientRef.current = client;
   }, [accessToken, instanceUrl]);
 
-  const value = useMemo(() => {
-    return {
-      client: masto,
-      accountId: accountId || null,
-    };
-  }, [accountId, masto]);
-
   return (
-    <MastodonContext.Provider value={value}>
+    <MastodonContext.Provider
+      value={{
+        client: clientRef.current || undefined,
+        accountId: accountId || null,
+      }}
+    >
       {props.children}
     </MastodonContext.Provider>
   );
