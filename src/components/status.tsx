@@ -2,10 +2,9 @@
 import "@github/relative-time-element";
 
 import clsx from "clsx";
-import parse from "html-react-parser";
 import { compact } from "lodash-es";
 import type { mastodon } from "masto";
-import { useMemo, useRef, useState } from "react";
+import { useRef, useState } from "react";
 import { useButton } from "react-aria";
 
 import { isElement } from "../helpers/domHelpers";
@@ -13,7 +12,7 @@ import { makeAccountName } from "../helpers/mastodonHelpers";
 import { BlurhashImage } from "./blurhashImage";
 import { SmallButton } from "./button";
 import { renderWithEmoji } from "./emojify";
-import { getParserOptions } from "./htmlReactParserOptions";
+import { HtmlRenderer } from "./htmlRendered";
 
 interface StatusProps {
   status: mastodon.v1.Status;
@@ -76,11 +75,6 @@ export function Status(props: StatusProps) {
         </div>
       );
     })
-  );
-
-  const parseOptions = useMemo(
-    () => getParserOptions({ emojiArray: status.emojis }),
-    [status.emojis]
   );
 
   return (
@@ -165,7 +159,7 @@ export function Status(props: StatusProps) {
       )}
       {(!isCollapsed && (
         <div className="text-sm dark:text-neutral-100">
-          {parse(status.content, parseOptions)}
+          <HtmlRenderer content={status.content} emojiArray={status.emojis} />
         </div>
       )) ||
         null}

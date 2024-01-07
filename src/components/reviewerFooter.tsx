@@ -1,7 +1,5 @@
 import clsx from "clsx";
-import parse from "html-react-parser";
 import type { Dispatch, SetStateAction } from "react";
-import { useMemo } from "react";
 
 import { makeAccountName } from "../helpers/mastodonHelpers";
 import type { TokimekiAccount, TokimekiRelationship } from "../store";
@@ -14,7 +12,7 @@ import {
 } from "../store/selectors";
 import { SmallButton } from "./button";
 import { renderWithEmoji } from "./emojify";
-import { getParserOptions } from "./htmlReactParserOptions";
+import { HtmlRenderer } from "./htmlRendered";
 
 interface ReviewerFooterProps {
   account: TokimekiAccount;
@@ -47,17 +45,6 @@ export function ReviewerFooter(props: ReviewerFooterProps) {
 
     return followingIndex === 0 ? "Starting with " : `#${followingIndex + 1}: `;
   };
-
-  const parseOptions = useMemo(
-    () =>
-      getParserOptions({
-        emojiArray: account.emojis || [],
-        classNames: {
-          p: "first-of-type:mt-0 text-sm !mt-1 lg:!mt-2",
-        },
-      }),
-    [account.emojis]
-  );
 
   const baseBlockClassname =
     "custom-prose w-full rounded-md border-[1px] border-black/30 p-2 leading-normal";
@@ -128,13 +115,25 @@ export function ReviewerFooter(props: ReviewerFooterProps) {
               )}
             >
               <strong className="text-sm">Bio:</strong>{" "}
-              {parse(account.note, parseOptions)}
+              <HtmlRenderer
+                content={account.note}
+                emojiArray={account.emojis}
+                classNames={{
+                  p: "first-of-type:mt-0 text-sm !mt-1 lg:!mt-2",
+                }}
+              />
             </div>
           )}
           {showNote && accountRelationship?.note && (
             <div className={clsx(baseBlockClassname, "bg-yellow-400/10")}>
               <strong className="text-sm">Note:</strong>{" "}
-              {parse(accountRelationship.note, parseOptions)}
+              <HtmlRenderer
+                content={accountRelationship.note}
+                emojiArray={account.emojis}
+                classNames={{
+                  p: "first-of-type:mt-0 text-sm !mt-1 lg:!mt-2",
+                }}
+              />
             </div>
           )}
         </div>

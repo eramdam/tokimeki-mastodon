@@ -227,7 +227,6 @@ export function markAsFinished(): void {
 
 export async function fetchLists(client: mastodon.Client) {
   const lists = await client.v1.lists.list();
-  console.log({ lists });
   usePersistedStore.setState({ lists });
 }
 

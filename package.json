@@ -29,6 +29,7 @@
     "react-aria": "^3.22.0",
     "react-blurhash": "^0.3.0",
     "react-dom": "18.2.0",
+    "react-error-boundary": "^4.0.12",
     "react-merge-refs": "^2.0.1",
     "react-stately": "3.20.0",
     "swr": "^2.0.0",
