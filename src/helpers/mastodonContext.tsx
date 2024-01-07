@@ -1,5 +1,4 @@
-import type { mastodon } from "masto";
-import { login } from "masto";
+import { createRestAPIClient } from "masto";
 import type { PropsWithChildren } from "react";
 import { createContext, useContext, useEffect, useMemo, useState } from "react";
 
@@ -8,9 +7,10 @@ import {
   useAccountId,
   useInstanceUrl,
 } from "../store/selectors";
+import type { MastodonClient } from "./typeHelpers";
 
 const MastodonContext = createContext<{
-  client: mastodon.Client | undefined;
+  client: MastodonClient | undefined;
   accountId: string | null;
 }>({ client: undefined, accountId: null });
 
@@ -18,19 +18,20 @@ export const MastodonProvider = (props: PropsWithChildren<object>) => {
   const accessToken = useAccessToken();
   const accountId = useAccountId();
   const instanceUrl = useInstanceUrl();
-  const [masto, setMasto] = useState<mastodon.Client | undefined>();
+  const [masto, setMasto] = useState<MastodonClient | undefined>();
 
   useEffect(() => {
     if (!accessToken || !instanceUrl) {
       return;
     }
 
-    login({
+    console.log({
       url: instanceUrl,
       accessToken: accessToken,
-      disableVersionCheck: true,
-    }).then((mastoClient) => {
-      setMasto(mastoClient);
+    });
+    const client = createRestAPIClient({
+      url: instanceUrl,
+      accessToken: accessToken,
     });
   }, [accessToken, instanceUrl]);
 

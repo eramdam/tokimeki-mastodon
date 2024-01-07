@@ -68,7 +68,7 @@ export function Reviewer(props: ReviewerProps) {
       if (shouldUnfollow) {
         console.log("Will unfollow", currentAccount.acct);
         if (process.env.NODE_ENV !== "development") {
-          await client.v1.accounts.unfollow(currentAccount.id);
+          await client.v1.accounts.$select(currentAccount.id).unfollow();
         }
         unfollowAccount(currentAccount.id);
       } else {
@@ -119,7 +119,7 @@ export function Reviewer(props: ReviewerProps) {
     if (!client) {
       return;
     }
-    await client.v1.lists.addAccount(listId, {
+    await client.v1.lists.$select(listId).accounts.create({
       accountIds: compact([currentAccount?.id ?? ""]),
     });
     setAddedToListId(listId);
