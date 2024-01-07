@@ -1,6 +1,6 @@
 import { omit, pick } from "lodash-es";
 import type { mastodon } from "masto";
-import create from "zustand";
+import { create } from "zustand";
 import { devtools, persist } from "zustand/middleware";
 
 export enum SortOrders {
@@ -20,7 +20,7 @@ export interface TokimekiAccount {
 }
 
 export function pickTokimekiAccount(
-  account: mastodon.v1.Account | TokimekiAccount
+  account: mastodon.v1.Account | TokimekiAccount,
 ): TokimekiAccount {
   return pick(account, [
     "id",
@@ -93,8 +93,8 @@ export const usePersistedStore = create<TokimekiState>()(
       partialize(state) {
         return omit(state, ["actions", "nextAccount", "nextRelationship"]);
       },
-      version: 3,
+      version: 4,
     }),
-    { name: "main-store" }
-  )
+    { name: "main-store" },
+  ),
 );

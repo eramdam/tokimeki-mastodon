@@ -1,5 +1,5 @@
 import type { AriaMenuProps, MenuTriggerProps } from "@react-types/menu";
-import type { Node } from "@react-types/shared";
+import type { Key, Node } from "@react-types/shared";
 import clsx from "clsx";
 import type { CSSProperties } from "react";
 import React, { useRef } from "react";
@@ -97,7 +97,7 @@ function Menu<T extends object>(props: MenuProps<T>) {
 interface MenuSectionProps<T> {
   section: Node<T>;
   state: TreeState<T>;
-  onAction?: (key: React.Key) => void;
+  onAction?: (key: Key) => void;
   onClose: () => void;
 }
 
@@ -118,7 +118,7 @@ function MenuSection<T>({
         {...itemProps}
         className={clsx(
           section.key === state.collection.getFirstKey() && "mt-1",
-          section.key !== state.collection.getFirstKey() && "mb-1"
+          section.key !== state.collection.getFirstKey() && "mb-1",
         )}
       >
         <ul {...groupProps}>
@@ -140,7 +140,7 @@ function MenuSection<T>({
 interface MenuItemProps<T> {
   item: Node<T>;
   state: TreeState<T>;
-  onAction?: (key: React.Key) => void;
+  onAction?: (key: Key) => void;
   onClose: () => void;
 }
 
@@ -154,7 +154,7 @@ function MenuItem<T>({ item, state, onAction, onClose }: MenuItemProps<T>) {
       onClose,
     },
     state,
-    ref
+    ref,
   );
 
   // Handle focus events so we can apply highlighted
@@ -166,8 +166,8 @@ function MenuItem<T>({ item, state, onAction, onClose }: MenuItemProps<T>) {
       {...menuItemProps}
       ref={ref}
       className={clsx(
-        "mx-1 truncate rounded-lg py-2 px-3 text-sm capitalize text-violet-800 focus:outline-none dark:text-violet-500",
-        isFocused ? "bg-violet-200 dark:bg-violet-800" : ""
+        "mx-1 truncate rounded-lg px-3 py-2 text-sm capitalize text-violet-800 focus:outline-none dark:text-violet-500",
+        isFocused ? "bg-violet-200 dark:bg-violet-800" : "",
       )}
     >
       {item.rendered}
