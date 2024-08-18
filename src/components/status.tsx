@@ -25,7 +25,7 @@ export function Status(props: StatusProps) {
   const initialIsCollapsed = !!status.spoilerText;
   const [isCollapsed, setIsCollapsed] = useState(initialIsCollapsed);
   const [areMediaHidden, setAreMediaHidden] = useState(
-    status.sensitive || initialIsCollapsed
+    status.sensitive || initialIsCollapsed,
   );
   const mediaWrapperRef = useRef<HTMLDivElement | null>(null);
   const { buttonProps } = useButton(
@@ -34,10 +34,10 @@ export function Status(props: StatusProps) {
         setAreMediaHidden(false);
       },
     },
-    mediaWrapperRef
+    mediaWrapperRef,
   );
   const hasUncachedMedia = status.mediaAttachments.some(
-    (m) => m.type === "unknown"
+    (m) => m.type === "unknown",
   );
   const renderMediaText = () => {
     if (hasUncachedMedia) {
@@ -74,7 +74,7 @@ export function Status(props: StatusProps) {
           ></BlurhashImage>
         </div>
       );
-    })
+    }),
   );
 
   return (
@@ -114,9 +114,7 @@ export function Status(props: StatusProps) {
             <img
               alt={makeAccountName(booster)}
               src={booster.avatar}
-              className="absolute -bottom-2 -right-2 -mt-2 h-6 w-6 rounded-md border-2 border-white bg-white dark:border-neutral-800 dark:bg-neutral-800
-              
-              "
+              className="absolute -bottom-2 -right-2 -mt-2 h-6 w-6 rounded-md border-2 border-white bg-white dark:border-neutral-800 dark:bg-neutral-800"
             />
           )}
         </div>
@@ -125,7 +123,7 @@ export function Status(props: StatusProps) {
           <span className="truncate text-base leading-tight">
             {renderWithEmoji(
               status.account.emojis,
-              makeAccountName(status.account)
+              makeAccountName(status.account),
             )}
           </span>
           <span className="truncate text-xs leading-tight">
@@ -175,7 +173,7 @@ export function Status(props: StatusProps) {
               "absolute",
               (areMediaHidden || hasUncachedMedia) &&
                 "top-1/2 left-1/2 z-20 -translate-x-1/2 -translate-y-1/2",
-              !areMediaHidden && !hasUncachedMedia && "top-1 left-1 z-20"
+              !areMediaHidden && !hasUncachedMedia && "top-1 left-1 z-20",
             )}
             onPress={() => {
               if (hasUncachedMedia) {

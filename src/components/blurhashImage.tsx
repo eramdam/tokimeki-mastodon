@@ -35,7 +35,7 @@ export function BlurhashImage(props: BlurhashImageProps) {
           {
             "opacity-0": !isLoaded || props.isHidden || props.isUncached,
           },
-          "text-[0px]"
+          "text-[0px]",
         )}
         onLoad={() => setIsLoaded(true)}
         width={props.width || 32}

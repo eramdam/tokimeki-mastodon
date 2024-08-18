@@ -74,7 +74,7 @@ const Home: NextPage = () => {
       });
       router.push("/review");
     },
-    [clientId, clientSecret, router, storedInstanceUrl]
+    [clientId, clientSecret, router, storedInstanceUrl],
   );
 
   const account = useAccountId();
@@ -103,7 +103,7 @@ const Home: NextPage = () => {
     try {
       const { clientId, clientSecret } = await registerApplication(
         localInstanceUrl.replace(/\/$/, ""),
-        window.location.origin
+        window.location.origin,
       );
 
       if (clientId && clientSecret) {
@@ -155,11 +155,11 @@ const Home: NextPage = () => {
             label="Instance domain"
             placeholder="https://"
             type={"url"}
-            className="custom-prose flex flex-col gap-2 text-center "
+            className="custom-prose flex flex-col gap-2 text-center"
             value={localInstanceUrl}
             onChange={(value) => {
               setInstanceDomain(
-                value.startsWith("https://") ? value : `https://${value}`
+                value.startsWith("https://") ? value : `https://${value}`,
               );
             }}
             validationState={isInstanceValid || "valid"}

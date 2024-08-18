@@ -37,7 +37,7 @@ export function saveAfterOAuthCode(payload: {
 }
 
 export function updateSettings(
-  payload: Partial<TokimekiState["settings"]>
+  payload: Partial<TokimekiState["settings"]>,
 ): void {
   usePersistedStore.setState((state) => ({
     settings: {
@@ -58,7 +58,7 @@ export function keepAccount(accountId: string): void {
 }
 export async function fetchFollowings(
   accountId: string,
-  client: mastodon.Client
+  client: mastodon.Client,
 ) {
   usePersistedStore.setState({ isFetching: true });
   const persistedState = usePersistedStore.getState();
@@ -68,9 +68,9 @@ export async function fetchFollowings(
       filterFollowingIds(
         persistedState.baseFollowingIds,
         persistedState.keptIds,
-        persistedState.unfollowedIds
+        persistedState.unfollowedIds,
       ),
-      usePersistedStore.getState().settings.sortOrder
+      usePersistedStore.getState().settings.sortOrder,
     );
     usePersistedStore.setState({
       currentAccount: undefined,
@@ -123,7 +123,7 @@ export async function fetchFollowings(
   const accountIds = accounts.map((a) => a.id);
   const sortedFollowings = sortFollowings(
     accountIds,
-    usePersistedStore.getState().settings.sortOrder
+    usePersistedStore.getState().settings.sortOrder,
   );
 
   const firstId = sortedFollowings[0] || "";
@@ -149,7 +149,7 @@ export async function fetchFollowings(
   });
 
   const relationships = await client.v1.accounts.fetchRelationships(
-    compact([firstAccount?.id])
+    compact([firstAccount?.id]),
   );
   const currentRelationship = relationships[0]
     ? pick(relationships[0], ["followedBy", "note", "showingReblogs"])
@@ -172,7 +172,7 @@ export async function setCurrentAccountEmpty() {
 }
 export async function goToNextAccount(
   client: mastodon.Client,
-  currentAccount: TokimekiAccount
+  currentAccount: TokimekiAccount,
 ) {
   const { followingIds, nextAccount, nextRelationship } =
     usePersistedStore.getState();
@@ -243,7 +243,7 @@ export async function createList(client: mastodon.Client, name: string) {
 export async function addToList(
   client: mastodon.Client,
   listId: string,
-  accountId: string
+  accountId: string,
 ) {
   await client.v1.lists.addAccount(listId, {
     accountIds: compact([accountId]),

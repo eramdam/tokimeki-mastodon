@@ -85,7 +85,7 @@ export function FeedWidget(props: FeedWidgetProps) {
     <div
       className={clsx(
         "flex min-h-[400px] min-w-full flex-col overflow-y-scroll",
-        props.className
+        props.className,
       )}
     >
       {renderContent()}

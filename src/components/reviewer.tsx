@@ -46,7 +46,7 @@ export function Reviewer(props: ReviewerProps) {
   const { skipConfirmation } = useSettings();
   const [isFetching, setIsFetching] = useState(false);
   const [addedToListId, setAddedToListId] = useState<string | undefined>(
-    undefined
+    undefined,
   );
 
   const onNextClick = async ({
@@ -150,7 +150,7 @@ export function Reviewer(props: ReviewerProps) {
           animationState === AnimationState.Keep &&
             "translate-x-[20%] translate-y-[200px] rotate-[10deg] scale-0 opacity-0",
           animationState === AnimationState.Unfollow &&
-            "translate-x-[-20%] translate-y-[200px] rotate-[-10deg] scale-0 opacity-0"
+            "translate-x-[-20%] translate-y-[200px] rotate-[-10deg] scale-0 opacity-0",
         )}
       >
         <FeedWidget
@@ -161,7 +161,7 @@ export function Reviewer(props: ReviewerProps) {
 
       <Block
         className={clsx(
-          "mt-0 flex max-h-[75vh] flex-shrink-0 flex-col items-start border-t-2 dark:border-t-neutral-600 lg:max-h-[50vh] lg:w-3/4"
+          "mt-0 flex max-h-[75vh] flex-shrink-0 flex-col items-start border-t-2 dark:border-t-neutral-600 lg:max-h-[50vh] lg:w-3/4",
         )}
       >
         {currentAccount && currentAccountRelationship ? (

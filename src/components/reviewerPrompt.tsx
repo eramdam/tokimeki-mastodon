@@ -10,7 +10,7 @@ export const ReviewerPrompt = (
     animationState: AnimationState;
     account: TokimekiAccount;
     loadingRender: ReactNode;
-  }>
+  }>,
 ) => {
   const { animationState, account } = props;
   const accountName = makeAccountName(account);
@@ -41,5 +41,5 @@ export const ReviewerPrompt = (
     return <>{props.loadingRender}</>;
   }
 
-  return <div className="custom-prose leading-normal ">{renderContent()}</div>;
+  return <div className="custom-prose leading-normal">{renderContent()}</div>;
 };

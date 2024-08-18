@@ -4,7 +4,7 @@ import type { mastodon } from "masto";
 
 export function renderWithEmoji(
   emojiArray: mastodon.v1.CustomEmoji[],
-  text: string
+  text: string,
 ) {
   const emojiMap = keyBy(emojiArray, (e) => e.shortcode);
   const shortcodes = Object.keys(emojiMap).map((s) => `:${s}:`);

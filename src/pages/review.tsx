@@ -57,9 +57,9 @@ const ReviewContent = () => {
   const hasProgress = useMemo(
     () =>
       Boolean(
-        (unfollowedIds && unfollowedIds.length) || (keptIds && keptIds.length)
+        (unfollowedIds && unfollowedIds.length) || (keptIds && keptIds.length),
       ),
-    [keptIds, unfollowedIds]
+    [keptIds, unfollowedIds],
   );
   const isFinished = useIsFinished();
   const filteredFollowings = useFilteredFollowings();
@@ -157,7 +157,7 @@ const ReviewContent = () => {
         </Button>
       </Block>
       <Block className="w-full">
-        <div className="custom-prose opacity-60 ">
+        <div className="custom-prose opacity-60">
           <p>
             Based off{" "}
             <a href="https://tokimeki-unfollow.glitch.me/">Tokimeki Unfollow</a>{" "}

@@ -11,7 +11,7 @@ export function Block(props: PropsWithHtmlProps<"div">) {
         "bg-white",
         "dark:bg-neutral-800",
         "peer lg:peer-[]:-mt-4",
-        className
+        className,
       )}
       {...rest}
     >

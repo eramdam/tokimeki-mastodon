@@ -31,7 +31,7 @@ export function LinkButton(props: LinkButtonProps) {
         "text-sm underline dark:text-white",
         props.position && positionClassnames[props.position],
         props.position && "fixed block",
-        props.className
+        props.className,
       )}
     >
       {props.children}

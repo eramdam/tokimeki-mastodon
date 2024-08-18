@@ -20,7 +20,7 @@ export interface TokimekiAccount {
 }
 
 export function pickTokimekiAccount(
-  account: mastodon.v1.Account | TokimekiAccount
+  account: mastodon.v1.Account | TokimekiAccount,
 ): TokimekiAccount {
   return pick(account, [
     "id",
@@ -95,6 +95,6 @@ export const usePersistedStore = create<TokimekiState>()(
       },
       version: 3,
     }),
-    { name: "main-store" }
-  )
+    { name: "main-store" },
+  ),
 );

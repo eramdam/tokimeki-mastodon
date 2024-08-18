@@ -34,7 +34,7 @@ export function getAuthURL(opts: { clientId: string; instanceUrl: string }) {
   });
   const authorizationURL = `https://${opts.instanceUrl.replace(
     /https?:\/\//,
-    ""
+    "",
   )}/oauth/authorize?${authorizationParams.toString()}`;
 
   return authorizationURL;
@@ -62,7 +62,7 @@ export async function getAccessToken(opts: {
         "Content-Type": "application/x-www-form-urlencoded",
       },
       body: params.toString(),
-    }
+    },
   );
   const tokenJSON = await tokenResponse.json();
   return tokenJSON;

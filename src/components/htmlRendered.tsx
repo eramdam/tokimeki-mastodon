@@ -18,7 +18,7 @@ export function HtmlRenderer(props: HtmlRendererProps) {
   const { content, emojiArray, classNames } = props;
   const parseOptions = useMemo(
     () => getParserOptions({ emojiArray, classNames }),
-    [classNames, emojiArray]
+    [classNames, emojiArray],
   );
 
   return (

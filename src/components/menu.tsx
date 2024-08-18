@@ -118,7 +118,7 @@ function MenuSection<T>({
         {...itemProps}
         className={clsx(
           section.key === state.collection.getFirstKey() && "mt-1",
-          section.key !== state.collection.getFirstKey() && "mb-1"
+          section.key !== state.collection.getFirstKey() && "mb-1",
         )}
       >
         <ul {...groupProps}>
@@ -154,7 +154,7 @@ function MenuItem<T>({ item, state, onAction, onClose }: MenuItemProps<T>) {
       onClose,
     },
     state,
-    ref
+    ref,
   );
 
   // Handle focus events so we can apply highlighted
@@ -167,7 +167,7 @@ function MenuItem<T>({ item, state, onAction, onClose }: MenuItemProps<T>) {
       ref={ref}
       className={clsx(
         "mx-1 truncate rounded-lg py-2 px-3 text-sm capitalize text-violet-800 focus:outline-none dark:text-violet-500",
-        isFocused ? "bg-violet-200 dark:bg-violet-800" : ""
+        isFocused ? "bg-violet-200 dark:bg-violet-800" : "",
       )}
     >
       {item.rendered}
