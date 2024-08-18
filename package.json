@@ -9,7 +9,7 @@
     "start": "next start",
     "typecheck": "tsc -p .",
     "typecheck:watch": "npm run typecheck -- --watch",
-    "prepare": "husky install"
+    "prepare": "husky"
   },
   "dependencies": {
     "@github/relative-time-element": "^4.4.2",
@@ -48,8 +48,8 @@
     "@types/react-dom": "^18.3.0",
     "autoprefixer": "^10.4.20",
     "eslint": "^9.9.0",
-    "husky": "^8.0.3",
-    "lint-staged": "^13.1.0",
+    "husky": "^9.1.4",
+    "lint-staged": "^15.2.9",
     "postcss": "^8.4.41",
     "postcss-nesting": "^13.0.0",
     "prettier": "^3.3.3",
