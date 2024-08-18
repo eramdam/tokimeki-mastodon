@@ -1,4 +1,3 @@
-/* eslint-disable @next/next/no-img-element */
 import { pick } from "lodash-es";
 import { useRouter } from "next/router";
 import { useMemo, useState } from "react";

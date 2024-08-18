@@ -1,4 +1,3 @@
-/* eslint-disable @next/next/no-img-element */
 import { isString, keyBy } from "lodash-es";
 import type { mastodon } from "masto";
 

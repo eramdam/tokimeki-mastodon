@@ -31,7 +31,7 @@ const Home: NextPage = () => {
     try {
       new URL(localInstanceUrl);
       return "valid";
-    } catch (e) {
+    } catch (_e) {
       return "invalid";
     }
   }, [localInstanceUrl]);

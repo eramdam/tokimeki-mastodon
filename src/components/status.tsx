@@ -1,4 +1,3 @@
-/* eslint-disable @next/next/no-img-element */
 import "@github/relative-time-element";
 
 import clsx from "clsx";

@@ -1,4 +1,3 @@
-/* eslint-disable @next/next/no-img-element */
 import clsx from "clsx";
 import { useEffect, useRef, useState } from "react";
 import { BlurhashCanvas } from "react-blurhash";
