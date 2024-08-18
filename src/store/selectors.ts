@@ -1,6 +1,5 @@
 import { shuffle } from "lodash-es";
 import { useMemo } from "react";
-import shallow from "zustand/shallow";
 
 import { SortOrders, usePersistedStore } from "./index";
 
@@ -26,7 +25,7 @@ export const useOAuthCodeDependencies = () =>
       clientSecret: state.clientSecret,
       instanceUrl: state.instanceUrl,
     };
-  }, shallow);
+  });
 
 export const useFollowingIds = () =>
   usePersistedStore((state) => state.followingIds);
