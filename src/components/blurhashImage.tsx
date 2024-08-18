@@ -42,12 +42,14 @@ export function BlurhashImage(props: BlurhashImageProps) {
         height={props.height || 32}
         alt={props.description || ""}
       />
-      <BlurhashCanvas
-        className={props.canvasClassname}
-        hash={props.hash}
-        width={props.width || 32}
-        height={props.height || 32}
-      ></BlurhashCanvas>
+      {!isLoaded && (
+        <BlurhashCanvas
+          className={props.canvasClassname}
+          hash={props.hash}
+          width={props.width || 32}
+          height={props.height || 32}
+        ></BlurhashCanvas>
+      )}
     </>
   );
 }
