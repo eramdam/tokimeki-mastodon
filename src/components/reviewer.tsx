@@ -68,7 +68,7 @@ export function Reviewer(props: ReviewerProps) {
       if (shouldUnfollow) {
         console.log("Will unfollow", currentAccount.acct);
         if (process.env.NODE_ENV !== "development") {
-          await client.v1.accounts.unfollow(currentAccount.id);
+          await client.v1.accounts.$select(currentAccount.id).unfollow();
         }
         unfollowAccount(currentAccount.id);
       } else {
@@ -161,7 +161,7 @@ export function Reviewer(props: ReviewerProps) {
 
       <Block
         className={clsx(
-          "mt-0 flex max-h-[75vh] flex-shrink-0 flex-col items-start border-t-2 dark:border-t-neutral-600 lg:max-h-[50vh] lg:w-3/4",
+          "mt-0 flex max-h-[75vh] flex-shrink-0 flex-col items-start border-t-2 lg:max-h-[50vh] lg:w-3/4 dark:border-t-neutral-600",
         )}
       >
         {currentAccount && currentAccountRelationship ? (

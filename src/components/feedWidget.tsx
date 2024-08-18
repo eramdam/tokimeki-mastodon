@@ -32,11 +32,13 @@ export function FeedWidget(props: FeedWidgetProps) {
       return;
     }
 
-    const statusesPromise = client.v1.accounts.listStatuses(account.id, {
-      limit: 40,
-      excludeReplies: true,
-      excludeReblogs: !currentAccountRelationship.showingReblogs,
-    });
+    const statusesPromise = client.v1.accounts
+      .$select(account.id)
+      .statuses.list({
+        limit: 40,
+        excludeReplies: true,
+        excludeReblogs: !currentAccountRelationship.showingReblogs,
+      });
 
     statusesPromise.then((res) => {
       setStatuses(res.slice(0, 20));

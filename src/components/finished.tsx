@@ -29,9 +29,11 @@ export function Finished() {
       return [];
     }
 
-    const accounts = await client.v1.accounts.listFollowing(accountId, {
-      limit: 80,
-    });
+    const accounts = await client.v1.accounts
+      .$select(accountId)
+      .following.list({
+        limit: 80,
+      });
     return accounts.map((a) => pick(a, ["id", "avatar", "displayName"]));
   });
 
