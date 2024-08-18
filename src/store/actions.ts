@@ -239,19 +239,3 @@ export async function createList(client: mastodon.rest.Client, name: string) {
     lists: [...currentLists, newList],
   });
 }
-
-export async function addToList(
-  client: mastodon.rest.Client,
-  listId: string,
-  accountId: string,
-) {
-  await client.v1.lists.addAccount(listId, {
-    accountIds: compact([accountId]),
-  });
-  usePersistedStore.setState({
-    currentAccountListIds: [
-      ...(usePersistedStore.getState().currentAccountListIds || []),
-      listId,
-    ],
-  });
-}
