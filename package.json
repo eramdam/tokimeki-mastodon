@@ -18,7 +18,7 @@
     "@types/lodash-es": "^4.17.12",
     "@types/zen-observable": "^0.8.7",
     "blurhash": "^2.0.5",
-    "clsx": "^1.2.1",
+    "clsx": "^2.1.1",
     "dompurify": "^2.4.3",
     "globals": "^15.9.0",
     "html-react-parser": "^3.0.7",
