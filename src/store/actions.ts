@@ -83,17 +83,17 @@ export async function fetchFollowings(
     });
 
     const [firstAccountId, secondAccountId] = sortedFollowings;
-    const idsToFetch = compact([firstAccountId, secondAccountId]);
-    const accountPromises = idsToFetch.map((id) => {
+    const accountIdsToFetch = compact([firstAccountId, secondAccountId]);
+    const accountPromises = accountIdsToFetch.map((id) => {
       return client.v1.accounts.$select(id).fetch();
     });
     const relationshipsPromises = client.v1.accounts.relationships.fetch({
-      id: idsToFetch,
+      id: accountIdsToFetch,
     });
     const [currentAccount, nextAccount] = await Promise.all(accountPromises);
     const [currentRelationship, nextRelationship] = await relationshipsPromises;
-    const listPromises = idsToFetch.map((id) => {
-      return client.v1.accounts.listLists(id);
+    const listPromises = accountIdsToFetch.map((id) => {
+      return client.v1.accounts.$select(id).lists.list();
     });
     const [currentAccountListIds, nextAccountListIds] = (
       await Promise.all(listPromises)
@@ -134,7 +134,7 @@ export async function fetchFollowings(
   const secondId = sortedFollowings[1] || "";
   const secondAccount = accounts.find((a) => a.id === secondId);
   const listPromises = [firstId, secondId].map((id) => {
-    return client.v1.accounts.listLists(id);
+    return client.v1.accounts.$select(id).lists.list();
   });
   const [currentAccountListIds, nextAccountListIds] = (
     await Promise.all(listPromises)
@@ -196,7 +196,7 @@ export async function goToNextAccount(
     : undefined;
 
   const currentAccountListIds = (
-    await client.v1.accounts.listLists(newAccount.id)
+    await client.v1.accounts.$select(newAccount.id).lists.list()
   ).map((l) => l.id);
 
   usePersistedStore.setState({

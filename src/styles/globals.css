@@ -59,3 +59,12 @@
   width: 36px;
   height: 36px;
 }
+
+article .invisible {
+  display: inline-block;
+  font-size: 0;
+  height: 0;
+  line-height: 0;
+  position: absolute;
+  width: 0;
+}

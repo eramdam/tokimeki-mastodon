@@ -28,7 +28,11 @@ export function getParserOptions(options: GetParserOptionsProps) {
         }
         if (domNode.tagName === "a") {
           const anchorProps = mergeProps(attributesToProps(domNode.attribs), {
-            className: clsx("text-blue-500 hover:underline", classNames?.a),
+            className: clsx(
+              "text-blue-500 hover:underline",
+              classNames?.a,
+              "statuses-link",
+            ),
             target: "_blank",
             rel: "noreferrer noopener",
           });

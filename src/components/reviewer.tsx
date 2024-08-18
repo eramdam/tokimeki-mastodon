@@ -119,7 +119,7 @@ export function Reviewer(props: ReviewerProps) {
     if (!client) {
       return;
     }
-    await client.v1.lists.addAccount(listId, {
+    await client.v1.lists.$select(listId).accounts.create({
       accountIds: compact([currentAccount?.id ?? ""]),
     });
     setAddedToListId(listId);
