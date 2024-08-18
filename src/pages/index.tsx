@@ -1,5 +1,5 @@
 import type { ValidationState } from "@react-types/shared";
-import { login } from "masto";
+import { createRestAPIClient } from "masto";
 import { type NextPage } from "next";
 import Head from "next/head";
 import { useRouter } from "next/router";
@@ -61,11 +61,10 @@ const Home: NextPage = () => {
         return;
       }
 
-      const masto = await login({
+      const masto = createRestAPIClient({
         url: storedInstanceUrl,
         accessToken: access_token,
         timeout: 30_000,
-        disableVersionCheck: true,
       });
       const account = await masto.v1.accounts.verifyCredentials();
       saveAfterOAuthCode({

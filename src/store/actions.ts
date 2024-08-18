@@ -58,7 +58,7 @@ export function keepAccount(accountId: string): void {
 }
 export async function fetchFollowings(
   accountId: string,
-  client: mastodon.Client,
+  client: mastodon.rest.Client,
 ) {
   usePersistedStore.setState({ isFetching: true });
   const persistedState = usePersistedStore.getState();
@@ -171,7 +171,7 @@ export async function setCurrentAccountEmpty() {
   });
 }
 export async function goToNextAccount(
-  client: mastodon.Client,
+  client: mastodon.rest.Client,
   currentAccount: TokimekiAccount,
 ) {
   const { followingIds, nextAccount, nextRelationship } =
@@ -225,12 +225,12 @@ export function markAsFinished(): void {
   usePersistedStore.setState({ isFinished: true });
 }
 
-export async function fetchLists(client: mastodon.Client) {
+export async function fetchLists(client: mastodon.rest.Client) {
   const lists = await client.v1.lists.list();
   usePersistedStore.setState({ lists });
 }
 
-export async function createList(client: mastodon.Client, name: string) {
+export async function createList(client: mastodon.rest.Client, name: string) {
   const newList = await client.v1.lists.create({
     title: name,
   });
@@ -241,7 +241,7 @@ export async function createList(client: mastodon.Client, name: string) {
 }
 
 export async function addToList(
-  client: mastodon.Client,
+  client: mastodon.rest.Client,
   listId: string,
   accountId: string,
 ) {
