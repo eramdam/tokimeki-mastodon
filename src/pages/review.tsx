@@ -158,15 +158,16 @@ const ReviewContent = () => {
       </Block>
       <Block className="w-full">
         <div className="custom-prose opacity-60">
-          <p>
+          <p className="!m-0">
             Based off{" "}
             <a href="https://tokimeki-unfollow.glitch.me/">Tokimeki Unfollow</a>{" "}
             by <a href="https://tarng.com/">Julius Tarng</a>.
             <br />
-            <br />
             Made by <a href="https://erambert.me">Damien Erambert</a>. Find me
             at{" "}
-            <a href="https://octodon.social/@eramdam">eramdam@octodon.social</a>
+            <a href="https://social.erambert.me/@eramdam">
+              eramdam@erambert.me
+            </a>
             !
           </p>
         </div>

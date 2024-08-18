@@ -207,7 +207,9 @@ const Home: NextPage = () => {
             <br />
             Made by <a href="https://erambert.me">Damien Erambert</a>. Find me
             at{" "}
-            <a href="https://octodon.social/@eramdam">eramdam@octodon.social</a>
+            <a href="https://social.erambert.me/@eramdam">
+              eramdam@erambert.me
+            </a>
             !
           </p>
           <small className="inline-block w-full pb-2 text-center">
