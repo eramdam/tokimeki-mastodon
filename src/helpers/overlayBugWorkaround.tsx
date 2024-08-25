@@ -22,11 +22,11 @@ import type { MenuTriggerState, OverlayTriggerState } from "react-stately";
  * @returns An invisible element to include next to your overlay trigger
  */
 export const useOverlayBugWorkaround = (
-  state: MenuTriggerState | OverlayTriggerState
+  state: MenuTriggerState | OverlayTriggerState,
 ) => {
   const [renderCount, triggerRerender] = useReducer(
     (renders) => renders + 1,
-    0
+    0,
   );
 
   useEffect(() => {

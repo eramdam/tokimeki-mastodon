@@ -1,6 +1,6 @@
 import clsx from "clsx";
 import type { Text } from "domhandler";
-import type { HTMLReactParserOptions } from "html-react-parser";
+import type { DOMNode, HTMLReactParserOptions } from "html-react-parser";
 import { attributesToProps, domToReact, Element } from "html-react-parser";
 import type { mastodon } from "masto";
 import { mergeProps } from "react-aria";
@@ -28,18 +28,24 @@ export function getParserOptions(options: GetParserOptionsProps) {
         }
         if (domNode.tagName === "a") {
           const anchorProps = mergeProps(attributesToProps(domNode.attribs), {
-            className: clsx("text-blue-500 hover:underline", classNames?.a),
+            className: clsx(
+              "text-blue-500 hover:underline",
+              classNames?.a,
+              "statuses-link",
+            ),
             target: "_blank",
             rel: "noreferrer noopener",
           });
           return (
-            <a {...anchorProps}>{domToReact(domNode.children, parseOptions)}</a>
+            <a {...anchorProps}>
+              {domToReact(domNode.children as DOMNode[], parseOptions)}
+            </a>
           );
         }
         if (domNode.tagName === "p") {
           return (
             <p className={clsx("leading-normal last:mb-0", classNames?.p)}>
-              {domToReact(domNode.children, parseOptions)}
+              {domToReact(domNode.children as DOMNode[], parseOptions)}
             </p>
           );
         }

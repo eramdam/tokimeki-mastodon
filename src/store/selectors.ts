@@ -1,6 +1,5 @@
 import { shuffle } from "lodash-es";
 import { useMemo } from "react";
-import shallow from "zustand/shallow";
 
 import { SortOrders, usePersistedStore } from "./index";
 
@@ -26,7 +25,7 @@ export const useOAuthCodeDependencies = () =>
       clientSecret: state.clientSecret,
       instanceUrl: state.instanceUrl,
     };
-  }, shallow);
+  });
 
 export const useFollowingIds = () =>
   usePersistedStore((state) => state.followingIds);
@@ -39,7 +38,7 @@ export const useFilteredFollowings = () => {
 
   return useMemo(
     () => filterFollowingIds(baseFollowings, keptIds, unfollowedIds),
-    [baseFollowings, keptIds, unfollowedIds]
+    [baseFollowings, keptIds, unfollowedIds],
   );
 };
 
@@ -67,7 +66,7 @@ export const useKeptAccounts = () => {
 
   return useMemo(
     () => baseFollowings.filter((a) => keptIds?.includes(a)),
-    [baseFollowings, keptIds]
+    [baseFollowings, keptIds],
   );
 };
 
@@ -82,7 +81,7 @@ export const useListById = (id: string | undefined) => {
 export function filterFollowingIds(
   array: string[],
   keptIds: string[] | null | undefined,
-  unfollowedIds: string[] | null | undefined
+  unfollowedIds: string[] | null | undefined,
 ) {
   return array.filter((a) => {
     return !keptIds?.includes(a) && !unfollowedIds?.includes(a);

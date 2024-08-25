@@ -28,7 +28,7 @@ export function Popover(props: PopoverProps) {
       ...props,
       popoverRef: ref,
     },
-    state
+    state,
   );
 
   const { popoverProps, underlayProps } = returnProps;
@@ -42,7 +42,7 @@ export function Popover(props: PopoverProps) {
         className={clsx(
           "z-10 mt-2 rounded-xl border-2 border-violet-800 shadow-lg shadow-black/30 dark:border-violet-500",
           "bg-white",
-          "dark:bg-neutral-800"
+          "dark:bg-neutral-800",
         )}
       >
         <DismissButton onDismiss={state.close} />

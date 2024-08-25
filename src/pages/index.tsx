@@ -1,5 +1,5 @@
 import type { ValidationState } from "@react-types/shared";
-import { login } from "masto";
+import { createRestAPIClient } from "masto";
 import { type NextPage } from "next";
 import Head from "next/head";
 import { useRouter } from "next/router";
@@ -31,7 +31,7 @@ const Home: NextPage = () => {
     try {
       new URL(localInstanceUrl);
       return "valid";
-    } catch (e) {
+    } catch (_e) {
       return "invalid";
     }
   }, [localInstanceUrl]);
@@ -61,11 +61,10 @@ const Home: NextPage = () => {
         return;
       }
 
-      const masto = await login({
+      const masto = createRestAPIClient({
         url: storedInstanceUrl,
         accessToken: access_token,
         timeout: 30_000,
-        disableVersionCheck: true,
       });
       const account = await masto.v1.accounts.verifyCredentials();
       saveAfterOAuthCode({
@@ -74,7 +73,7 @@ const Home: NextPage = () => {
       });
       router.push("/review");
     },
-    [clientId, clientSecret, router, storedInstanceUrl]
+    [clientId, clientSecret, router, storedInstanceUrl],
   );
 
   const account = useAccountId();
@@ -103,7 +102,7 @@ const Home: NextPage = () => {
     try {
       const { clientId, clientSecret } = await registerApplication(
         localInstanceUrl.replace(/\/$/, ""),
-        window.location.origin
+        window.location.origin,
       );
 
       if (clientId && clientSecret) {
@@ -155,11 +154,11 @@ const Home: NextPage = () => {
             label="Instance domain"
             placeholder="https://"
             type={"url"}
-            className="custom-prose flex flex-col gap-2 text-center "
+            className="custom-prose flex flex-col gap-2 text-center"
             value={localInstanceUrl}
             onChange={(value) => {
               setInstanceDomain(
-                value.startsWith("https://") ? value : `https://${value}`
+                value.startsWith("https://") ? value : `https://${value}`,
               );
             }}
             validationState={isInstanceValid || "valid"}
@@ -208,7 +207,9 @@ const Home: NextPage = () => {
             <br />
             Made by <a href="https://erambert.me">Damien Erambert</a>. Find me
             at{" "}
-            <a href="https://octodon.social/@eramdam">eramdam@octodon.social</a>
+            <a href="https://social.erambert.me/@eramdam">
+              eramdam@erambert.me
+            </a>
             !
           </p>
           <small className="inline-block w-full pb-2 text-center">

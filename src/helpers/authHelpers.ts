@@ -1,4 +1,4 @@
-import { login } from "masto";
+import { createRestAPIClient } from "masto";
 
 import { env } from "../env/client.mjs";
 
@@ -12,9 +12,8 @@ const OAUTH_SCOPES = [
 ].join(" ");
 
 export async function registerApplication(instanceURL: string, origin: string) {
-  const masto = await login({
+  const masto = createRestAPIClient({
     url: instanceURL,
-    disableVersionCheck: true,
   });
 
   return await masto.v1.apps.create({
@@ -34,7 +33,7 @@ export function getAuthURL(opts: { clientId: string; instanceUrl: string }) {
   });
   const authorizationURL = `https://${opts.instanceUrl.replace(
     /https?:\/\//,
-    ""
+    "",
   )}/oauth/authorize?${authorizationParams.toString()}`;
 
   return authorizationURL;
@@ -62,7 +61,7 @@ export async function getAccessToken(opts: {
         "Content-Type": "application/x-www-form-urlencoded",
       },
       body: params.toString(),
-    }
+    },
   );
   const tokenJSON = await tokenResponse.json();
   return tokenJSON;

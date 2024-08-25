@@ -9,7 +9,7 @@ import { useRadioGroupState } from "react-stately";
 const RadioContext = createContext<RadioGroupState | null>(null);
 
 export function RadioGroup(
-  props: PropsWithChildren<AriaRadioGroupProps & { className?: string }>
+  props: PropsWithChildren<AriaRadioGroupProps & { className?: string }>,
 ) {
   const { label, children } = props;
   const state = useRadioGroupState(props);

@@ -1,4 +1,3 @@
-/* eslint-disable @next/next/no-img-element */
 import clsx from "clsx";
 import { useEffect, useRef, useState } from "react";
 import { BlurhashCanvas } from "react-blurhash";
@@ -35,19 +34,21 @@ export function BlurhashImage(props: BlurhashImageProps) {
           {
             "opacity-0": !isLoaded || props.isHidden || props.isUncached,
           },
-          "text-[0px]"
+          "text-[0px]",
         )}
         onLoad={() => setIsLoaded(true)}
         width={props.width || 32}
         height={props.height || 32}
         alt={props.description || ""}
       />
-      <BlurhashCanvas
-        className={props.canvasClassname}
-        hash={props.hash}
-        width={props.width || 32}
-        height={props.height || 32}
-      ></BlurhashCanvas>
+      {!isLoaded && (
+        <BlurhashCanvas
+          className={props.canvasClassname}
+          hash={props.hash}
+          width={props.width || 32}
+          height={props.height || 32}
+        ></BlurhashCanvas>
+      )}
     </>
   );
 }

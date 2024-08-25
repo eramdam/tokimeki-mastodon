@@ -13,7 +13,7 @@ export function Options() {
   const [showAdvanced, setShowAdvanced] = useState(false);
 
   return (
-    <div className="custom-prose w-full ">
+    <div className="custom-prose w-full">
       <h3 className="!mt-2">Options</h3>
       <div>
         <label>

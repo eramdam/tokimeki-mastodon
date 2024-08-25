@@ -1,4 +1,3 @@
-/* eslint-disable @next/next/no-img-element */
 import { pick } from "lodash-es";
 import { useRouter } from "next/router";
 import { useMemo, useState } from "react";
@@ -30,9 +29,11 @@ export function Finished() {
       return [];
     }
 
-    const accounts = await client.v1.accounts.listFollowing(accountId, {
-      limit: 80,
-    });
+    const accounts = await client.v1.accounts
+      .$select(accountId)
+      .following.list({
+        limit: 80,
+      });
     return accounts.map((a) => pick(a, ["id", "avatar", "displayName"]));
   });
 
@@ -62,7 +63,7 @@ export function Finished() {
     if (maybeReset) {
       return (
         <Block className="mt-0 flex flex-shrink-0 flex-col items-start lg:w-3/4">
-          <p className="custom-prose leading-normal ">
+          <p className="custom-prose leading-normal">
             Wanna do it again with your current follows? <br />
             <br />
             This will reset your progress data and start over. Then, it will log
@@ -93,7 +94,7 @@ export function Finished() {
 
     return (
       <Block className="mt-0 flex flex-shrink-0 flex-col items-start lg:w-3/4">
-        <p className="custom-prose leading-normal ">
+        <p className="custom-prose leading-normal">
           Wow, you&apos;ve done it — amazing! Hope you enjoy your new feed. Come
           back if you ever feel like it&apos;s getting out of control again.{" "}
           <br />
@@ -111,7 +112,7 @@ export function Finished() {
                 ` using Tokimeki Unfollow\n${window.origin}`;
 
               window.open(
-                `${instanceUrl}/share?text=${encodeURIComponent(text)}`
+                `${instanceUrl}/share?text=${encodeURIComponent(text)}`,
               );
             }}
           >

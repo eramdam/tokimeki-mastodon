@@ -1,6 +1,6 @@
 import { omit, pick } from "lodash-es";
 import type { mastodon } from "masto";
-import create from "zustand";
+import { createWithEqualityFn } from "zustand/traditional";
 import { devtools, persist } from "zustand/middleware";
 
 export enum SortOrders {
@@ -20,7 +20,7 @@ export interface TokimekiAccount {
 }
 
 export function pickTokimekiAccount(
-  account: mastodon.v1.Account | TokimekiAccount
+  account: mastodon.v1.Account | TokimekiAccount,
 ): TokimekiAccount {
   return pick(account, [
     "id",
@@ -86,7 +86,7 @@ export const initialPersistedState: TokimekiState = {
   lists: [],
 };
 
-export const usePersistedStore = create<TokimekiState>()(
+export const usePersistedStore = createWithEqualityFn<TokimekiState>()(
   devtools(
     persist(() => initialPersistedState, {
       name: "tokimeki-mastodon", // name of the item in the storage (must be unique)
@@ -95,6 +95,6 @@ export const usePersistedStore = create<TokimekiState>()(
       },
       version: 3,
     }),
-    { name: "main-store" }
-  )
+    { name: "main-store" },
+  ),
 );

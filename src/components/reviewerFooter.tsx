@@ -111,7 +111,7 @@ export function ReviewerFooter(props: ReviewerFooterProps) {
             <div
               className={clsx(
                 baseBlockClassname,
-                "border-black/30 bg-black/10 dark:bg-black/50"
+                "border-black/30 bg-black/10 dark:bg-black/50",
               )}
             >
               <strong className="text-sm">Bio:</strong>{" "}

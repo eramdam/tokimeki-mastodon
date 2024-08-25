@@ -105,7 +105,7 @@ export function ReviewerButtons(props: ReviewerButtonsProps) {
         <Section>
           {lists.map((list) => {
             return (
-              <Item key={list.id}>
+              <Item key={list.id} textValue={list.title}>
                 {list.title}
                 {currentAccountListIds?.includes(list.id) && (
                   <span className="ml-3 align-middle">✅</span>
