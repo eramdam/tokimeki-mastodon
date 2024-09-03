@@ -11,11 +11,10 @@ const MyApp: AppType = ({ Component, pageProps }) => {
         <title>Tokimeki Mastodon</title>
       </Head>
       <Script
-        defer
-        data-domain="tokimeki-mastodon.vercel.app"
-        src="https://plausible.io/js/script.js"
+        async
+        src="https://umami.erambert.me/script.js"
+        data-website-id="51e9d456-88f4-4589-99b4-26eed5a94055"
       ></Script>
-
       <Component {...pageProps} />
     </>
   );
