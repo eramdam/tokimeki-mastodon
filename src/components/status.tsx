@@ -133,14 +133,14 @@ export function Status(props: StatusProps) {
         <div className="flex-1 flex-shrink"></div>
 
         <div className="self-start">
+          {/* @ts-expect-error - relative-time-element is not typed properly */}
           <relative-time
-            // @ts-expect-error - relative-time-element is not typed properly
             class="text-xs leading-normal dark:text-neutral-400"
             datetime={status.createdAt}
             tense="past"
             format="relative"
             formatStyle="narrow"
-          ></relative-time>
+          />
         </div>
       </div>
       {initialIsCollapsed && (
@@ -162,7 +162,7 @@ export function Status(props: StatusProps) {
         null}
       {(mediaRenders.length && (
         <div
-          className="relative mt-4 mb-2 flex gap-1"
+          className="relative mb-2 mt-4 flex gap-1"
           {...buttonProps}
           ref={mediaWrapperRef}
         >
@@ -171,8 +171,8 @@ export function Status(props: StatusProps) {
             className={clsx(
               "absolute",
               (areMediaHidden || hasUncachedMedia) &&
-                "top-1/2 left-1/2 z-20 -translate-x-1/2 -translate-y-1/2",
-              !areMediaHidden && !hasUncachedMedia && "top-1 left-1 z-20",
+                "left-1/2 top-1/2 z-20 -translate-x-1/2 -translate-y-1/2",
+              !areMediaHidden && !hasUncachedMedia && "left-1 top-1 z-20",
             )}
             onPress={() => {
               if (hasUncachedMedia) {

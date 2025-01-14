@@ -13,7 +13,7 @@
   },
   "dependencies": {
     "@atproto/api": "^0.13.26",
-    "@github/relative-time-element": "^4.4.4",
+    "@github/relative-time-element": "^4.4.5",
     "@react-types/shared": "^3.26.0",
     "@types/eslint__js": "^8.42.3",
     "@types/lodash-es": "^4.17.12",
@@ -22,6 +22,7 @@
     "clsx": "^2.1.1",
     "globals": "^15.14.0",
     "html-react-parser": "^5.2.2",
+    "idb-keyval": "^6.2.1",
     "localforage": "^1.10.0",
     "localforage-observable": "^2.1.1",
     "lodash-es": "^4.17.21",
