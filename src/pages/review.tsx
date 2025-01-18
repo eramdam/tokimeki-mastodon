@@ -9,13 +9,13 @@ import { LinkButton } from "../components/linkButton";
 import { Options } from "../components/options";
 import { Reviewer } from "../components/reviewer";
 import { MastodonProvider, useMastodon } from "../helpers/mastodonContext";
+import { resetStates } from "../store/mainStore";
 import {
-  fetchFollowings,
-  fetchLists,
+  fetchMastodonFollowings,
+  fetchMastodonLists,
   markAsFinished,
-  resetStates,
-} from "../store/actions";
-import { useIsFinished } from "../store/selectors";
+} from "../store/mastodonStore";
+import { useIsFinished } from "../store/mainStore";
 import {
   useMastodonFilteredFollowings,
   useMastodonStartCount,
@@ -71,8 +71,8 @@ const ReviewContent = () => {
       return;
     }
 
-    fetchFollowings(accountId, client);
-    fetchLists(client);
+    fetchMastodonFollowings(accountId, client);
+    fetchMastodonLists(client);
   }, [accountId, client, isReviewing]);
 
   if (isFinished) {

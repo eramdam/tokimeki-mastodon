@@ -3,7 +3,7 @@ import { useState } from "react";
 import { Item, Section } from "react-stately";
 
 import { useMastodon } from "../helpers/mastodonContext";
-import { createList } from "../store/actions";
+import { createMastodonList } from "../store/mastodonStore";
 import { useMastodonLists } from "../store/mastodonStore";
 import { useMastodonCurrentAccountListIds } from "../store/mastodonStore";
 import { Button, SmallButton } from "./button";
@@ -62,7 +62,7 @@ export function ReviewerButtons(props: ReviewerButtonsProps) {
                 if (!client) {
                   return;
                 }
-                await createList(client, listName);
+                await createMastodonList(client, listName);
                 setIsCreatingList(false);
                 setIsAddingTolist(true);
                 setListName("");

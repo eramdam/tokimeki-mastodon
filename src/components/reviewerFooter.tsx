@@ -3,7 +3,7 @@ import type { Dispatch, SetStateAction } from "react";
 
 import { makeAccountName } from "../helpers/mastodonHelpers";
 import type { TokimekiAccount, TokimekiRelationship } from "../store/common";
-import { useSettings } from "../store/selectors";
+import { useSettings } from "../store/mainStore";
 import {
   useMastodonCurrentIndex,
   useMastodonFollowingIds,

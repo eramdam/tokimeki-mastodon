@@ -1,4 +1,5 @@
 import { createCustomStore } from "./common";
+import { useMastodonStore, initialMastodonState } from "./mastodonStore";
 
 export enum SortOrders {
   OLDEST = "oldest",
@@ -38,3 +39,23 @@ export const initialMainState: MainState = {
 };
 
 export const useMainStore = createCustomStore(initialMainState, "main-store");
+export const useIsFinished = () => useMainStore((state) => state.isFinished);
+export const useSettings = () => useMainStore((state) => state.settings);
+export const useIsFetching = () => useMainStore((state) => state.isFetching);
+export function resetStates() {
+  useMainStore.setState(() => {
+    return initialMainState;
+  }, true);
+  useMastodonStore.setState(() => {
+    return initialMastodonState;
+  }, true);
+}
+
+export function updateSettings(payload: Partial<MainState["settings"]>): void {
+  useMainStore.setState((state) => ({
+    settings: {
+      ...state.settings,
+      ...payload,
+    },
+  }));
+}

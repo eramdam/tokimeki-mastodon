@@ -4,7 +4,7 @@ import { useMemo, useState } from "react";
 import useSWR from "swr";
 
 import { useMastodon } from "../helpers/mastodonContext";
-import { resetStates } from "../store/actions";
+import { resetStates } from "../store/mainStore";
 import {
   useMastodonInstanceUrl,
   useMastodonStartCount,

@@ -14,7 +14,10 @@ import {
   getAuthURL,
   registerApplication,
 } from "../helpers/authHelpers";
-import { saveAfterOAuthCode, saveLoginCredentials } from "../store/actions";
+import {
+  saveMastodonAfterOAuthCode,
+  saveMastodonLoginCredentials,
+} from "../store/mastodonStore";
 import {
   useMastodonAccountId,
   useMastodonOAuthCodeDependencies,
@@ -71,7 +74,7 @@ const Home: NextPage = () => {
         timeout: 30_000,
       });
       const account = await masto.v1.accounts.verifyCredentials();
-      saveAfterOAuthCode({
+      saveMastodonAfterOAuthCode({
         accessToken: access_token,
         account,
       });
@@ -110,7 +113,7 @@ const Home: NextPage = () => {
       );
 
       if (clientId && clientSecret) {
-        saveLoginCredentials({
+        saveMastodonLoginCredentials({
           instanceUrl: localInstanceUrl.replace(/\/$/, ""),
           clientId,
           clientSecret,

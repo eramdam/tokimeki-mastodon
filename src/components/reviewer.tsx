@@ -5,11 +5,11 @@ import { useState } from "react";
 import { delayAsync } from "../helpers/asyncHelpers";
 import { useMastodon } from "../helpers/mastodonContext";
 import {
-  goToNextAccount,
-  keepAccount,
-  unfollowAccount,
-} from "../store/actions";
-import { useSettings } from "../store/selectors";
+  goToNextMastodonAccount,
+  keepMastodonAccount,
+  unfollowMastodonAccount,
+} from "../store/mastodonStore";
+import { useSettings } from "../store/mainStore";
 import {
   useMastodonFilteredFollowings,
   useMastodonFollowingIds,
@@ -72,9 +72,9 @@ export function Reviewer(props: ReviewerProps) {
         if (process.env.NODE_ENV !== "development") {
           await client.v1.accounts.$select(currentAccount.id).unfollow();
         }
-        unfollowAccount(currentAccount.id);
+        unfollowMastodonAccount(currentAccount.id);
       } else {
-        keepAccount(currentAccount.id);
+        keepMastodonAccount(currentAccount.id);
       }
     }
 
@@ -94,7 +94,7 @@ export function Reviewer(props: ReviewerProps) {
 
     setAddedToListId(undefined);
     setAnimated(AnimationState.Idle);
-    await goToNextAccount(client, currentAccount);
+    await goToNextMastodonAccount(client, currentAccount);
     setIsFetching(false);
   };
 
