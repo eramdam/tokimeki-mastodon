@@ -6,6 +6,7 @@ import {
 } from "zustand/middleware";
 import { get, set, del } from "idb-keyval";
 import { createWithEqualityFn } from "zustand/traditional";
+import type { TokimekiAccount, TokimekiRelationship } from ".";
 
 export const idbStorage: StateStorage = {
   getItem: async (name: string): Promise<string | null> => {
@@ -38,3 +39,27 @@ export function createCustomStore<T>(initialState: T, name: string) {
     ),
   );
 }
+export type CommonServiceState = {
+  /** The account currently being reviewed */
+  currentAccount: TokimekiAccount | undefined;
+  /** The lists that include the account being currently reviewed. */
+  currentAccountListIds: string[] | undefined;
+  /** The relationship the user has with the current account. */
+  currentRelationship: TokimekiRelationship | undefined;
+  /** The account that will be shown next. */
+  nextAccount: TokimekiAccount | undefined;
+  /** The lists that include the account that will be shown next. */
+  nextAccountListIds: string[] | undefined;
+  /** The relationship the user has with the next account. */
+  nextRelationship: TokimekiRelationship | undefined;
+  /** The IDs of accounts the user followed when they started the review process. */
+  baseFollowingIds: string[];
+  /** The IDs of accounts the user is currently following (might be redundant with `baseFollowingIds`) */
+  followingIds: string[];
+  /** The IDs of accounts the user decided to keep following. */
+  keptIds: string[];
+  /** The IDs of accoutns the user decided to unfollow. */
+  unfollowedIds: string[];
+  /** How many accounts the user started with. (might be redundant with `baseFollowingIds`) */
+  startCount: number;
+};

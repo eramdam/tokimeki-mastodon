@@ -1,7 +1,8 @@
 import { shuffle } from "lodash-es";
 import { useMemo } from "react";
 
-import { SortOrders, useMainStore, useMastodonStore } from "./index";
+import { SortOrders, useMainStore } from "./index";
+import { useMastodonStore } from "./mastodon";
 
 export const useIsFinished = () => useMainStore((state) => state.isFinished);
 export const useAccountId = () => useMastodonStore((state) => state.accountId);
