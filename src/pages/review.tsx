@@ -15,15 +15,17 @@ import {
   markAsFinished,
   resetStates,
 } from "../store/actions";
+import { useIsFinished } from "../store/selectors";
 import {
-  useAccountId,
-  useAccountUsername,
-  useFilteredFollowings,
-  useIsFinished,
-  useKeptIds,
-  useStartCount,
-  useUnfollowedIds,
-} from "../store/selectors";
+  useMastodonFilteredFollowings,
+  useMastodonStartCount,
+} from "../store/mastodonStore";
+import {
+  useMastodonAccountId,
+  useMastodonAccountUsername,
+  useMastodonKeptIds,
+  useMastodonUnfollowedIds,
+} from "../store/mastodonStore";
 
 const Review: NextPage = () => {
   const [hasMounted, setHasMounted] = useState(false);
@@ -48,11 +50,11 @@ const ReviewContent = () => {
   const router = useRouter();
 
   const { client } = useMastodon();
-  const accountId = useAccountId();
-  const accountUsername = useAccountUsername();
-  const keptIds = useKeptIds();
-  const unfollowedIds = useUnfollowedIds();
-  const startCount = useStartCount();
+  const accountId = useMastodonAccountId();
+  const accountUsername = useMastodonAccountUsername();
+  const keptIds = useMastodonKeptIds();
+  const unfollowedIds = useMastodonUnfollowedIds();
+  const startCount = useMastodonStartCount();
 
   const hasProgress = useMemo(
     () =>
@@ -62,7 +64,7 @@ const ReviewContent = () => {
     [keptIds, unfollowedIds],
   );
   const isFinished = useIsFinished();
-  const filteredFollowings = useFilteredFollowings();
+  const filteredFollowings = useMastodonFilteredFollowings();
 
   useEffect(() => {
     if (!isReviewing || !client || !accountId) {

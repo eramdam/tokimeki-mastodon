@@ -3,13 +3,13 @@ import type { Dispatch, SetStateAction } from "react";
 
 import { makeAccountName } from "../helpers/mastodonHelpers";
 import type { TokimekiAccount, TokimekiRelationship } from "../store";
+import { useSettings } from "../store/selectors";
 import {
-  useCurrentIndex,
-  useFollowingIds,
-  useInstanceUrl,
-  useListById,
-  useSettings,
-} from "../store/selectors";
+  useMastodonCurrentIndex,
+  useMastodonFollowingIds,
+  useMastodonInstanceUrl,
+} from "../store/mastodonStore";
+import { useMastodonListById } from "../store/mastodonStore";
 import { SmallButton } from "./button";
 import { renderWithEmoji } from "./emojify";
 import { HtmlRenderer } from "./htmlRendered";
@@ -32,11 +32,11 @@ export function ReviewerFooter(props: ReviewerFooterProps) {
     showNote,
     setShowNote,
   } = props;
-  const followingIndex = useCurrentIndex();
-  const followings = useFollowingIds();
+  const followingIndex = useMastodonCurrentIndex();
+  const followings = useMastodonFollowingIds();
   const { showFollowLabel } = useSettings();
-  const instanceUrl = useInstanceUrl();
-  const list = useListById(props.addedToListId);
+  const instanceUrl = useMastodonInstanceUrl();
+  const list = useMastodonListById(props.addedToListId);
 
   const renderTitle = () => {
     if (followingIndex === followings.length - 1) {
@@ -75,7 +75,7 @@ export function ReviewerFooter(props: ReviewerFooterProps) {
           </a>
           !{" "}
           {showFollowLabel && accountRelationship?.followedBy && (
-            <span className="inline-block rounded-md bg-violet-500 py-[2px] px-2 align-middle text-[10px] uppercase text-white dark:bg-violet-800">
+            <span className="inline-block rounded-md bg-violet-500 px-2 py-[2px] align-middle text-[10px] uppercase text-white dark:bg-violet-800">
               Follows you
             </span>
           )}

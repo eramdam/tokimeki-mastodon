@@ -4,7 +4,8 @@ import { Item, Section } from "react-stately";
 
 import { useMastodon } from "../helpers/mastodonContext";
 import { createList } from "../store/actions";
-import { useCurrentAccountListIds, useLists } from "../store/selectors";
+import { useMastodonLists } from "../store/mastodonStore";
+import { useMastodonCurrentAccountListIds } from "../store/mastodonStore";
 import { Button, SmallButton } from "./button";
 import { MenuButton } from "./menu";
 import { PopoverButton } from "./popover";
@@ -36,8 +37,8 @@ export function ReviewerButtons(props: ReviewerButtonsProps) {
     shouldSkipConfirmation,
     isFetching,
   } = props;
-  const lists = useLists();
-  const currentAccountListIds = useCurrentAccountListIds();
+  const lists = useMastodonLists();
+  const currentAccountListIds = useMastodonCurrentAccountListIds();
   const [isCreatingList, setIsCreatingList] = useState(false);
   const [isAddingToList, setIsAddingTolist] = useState(false);
   const [listName, setListName] = useState("");

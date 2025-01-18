@@ -15,7 +15,10 @@ import {
   registerApplication,
 } from "../helpers/authHelpers";
 import { saveAfterOAuthCode, saveLoginCredentials } from "../store/actions";
-import { useAccountId, useOAuthCodeDependencies } from "../store/selectors";
+import {
+  useMastodonAccountId,
+  useMastodonOAuthCodeDependencies,
+} from "../store/mastodonStore";
 
 const Home: NextPage = () => {
   const [localInstanceUrl, setInstanceDomain] = useState("");
@@ -25,7 +28,7 @@ const Home: NextPage = () => {
     clientId,
     clientSecret,
     instanceUrl: storedInstanceUrl,
-  } = useOAuthCodeDependencies();
+  } = useMastodonOAuthCodeDependencies();
 
   const isInstanceValid: ValidationState | undefined = useMemo(() => {
     try {
@@ -76,7 +79,7 @@ const Home: NextPage = () => {
     [clientId, clientSecret, router, storedInstanceUrl],
   );
 
-  const account = useAccountId();
+  const account = useMastodonAccountId();
 
   useEffect(() => {
     if (account) {

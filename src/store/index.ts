@@ -1,4 +1,3 @@
-import { pick } from "lodash-es";
 import type { mastodon } from "masto";
 
 import { createCustomStore } from "./common";
@@ -17,20 +16,6 @@ export interface TokimekiAccount {
   username: string;
   url: string;
   emojis: mastodon.v1.CustomEmoji[];
-}
-
-export function pickTokimekiAccount(
-  account: mastodon.v1.Account | TokimekiAccount,
-): TokimekiAccount {
-  return pick(account, [
-    "id",
-    "acct",
-    "note",
-    "displayName",
-    "username",
-    "url",
-    "emojis",
-  ]);
 }
 
 export interface TokimekiRelationship {

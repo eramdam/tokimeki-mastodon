@@ -9,13 +9,15 @@ import {
   keepAccount,
   unfollowAccount,
 } from "../store/actions";
+import { useSettings } from "../store/selectors";
 import {
-  useCurrentAccount,
-  useCurrentAccountRelationship,
-  useFilteredFollowings,
-  useFollowingIds,
-  useSettings,
-} from "../store/selectors";
+  useMastodonFilteredFollowings,
+  useMastodonFollowingIds,
+} from "../store/mastodonStore";
+import {
+  useMastodonCurrentAccount,
+  useMastodonCurrentAccountRelationship,
+} from "../store/mastodonStore";
 import { Block } from "./block";
 import { FeedWidget } from "./feedWidget";
 import { FollowingsLoadingIndicator } from "./followingsLoadingIndicator";
@@ -35,10 +37,10 @@ interface ReviewerProps {
 }
 
 export function Reviewer(props: ReviewerProps) {
-  const currentAccount = useCurrentAccount();
-  const currentAccountRelationship = useCurrentAccountRelationship();
-  const filteredFollowings = useFilteredFollowings();
-  const followings = useFollowingIds();
+  const currentAccount = useMastodonCurrentAccount();
+  const currentAccountRelationship = useMastodonCurrentAccountRelationship();
+  const filteredFollowings = useMastodonFilteredFollowings();
+  const followings = useMastodonFollowingIds();
   const { client } = useMastodon();
 
   const [animationState, setAnimated] = useState(AnimationState.Idle);

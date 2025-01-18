@@ -6,22 +6,24 @@ import useSWR from "swr";
 import { useMastodon } from "../helpers/mastodonContext";
 import { resetStates } from "../store/actions";
 import {
-  useAccountId,
-  useInstanceUrl,
-  useKeptIds,
-  useStartCount,
-} from "../store/selectors";
+  useMastodonInstanceUrl,
+  useMastodonStartCount,
+} from "../store/mastodonStore";
+import {
+  useMastodonAccountId,
+  useMastodonKeptIds,
+} from "../store/mastodonStore";
 import { Block } from "./block";
 import { Button } from "./button";
 
 export function Finished() {
   const [maybeReset, setMaybeReset] = useState(false);
   const router = useRouter();
-  const keptIdsFromStorage = useKeptIds();
+  const keptIdsFromStorage = useMastodonKeptIds();
   const keptIds = useMemo(() => keptIdsFromStorage || [], [keptIdsFromStorage]);
-  const startCount = useStartCount();
-  const instanceUrl = useInstanceUrl();
-  const accountId = useAccountId();
+  const startCount = useMastodonStartCount();
+  const instanceUrl = useMastodonInstanceUrl();
+  const accountId = useMastodonAccountId();
 
   const { client } = useMastodon();
   const { data: avatarsData } = useSWR("pics", async () => {

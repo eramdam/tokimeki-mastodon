@@ -2,9 +2,10 @@ import { compact, pick, uniq } from "lodash-es";
 import type { mastodon } from "masto";
 
 import type { MainState, SortOrders, TokimekiAccount } from ".";
-import { initialMainState, pickTokimekiAccount, useMainStore } from ".";
-import { initialMastodonState, useMastodonStore } from "./mastodon";
-import { filterFollowingIds, sortFollowings } from "./selectors";
+import { initialMainState, useMainStore } from ".";
+import { makeTokimekiAccountFromMastodonAccount } from "./mastodonStore";
+import { initialMastodonState, useMastodonStore } from "./mastodonStore";
+import { filterFollowingIds, sortFollowings } from "./helpers";
 
 export function resetStates() {
   useMainStore.setState(() => {
@@ -145,10 +146,13 @@ export async function fetchFollowings(
     baseFollowingIds: accountIds,
     followingIds: sortedFollowings,
     currentAccount:
-      (firstAccount && pickTokimekiAccount(firstAccount)) || undefined,
+      (firstAccount && makeTokimekiAccountFromMastodonAccount(firstAccount)) ||
+      undefined,
     currentAccountListIds,
     nextAccount:
-      (secondAccount && pickTokimekiAccount(secondAccount)) || undefined,
+      (secondAccount &&
+        makeTokimekiAccountFromMastodonAccount(secondAccount)) ||
+      undefined,
     nextAccountListIds,
   });
 
@@ -203,7 +207,7 @@ export async function goToNextAccount(
   ).map((l) => l.id);
 
   useMastodonStore.setState({
-    currentAccount: pickTokimekiAccount(newAccount),
+    currentAccount: makeTokimekiAccountFromMastodonAccount(newAccount),
     currentRelationship,
     currentAccountListIds,
   });
@@ -219,7 +223,7 @@ export async function goToNextAccount(
     .fetch()
     .then((newNextAccount) => {
       useMastodonStore.setState({
-        nextAccount: pickTokimekiAccount(newNextAccount),
+        nextAccount: makeTokimekiAccountFromMastodonAccount(newNextAccount),
       });
     });
   client.v1.accounts.relationships
