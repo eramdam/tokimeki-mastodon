@@ -59,3 +59,12 @@ export function updateSettings(payload: Partial<MainState["settings"]>): void {
     },
   }));
 }
+
+export function setService(service: Services, reset = false): void {
+  if (reset) {
+    resetStates();
+  }
+  useMainStore.setState({
+    service: service,
+  });
+}
