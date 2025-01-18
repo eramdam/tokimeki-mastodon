@@ -4,7 +4,7 @@ import { useMemo, useState } from "react";
 import useSWR from "swr";
 
 import { useMastodon } from "../helpers/mastodonContext";
-import { resetState } from "../store/actions";
+import { resetStates } from "../store/actions";
 import {
   useAccountId,
   useInstanceUrl,
@@ -80,7 +80,7 @@ export function Finished() {
             </Button>
             <Button
               onPress={() => {
-                resetState();
+                resetStates();
                 router.push("/");
               }}
               variant="secondary"

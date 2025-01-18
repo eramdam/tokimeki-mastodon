@@ -13,7 +13,7 @@ import {
   fetchFollowings,
   fetchLists,
   markAsFinished,
-  resetState,
+  resetStates,
 } from "../store/actions";
 import {
   useAccountId,
@@ -110,7 +110,7 @@ const ReviewContent = () => {
       <LinkButton
         position="southeast"
         onPress={() => {
-          resetState();
+          resetStates();
           router.push("/");
         }}
       >

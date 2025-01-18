@@ -1,9 +1,7 @@
-import { omit, pick } from "lodash-es";
+import { pick } from "lodash-es";
 import type { mastodon } from "masto";
-import { createWithEqualityFn } from "zustand/traditional";
-import type { StateStorage } from "zustand/middleware";
-import { createJSONStorage, devtools, persist } from "zustand/middleware";
-import { get, set, del } from "idb-keyval";
+
+import { createCustomStore } from "./common";
 
 export enum SortOrders {
   OLDEST = "oldest",
@@ -41,16 +39,7 @@ export interface TokimekiRelationship {
   showingReblogs: boolean;
 }
 
-export interface TokimekiState {
-  clientId?: string;
-  clientSecret?: string;
-  instanceUrl?: string;
-  accessToken?: string;
-  accountId?: string;
-  accountUsername?: string;
-  startCount?: number;
-  unfollowedIds: string[];
-  keptIds: string[];
+export type MainState = {
   settings: {
     showBio: boolean;
     showNote: boolean;
@@ -59,35 +48,10 @@ export interface TokimekiState {
     skipConfirmation: boolean;
   };
   isFetching: boolean;
-  currentAccount?: TokimekiAccount;
-  currentAccountListIds?: string[];
-  currentRelationship?: TokimekiRelationship;
-  nextAccount?: TokimekiAccount;
-  nextAccountListIds?: string[];
-  nextRelationship?: TokimekiRelationship;
-  baseFollowingIds: string[];
-  followingIds: string[];
   isFinished: boolean;
-  lists: mastodon.v1.List[];
-}
-
-// Custom storage object
-const storage: StateStorage = {
-  getItem: async (name: string): Promise<string | null> => {
-    console.log(name, "has been retrieved");
-    return (await get(name)) || null;
-  },
-  setItem: async (name: string, value: string): Promise<void> => {
-    console.log(name, "with value", value, "has been saved");
-    await set(name, value);
-  },
-  removeItem: async (name: string): Promise<void> => {
-    console.log(name, "has been deleted");
-    await del(name);
-  },
 };
 
-export const initialPersistedState: TokimekiState = {
+export const initialMainState: MainState = {
   settings: {
     sortOrder: SortOrders.OLDEST,
     showBio: false,
@@ -95,25 +59,76 @@ export const initialPersistedState: TokimekiState = {
     showFollowLabel: false,
     skipConfirmation: false,
   },
-  keptIds: [],
-  unfollowedIds: [],
-  isFinished: false,
   isFetching: false,
-  baseFollowingIds: [],
-  followingIds: [],
-  lists: [],
+  isFinished: false,
 };
 
-export const usePersistedStore = createWithEqualityFn<TokimekiState>()(
-  devtools(
-    persist(() => initialPersistedState, {
-      name: "tokimeki-mastodon", // name of the item in the storage (must be unique)
-      partialize(state) {
-        return omit(state, ["actions", "nextAccount", "nextRelationship"]);
-      },
-      version: 3,
-      storage: createJSONStorage(() => storage),
-    }),
-    { name: "main-store" },
-  ),
+export const useMainStore = createCustomStore(initialMainState, "main-store");
+
+type CommonServiceState = {
+  /** The account currently being reviewed */
+  currentAccount: TokimekiAccount | undefined;
+  /** The lists that include the account being currently reviewed. */
+  currentAccountListIds: string[] | undefined;
+  /** The relationship the user has with the current account. */
+  currentRelationship: TokimekiRelationship | undefined;
+  /** The account that will be shown next. */
+  nextAccount: TokimekiAccount | undefined;
+  /** The lists that include the account that will be shown next. */
+  nextAccountListIds: string[] | undefined;
+  /** The relationship the user has with the next account. */
+  nextRelationship: TokimekiRelationship | undefined;
+  /** The IDs of accounts the user followed when they started the review process. */
+  baseFollowingIds: string[];
+  /** The IDs of accounts the user is currently following (might be redundant with `baseFollowingIds`) */
+  followingIds: string[];
+  /** The IDs of accounts the user decided to keep following. */
+  keptIds: string[];
+  /** The IDs of accoutns the user decided to unfollow. */
+  unfollowedIds: string[];
+  /** How many accounts the user started with. (might be redundant with `baseFollowingIds`) */
+  startCount: number;
+};
+
+type MastodonState = CommonServiceState & {
+  /** Mastodon app client id */
+  clientId: string | undefined;
+  /** Mastodon app client secret */
+  clientSecret: string | undefined;
+  /** Mastodon instance URL */
+  instanceUrl: string | undefined;
+  /** Access token for the current app */
+  accessToken: string | undefined;
+  /** ID of the current account */
+  accountId: string | undefined;
+  /** Username of the current account (before the @domain.com part) */
+  accountUsername: string | undefined;
+  /** Lists belonging to the logged-in user. */
+  lists: mastodon.v1.List[];
+};
+
+export const initialMastodonState: MastodonState = {
+  clientId: undefined,
+  clientSecret: undefined,
+  instanceUrl: undefined,
+  accessToken: undefined,
+  accountId: undefined,
+  accountUsername: undefined,
+  lists: [],
+  currentAccount: undefined,
+  currentAccountListIds: undefined,
+  currentRelationship: undefined,
+  nextAccount: undefined,
+  nextAccountListIds: undefined,
+  nextRelationship: undefined,
+  baseFollowingIds: [],
+  followingIds: [],
+  keptIds: [],
+  unfollowedIds: [],
+  startCount: 0,
+};
+
+export const useMastodonStore = createCustomStore(
+  initialMastodonState,
+  "mastodon",
 );
