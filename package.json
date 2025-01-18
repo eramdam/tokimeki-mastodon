@@ -28,6 +28,7 @@
     "lodash-es": "^4.17.21",
     "masto": "^6.10.2",
     "next": "^15.1.4",
+    "patch-package": "^8.0.0",
     "react": "^19.0.0",
     "react-aria": "^3.36.0",
     "react-blurhash": "^0.3.0",

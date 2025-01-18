@@ -1,0 +1,13 @@
+diff --git a/node_modules/@github/relative-time-element/dist/relative-time-element-define.d.ts b/node_modules/@github/relative-time-element/dist/relative-time-element-define.d.ts
+index 6465123..58113c8 100644
+--- a/node_modules/@github/relative-time-element/dist/relative-time-element-define.d.ts
++++ b/node_modules/@github/relative-time-element/dist/relative-time-element-define.d.ts
+@@ -9,6 +9,8 @@ declare global {
+     interface HTMLElementTagNameMap {
+         'relative-time': RelativeTimeElement;
+     }
++}
++declare module 'react' {
+     namespace JSX {
+         interface IntrinsicElements {
+             ['relative-time']: JSXBase['span'] & Partial<Omit<RelativeTimeElement, keyof HTMLElement>>;

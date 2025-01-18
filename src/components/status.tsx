@@ -133,7 +133,6 @@ export function Status(props: StatusProps) {
         <div className="flex-1 flex-shrink"></div>
 
         <div className="self-start">
-          {/* @ts-expect-error - relative-time-element is not typed properly */}
           <relative-time
             class="text-xs leading-normal dark:text-neutral-400"
             datetime={status.createdAt}
