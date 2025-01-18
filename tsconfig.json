@@ -15,11 +15,7 @@
     "jsx": "preserve",
     "incremental": true,
     "noUncheckedIndexedAccess": true,
-    "preserveWatchOutput": false,
-    "baseUrl": "src",
-    "paths": {
-      "@*": ["*"]
-    }
+    "preserveWatchOutput": false
   },
   "include": [
     "next-env.d.ts",
