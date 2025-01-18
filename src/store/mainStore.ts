@@ -6,6 +6,11 @@ export enum SortOrders {
   NEWEST = "newest",
 }
 
+export enum Services {
+  MASTODON = "mastodon",
+  BLUESKY = "bluesky",
+}
+
 export type MainState = {
   settings: {
     showBio: boolean;
@@ -16,6 +21,7 @@ export type MainState = {
   };
   isFetching: boolean;
   isFinished: boolean;
+  service: Services;
 };
 
 export const initialMainState: MainState = {
@@ -28,6 +34,7 @@ export const initialMainState: MainState = {
   },
   isFetching: false,
   isFinished: false,
+  service: Services.MASTODON,
 };
 
 export const useMainStore = createCustomStore(initialMainState, "main-store");

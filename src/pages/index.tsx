@@ -19,6 +19,7 @@ import {
   useMastodonAccountId,
   useMastodonOAuthCodeDependencies,
 } from "../store/mastodonStore";
+import { APP_NAME } from "../helpers/common";
 
 const Home: NextPage = () => {
   const [localInstanceUrl, setInstanceDomain] = useState("");
@@ -129,12 +130,12 @@ const Home: NextPage = () => {
     <>
       <Block className="flex flex-col items-center justify-center">
         <Head>
-          <title>Tokimeki Mastodon</title>
+          <title>{APP_NAME}</title>
           <meta name="description" content="" />
           <link rel="icon" href="/favicon.png" />
         </Head>
         <h1 className="text-accentColor text-center">
-          ✨ Welcome to Tokimeki Mastodon ✨
+          ✨ Welcome to {APP_NAME} ✨
         </h1>
         <p className="custom-prose">
           Following too many accounts? You&apos;re in the right place!
