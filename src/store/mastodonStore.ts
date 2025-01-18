@@ -3,7 +3,7 @@ import { type CommonServiceState, createCustomStore } from "./common";
 import { useMemo } from "react";
 import { filterFollowingIds } from "./helpers";
 import { pick } from "lodash-es";
-import type { TokimekiAccount } from ".";
+import type { TokimekiAccount } from "./common";
 
 type MastodonState = CommonServiceState & {
   /** Mastodon app client id */

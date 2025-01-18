@@ -2,7 +2,7 @@ import clsx from "clsx";
 import type { Dispatch, SetStateAction } from "react";
 
 import { makeAccountName } from "../helpers/mastodonHelpers";
-import type { TokimekiAccount, TokimekiRelationship } from "../store";
+import type { TokimekiAccount, TokimekiRelationship } from "../store/common";
 import { useSettings } from "../store/selectors";
 import {
   useMastodonCurrentIndex,

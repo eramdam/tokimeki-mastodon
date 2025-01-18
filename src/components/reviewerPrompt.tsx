@@ -1,7 +1,7 @@
 import type { PropsWithChildren, ReactNode } from "react";
 
 import { makeAccountName } from "../helpers/mastodonHelpers";
-import type { TokimekiAccount } from "../store";
+import type { TokimekiAccount } from "../store/common";
 import { renderWithEmoji } from "./emojify";
 import { AnimationState } from "./reviewer";
 

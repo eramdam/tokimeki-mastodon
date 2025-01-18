@@ -1,27 +1,9 @@
-import type { mastodon } from "masto";
-
 import { createCustomStore } from "./common";
 
 export enum SortOrders {
   OLDEST = "oldest",
   RANDOM = "random",
   NEWEST = "newest",
-}
-
-export interface TokimekiAccount {
-  id: string;
-  acct: string;
-  note: string;
-  displayName: string;
-  username: string;
-  url: string;
-  emojis: mastodon.v1.CustomEmoji[];
-}
-
-export interface TokimekiRelationship {
-  followedBy: boolean;
-  note?: string | null;
-  showingReblogs: boolean;
 }
 
 export type MainState = {

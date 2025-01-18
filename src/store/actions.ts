@@ -1,8 +1,9 @@
 import { compact, pick, uniq } from "lodash-es";
 import type { mastodon } from "masto";
 
-import type { MainState, SortOrders, TokimekiAccount } from ".";
-import { initialMainState, useMainStore } from ".";
+import type { MainState, SortOrders } from "./mainStore";
+import type { TokimekiAccount } from "./common";
+import { initialMainState, useMainStore } from "./mainStore";
 import { makeTokimekiAccountFromMastodonAccount } from "./mastodonStore";
 import { initialMastodonState, useMastodonStore } from "./mastodonStore";
 import { filterFollowingIds, sortFollowings } from "./helpers";

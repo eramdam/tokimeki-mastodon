@@ -6,7 +6,7 @@ import {
 } from "zustand/middleware";
 import { get, set, del } from "idb-keyval";
 import { createWithEqualityFn } from "zustand/traditional";
-import type { TokimekiAccount, TokimekiRelationship } from ".";
+import type { mastodon } from "masto";
 
 export const idbStorage: StateStorage = {
   getItem: async (name: string): Promise<string | null> => {
@@ -63,3 +63,19 @@ export type CommonServiceState = {
   /** How many accounts the user started with. (might be redundant with `baseFollowingIds`) */
   startCount: number;
 };
+
+export interface TokimekiAccount {
+  id: string;
+  acct: string;
+  note: string;
+  displayName: string;
+  username: string;
+  url: string;
+  emojis: mastodon.v1.CustomEmoji[];
+}
+
+export interface TokimekiRelationship {
+  followedBy: boolean;
+  note?: string | null;
+  showingReblogs: boolean;
+}

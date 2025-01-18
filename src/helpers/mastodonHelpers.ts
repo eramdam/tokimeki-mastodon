@@ -1,4 +1,4 @@
-import type { TokimekiAccount } from "../store";
+import type { TokimekiAccount } from "../store/common";
 
 export function makeAccountName(account: TokimekiAccount) {
   return (

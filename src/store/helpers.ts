@@ -1,5 +1,5 @@
 import { shuffle } from "lodash-es";
-import { SortOrders } from ".";
+import { SortOrders } from "./mainStore";
 
 /*
  * Helpers.

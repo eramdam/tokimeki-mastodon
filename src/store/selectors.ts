@@ -1,4 +1,4 @@
-import { useMainStore } from "./index";
+import { useMainStore } from "./mainStore";
 
 export const useIsFinished = () => useMainStore((state) => state.isFinished);
 export const useSettings = () => useMainStore((state) => state.settings);

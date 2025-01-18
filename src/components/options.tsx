@@ -1,6 +1,6 @@
 import { useState } from "react";
 
-import { SortOrders } from "../store";
+import { SortOrders } from "../store/mainStore";
 import { reorderFollowings, updateSettings } from "../store/actions";
 import { useSettings } from "../store/selectors";
 import { LinkButton } from "./linkButton";

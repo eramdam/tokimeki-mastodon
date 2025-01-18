@@ -3,7 +3,7 @@ import type { mastodon } from "masto";
 import { useEffect, useMemo, useState } from "react";
 
 import { useMastodon } from "../helpers/mastodonContext";
-import type { TokimekiAccount } from "../store";
+import type { TokimekiAccount } from "../store/common";
 import { useMastodonInstanceUrl } from "../store/mastodonStore";
 import { useMastodonCurrentAccountRelationship } from "../store/mastodonStore";
 import { Status } from "./status";
