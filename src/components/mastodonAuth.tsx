@@ -1,7 +1,7 @@
 import { useCallback, useEffect, useMemo, useState } from "react";
 import {
   registerMastodonApplication,
-  getAuthURL,
+  getMastodonAuthURL,
   getMastodonAccessToken,
 } from "../helpers/authHelpers";
 import {
@@ -54,7 +54,7 @@ export function MastodonAuthForm() {
           clientSecret,
         });
 
-        location.href = getAuthURL({
+        location.href = getMastodonAuthURL({
           instanceUrl: localInstanceUrl.replace(/\/$/, ""),
           clientId,
         });

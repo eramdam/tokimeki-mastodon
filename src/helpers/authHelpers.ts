@@ -27,7 +27,10 @@ export async function registerMastodonApplication(
   });
 }
 
-export function getAuthURL(opts: { clientId: string; instanceUrl: string }) {
+export function getMastodonAuthURL(opts: {
+  clientId: string;
+  instanceUrl: string;
+}) {
   const authorizationParams = new URLSearchParams({
     client_id: opts.clientId,
     scope: OAUTH_SCOPES,
