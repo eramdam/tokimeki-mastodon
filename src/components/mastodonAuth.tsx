@@ -121,39 +121,45 @@ export function MastodonAuthForm() {
   }, [account, onCode, router]);
 
   return (
-    <form
-      onSubmit={(e) => {
-        e.preventDefault();
-        onLogin();
-      }}
-      className="my-10 mb-2 flex w-full max-w-lg flex-col gap-5"
-    >
-      <TextInput
-        label="Instance domain"
-        placeholder="https://"
-        type={"url"}
-        className="custom-prose flex flex-col gap-2 text-center"
-        value={localInstanceUrl}
-        onChange={(value) => {
-          setInstanceDomain(
-            value.startsWith("https://") ? value : `https://${value}`,
-          );
+    <>
+      <form
+        onSubmit={(e) => {
+          e.preventDefault();
+          onLogin();
         }}
-        isInvalid={(isInstanceValid || "valid") === "invalid"}
-        isDisabled={isLoading}
-      ></TextInput>
-      <div className="flex justify-center">
-        <Button
-          variant="primary"
-          type="submit"
-          onPress={() => {
-            onLogin();
+        className="my-10 mb-2 flex w-full max-w-lg flex-col gap-5"
+      >
+        <TextInput
+          label="Instance domain"
+          placeholder="https://"
+          type={"url"}
+          className="custom-prose flex flex-col gap-2 text-center"
+          value={localInstanceUrl}
+          onChange={(value) => {
+            setInstanceDomain(
+              value.startsWith("https://") ? value : `https://${value}`,
+            );
           }}
-          isDisabled={isInstanceValid === "invalid" || isLoading}
-        >
-          {(isLoading && "Loading...") || "Login"}
-        </Button>
-      </div>
-    </form>
+          isInvalid={(isInstanceValid || "valid") === "invalid"}
+          isDisabled={isLoading}
+        ></TextInput>
+        <div className="flex justify-center">
+          <Button
+            variant="primary"
+            type="submit"
+            onPress={() => {
+              onLogin();
+            }}
+            isDisabled={isInstanceValid === "invalid" || isLoading}
+          >
+            {(isLoading && "Loading...") || "Login"}
+          </Button>
+        </div>
+      </form>
+      <p className="custom-prose !w-full !max-w-full !text-sm opacity-60">
+        This tool uses your Mastodon&apos;s account authorization to fetch your
+        followings, their toots and unfollow accounts.
+      </p>
+    </>
   );
 }

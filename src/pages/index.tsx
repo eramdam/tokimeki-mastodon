@@ -5,8 +5,11 @@ import packageJson from "../../package.json";
 import { Block } from "../components/block";
 import { MastodonAuthForm } from "../components/mastodonAuth";
 import { APP_NAME } from "../helpers/common";
+import { Radio, RadioGroup } from "../components/radioGroup";
+import { Services, setService, useMainStore } from "../store/mainStore";
 
 const Home: NextPage = () => {
+  const service = useMainStore((state) => state.service);
   return (
     <>
       <Block className="flex flex-col items-center justify-center">
@@ -28,11 +31,17 @@ const Home: NextPage = () => {
           following, and others you may have outgrown, but you never had the
           energy to clean up your follows.
         </p>
-        <MastodonAuthForm />
-        <p className="custom-prose !w-full !max-w-full !text-sm opacity-60">
-          This tool uses your Mastodon&apos;s account authorization to fetch
-          your followings, their toots and unfollow accounts.
-        </p>
+        <div className="custom-prose w-full">
+          <RadioGroup
+            label={"Which timeline do you want to clean today?"}
+            value={service}
+            onChange={(value) => setService(value as Services, false)}
+          >
+            <Radio value={Services.MASTODON}>Mastodon</Radio>
+            <Radio value={Services.BLUESKY}>Bluesky</Radio>
+          </RadioGroup>
+        </div>
+        {service === Services.MASTODON && <MastodonAuthForm />}
       </Block>
       <Block className="lg:py-0">
         <div className="custom-prose !max-w-full !text-sm !leading-relaxed opacity-60">
