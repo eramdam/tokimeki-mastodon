@@ -1,5 +1,6 @@
 import type { NextPage } from "next";
 import { useRouter } from "next/router";
+import type { PropsWithChildren } from "react";
 import { useEffect, useMemo, useState } from "react";
 
 import { Block } from "../components/block";
@@ -24,6 +25,7 @@ import {
 
 const Review: NextPage = () => {
   const [hasMounted, setHasMounted] = useState(false);
+  const [isReviewing, setIsReviewing] = useState(false);
 
   useEffect(() => {
     setHasMounted(true);
@@ -35,30 +37,27 @@ const Review: NextPage = () => {
 
   return (
     <MastodonProvider>
-      <ReviewContent />
+      <MastodonReviewContent
+        isReviewing={isReviewing}
+        setIsReviewing={setIsReviewing}
+      />
     </MastodonProvider>
   );
 };
 
-const ReviewContent = () => {
-  const [isReviewing, setIsReviewing] = useState(false);
-  const router = useRouter();
+interface ReviewContentWrapperProps {
+  isReviewing: boolean;
+  setIsReviewing: (b: boolean) => void;
+}
 
+const MastodonReviewContent = (props: ReviewContentWrapperProps) => {
+  const { isReviewing, setIsReviewing } = props;
   const { client } = useMastodon();
   const accountId = useMastodonAccountId();
   const accountUsername = useMastodonAccountUsername();
   const keptIds = useMastodonKeptIds();
   const unfollowedIds = useMastodonUnfollowedIds();
   const startCount = useMastodonStartCount();
-
-  const hasProgress = useMemo(
-    () =>
-      Boolean(
-        (unfollowedIds && unfollowedIds.length) || (keptIds && keptIds.length),
-      ),
-    [keptIds, unfollowedIds],
-  );
-  const isFinished = useIsFinished();
   const filteredFollowings = useMastodonFilteredFollowings();
 
   useEffect(() => {
@@ -69,6 +68,59 @@ const ReviewContent = () => {
     fetchMastodonFollowings(accountId, client);
     fetchMastodonLists(client);
   }, [accountId, client, isReviewing]);
+
+  return (
+    <ReviewContent
+      accountId={accountId}
+      accountUsername={accountUsername}
+      keptIds={keptIds}
+      unfollowedIds={unfollowedIds}
+      startCount={startCount}
+      filteredFollowings={filteredFollowings}
+      isReviewing={isReviewing}
+      setIsReviewing={setIsReviewing}
+    >
+      <MastodonReviewer
+        onFinished={() => {
+          markAsFinished();
+        }}
+      />
+    </ReviewContent>
+  );
+};
+
+interface ReviewContentProps {
+  accountId: string | undefined;
+  accountUsername: string | undefined;
+  keptIds: string[];
+  unfollowedIds: string[];
+  startCount: number;
+  filteredFollowings: string[];
+  isReviewing: boolean;
+  setIsReviewing: (b: boolean) => void;
+}
+
+const ReviewContent = (props: PropsWithChildren<ReviewContentProps>) => {
+  const {
+    accountId,
+    accountUsername,
+    keptIds,
+    startCount,
+    unfollowedIds,
+    filteredFollowings,
+    isReviewing,
+    setIsReviewing,
+  } = props;
+  const router = useRouter();
+
+  const hasProgress = useMemo(
+    () =>
+      Boolean(
+        (unfollowedIds && unfollowedIds.length) || (keptIds && keptIds.length),
+      ),
+    [keptIds, unfollowedIds],
+  );
+  const isFinished = useIsFinished();
 
   if (isFinished) {
     return <Finished />;
@@ -93,11 +145,7 @@ const ReviewContent = () => {
         >
           Options
         </LinkButton>
-        <MastodonReviewer
-          onFinished={() => {
-            markAsFinished();
-          }}
-        />
+        {props.children}
       </>
     );
   }
