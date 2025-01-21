@@ -11,7 +11,10 @@ const OAUTH_SCOPES = [
   "write:lists",
 ].join(" ");
 
-export async function registerApplication(instanceURL: string, origin: string) {
+export async function registerMastodonApplication(
+  instanceURL: string,
+  origin: string,
+) {
   const masto = createRestAPIClient({
     url: instanceURL,
   });
@@ -39,7 +42,7 @@ export function getAuthURL(opts: { clientId: string; instanceUrl: string }) {
   return authorizationURL;
 }
 
-export async function getAccessToken(opts: {
+export async function getMastodonAccessToken(opts: {
   clientId: string;
   instanceUrl: string;
   clientSecret: string;

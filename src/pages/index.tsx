@@ -1,134 +1,12 @@
-import type { ValidationState } from "@react-types/shared";
-import { createRestAPIClient } from "masto";
 import { type NextPage } from "next";
 import Head from "next/head";
-import { useRouter } from "next/router";
-import { useCallback, useEffect, useMemo, useState } from "react";
 
 import packageJson from "../../package.json";
 import { Block } from "../components/block";
-import { Button } from "../components/button";
-import { TextInput } from "../components/textField";
-import {
-  getAccessToken,
-  getAuthURL,
-  registerApplication,
-} from "../helpers/authHelpers";
-import {
-  saveMastodonAfterOAuthCode,
-  saveMastodonLoginCredentials,
-} from "../store/mastodonStore";
-import {
-  useMastodonAccountId,
-  useMastodonOAuthCodeDependencies,
-} from "../store/mastodonStore";
+import { MastodonAuthForm } from "../components/mastodonAuth";
 import { APP_NAME } from "../helpers/common";
 
 const Home: NextPage = () => {
-  const [localInstanceUrl, setInstanceDomain] = useState("");
-  const [isLoading, setIsLoading] = useState(false);
-  const router = useRouter();
-  const {
-    clientId,
-    clientSecret,
-    instanceUrl: storedInstanceUrl,
-  } = useMastodonOAuthCodeDependencies();
-
-  const isInstanceValid: ValidationState | undefined = useMemo(() => {
-    try {
-      new URL(localInstanceUrl);
-      return "valid";
-    } catch (_e) {
-      return "invalid";
-    }
-  }, [localInstanceUrl]);
-
-  const onCode = useCallback(
-    async (code: string) => {
-      setIsLoading(true);
-
-      if (!clientId || !clientSecret || !storedInstanceUrl) {
-        return;
-      }
-
-      const accessTokenResponse = await getAccessToken({
-        clientId,
-        clientSecret,
-        code,
-        instanceUrl: storedInstanceUrl,
-      });
-
-      if (!accessTokenResponse) {
-        return;
-      }
-
-      const { access_token } = accessTokenResponse;
-
-      if (!access_token) {
-        return;
-      }
-
-      const masto = createRestAPIClient({
-        url: storedInstanceUrl,
-        accessToken: access_token,
-        timeout: 30_000,
-      });
-      const account = await masto.v1.accounts.verifyCredentials();
-      saveMastodonAfterOAuthCode({
-        accessToken: access_token,
-        account,
-      });
-      router.push("/review");
-    },
-    [clientId, clientSecret, router, storedInstanceUrl],
-  );
-
-  const account = useMastodonAccountId();
-
-  useEffect(() => {
-    if (account) {
-      router.push("/review");
-      return;
-    }
-    const code = new URLSearchParams(window.location.search).get("code");
-
-    if (!code) {
-      return;
-    }
-
-    onCode(code);
-  }, [account, onCode, router]);
-
-  const onLogin = async () => {
-    if (!isInstanceValid || isLoading) {
-      return;
-    }
-
-    setIsLoading(true);
-
-    try {
-      const { clientId, clientSecret } = await registerApplication(
-        localInstanceUrl.replace(/\/$/, ""),
-        window.location.origin,
-      );
-
-      if (clientId && clientSecret) {
-        saveMastodonLoginCredentials({
-          instanceUrl: localInstanceUrl.replace(/\/$/, ""),
-          clientId,
-          clientSecret,
-        });
-
-        location.href = getAuthURL({
-          instanceUrl: localInstanceUrl.replace(/\/$/, ""),
-          clientId,
-        });
-      }
-    } catch (e) {
-      console.error(e);
-    }
-  };
-
   return (
     <>
       <Block className="flex flex-col items-center justify-center">
@@ -150,40 +28,7 @@ const Home: NextPage = () => {
           following, and others you may have outgrown, but you never had the
           energy to clean up your follows.
         </p>
-        <form
-          onSubmit={(e) => {
-            e.preventDefault();
-            onLogin();
-          }}
-          className="my-10 mb-2 flex w-full max-w-lg flex-col gap-5"
-        >
-          <TextInput
-            label="Instance domain"
-            placeholder="https://"
-            type={"url"}
-            className="custom-prose flex flex-col gap-2 text-center"
-            value={localInstanceUrl}
-            onChange={(value) => {
-              setInstanceDomain(
-                value.startsWith("https://") ? value : `https://${value}`,
-              );
-            }}
-            validationState={isInstanceValid || "valid"}
-            isDisabled={isLoading}
-          ></TextInput>
-          <div className="flex justify-center">
-            <Button
-              variant="primary"
-              type="submit"
-              onPress={() => {
-                onLogin();
-              }}
-              isDisabled={isInstanceValid === "invalid" || isLoading}
-            >
-              {(isLoading && "Loading...") || "Login"}
-            </Button>
-          </div>
-        </form>
+        <MastodonAuthForm />
         <p className="custom-prose !w-full !max-w-full !text-sm opacity-60">
           This tool uses your Mastodon&apos;s account authorization to fetch
           your followings, their toots and unfollow accounts.
