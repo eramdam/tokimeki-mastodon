@@ -1,7 +1,7 @@
 import type { NextPage } from "next";
 import { useRouter } from "next/router";
 import type { PropsWithChildren } from "react";
-import { useEffect, useMemo, useState } from "react";
+import { useCallback, useEffect, useMemo, useState } from "react";
 
 import { Block } from "../components/block";
 import { Button } from "../components/button";
@@ -18,10 +18,12 @@ import {
   useMastodonAccountId,
   useMastodonAccountUsername,
   useMastodonFilteredFollowings,
+  useMastodonInstanceUrl,
   useMastodonKeptIds,
   useMastodonStartCount,
   useMastodonUnfollowedIds,
 } from "../store/mastodonStore";
+import { pick } from "lodash-es";
 
 const Review: NextPage = () => {
   const [hasMounted, setHasMounted] = useState(false);
@@ -59,6 +61,7 @@ const MastodonReviewContent = (props: ReviewContentWrapperProps) => {
   const unfollowedIds = useMastodonUnfollowedIds();
   const startCount = useMastodonStartCount();
   const filteredFollowings = useMastodonFilteredFollowings();
+  const instanceUrl = useMastodonInstanceUrl();
 
   useEffect(() => {
     if (!isReviewing || !client || !accountId) {
@@ -68,6 +71,19 @@ const MastodonReviewContent = (props: ReviewContentWrapperProps) => {
     fetchMastodonFollowings(accountId, client);
     fetchMastodonLists(client);
   }, [accountId, client, isReviewing]);
+
+  const getFollowingsForAvatars = useCallback(async () => {
+    if (!client || !accountId) {
+      return [];
+    }
+
+    const accounts = await client.v1.accounts
+      .$select(accountId)
+      .following.list({
+        limit: 80,
+      });
+    return accounts.map((a) => pick(a, ["id", "avatar", "displayName"]));
+  }, []);
 
   return (
     <ReviewContent
@@ -79,6 +95,8 @@ const MastodonReviewContent = (props: ReviewContentWrapperProps) => {
       filteredFollowings={filteredFollowings}
       isReviewing={isReviewing}
       setIsReviewing={setIsReviewing}
+      instanceUrl={instanceUrl}
+      getFollowingsForAvatars={getFollowingsForAvatars}
     >
       <MastodonReviewer
         onFinished={() => {
@@ -98,6 +116,14 @@ interface ReviewContentProps {
   filteredFollowings: string[];
   isReviewing: boolean;
   setIsReviewing: (b: boolean) => void;
+  instanceUrl: string | undefined;
+  getFollowingsForAvatars: () => Promise<
+    {
+      id: string;
+      avatar: string;
+      displayName: string;
+    }[]
+  >;
 }
 
 const ReviewContent = (props: PropsWithChildren<ReviewContentProps>) => {
@@ -110,6 +136,8 @@ const ReviewContent = (props: PropsWithChildren<ReviewContentProps>) => {
     filteredFollowings,
     isReviewing,
     setIsReviewing,
+    instanceUrl,
+    getFollowingsForAvatars,
   } = props;
   const router = useRouter();
 
@@ -123,7 +151,15 @@ const ReviewContent = (props: PropsWithChildren<ReviewContentProps>) => {
   const isFinished = useIsFinished();
 
   if (isFinished) {
-    return <Finished />;
+    return (
+      <Finished
+        startCount={startCount}
+        keptIds={keptIds}
+        accountId={accountId}
+        instanceUrl={instanceUrl}
+        getFollowingsForAvatars={getFollowingsForAvatars}
+      />
+    );
   }
 
   if (!accountUsername || !accountId) {

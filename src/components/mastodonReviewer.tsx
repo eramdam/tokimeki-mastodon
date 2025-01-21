@@ -3,16 +3,20 @@ import { useCallback, useState } from "react";
 import { useMastodon } from "../helpers/mastodonContext";
 import type { TokimekiAccount } from "../store/common";
 import {
+  createMastodonList,
   goToNextMastodonAccount,
   useMastodonCurrentAccount,
+  useMastodonCurrentAccountListIds,
   useMastodonCurrentAccountRelationship,
   useMastodonCurrentIndex,
   useMastodonFilteredFollowings,
   useMastodonFollowingIds,
   useMastodonInstanceUrl,
   useMastodonListById,
+  useMastodonLists,
 } from "../store/mastodonStore";
 import { Reviewer } from "./reviewer";
+import { MastodonFeedWidget } from "./mastodonFeedWidget";
 
 interface MastodonReviewerProps {
   onFinished: () => void;
@@ -30,6 +34,8 @@ export function MastodonReviewer(props: MastodonReviewerProps) {
     undefined,
   );
   const list = useMastodonListById(addedToListId);
+  const lists = useMastodonLists();
+  const currentAccountListIds = useMastodonCurrentAccountListIds();
 
   const unfollowAccount = useCallback(async (accountId: string) => {
     if (!client) {
@@ -74,6 +80,19 @@ export function MastodonReviewer(props: MastodonReviewerProps) {
       makeAccountUrl={() => `${instanceUrl}/@${currentAccount?.acct}`}
       listName={list?.title}
       setAddedToListId={setAddedToListId}
-    />
+      lists={lists}
+      currentAccountListIds={currentAccountListIds}
+      createList={async (listName: string) => {
+        if (!client) {
+          return;
+        }
+        createMastodonList(client, listName);
+      }}
+    >
+      <MastodonFeedWidget
+        key={currentAccount?.id}
+        account={currentAccount}
+      ></MastodonFeedWidget>
+    </Reviewer>
   );
 }

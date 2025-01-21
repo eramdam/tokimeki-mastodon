@@ -1,4 +1,5 @@
 import clsx from "clsx";
+import type { PropsWithChildren } from "react";
 import { useState } from "react";
 
 import { delayAsync } from "../helpers/asyncHelpers";
@@ -9,7 +10,6 @@ import {
   unfollowMastodonAccount,
 } from "../store/mastodonStore";
 import { Block } from "./block";
-import { FeedWidget } from "./feedWidget";
 import { FollowingsLoadingIndicator } from "./followingsLoadingIndicator";
 import { ReviewerButtons } from "./reviewerButtons";
 import { ReviewerFooter } from "./reviewerFooter";
@@ -35,9 +35,12 @@ interface ReviewerProps {
   makeAccountUrl: () => string;
   setAddedToListId: (listId: string | undefined) => void;
   listName: string | undefined;
+  lists: { id: string; title: string }[];
+  currentAccountListIds: string[] | undefined;
+  createList: (listName: string) => Promise<void>;
 }
 
-export function Reviewer(props: ReviewerProps) {
+export function Reviewer(props: PropsWithChildren<ReviewerProps>) {
   const {
     filteredFollowings,
     followings,
@@ -46,6 +49,9 @@ export function Reviewer(props: ReviewerProps) {
     goToNextAccount,
     addToList,
     setAddedToListId,
+    lists,
+    currentAccountListIds,
+    createList,
   } = props;
 
   const {
@@ -157,10 +163,7 @@ export function Reviewer(props: ReviewerProps) {
             "translate-x-[-20%] translate-y-[200px] rotate-[-10deg] scale-0 opacity-0",
         )}
       >
-        <FeedWidget
-          key={currentAccount?.id}
-          account={currentAccount}
-        ></FeedWidget>
+        {props.children}
       </Block>
 
       <Block
@@ -198,6 +201,9 @@ export function Reviewer(props: ReviewerProps) {
               isVisible={isVisible}
               shouldSkipConfirmation={skipConfirmation}
               isFetching={isFetching}
+              lists={lists}
+              currentAccountListIds={currentAccountListIds}
+              createList={createList}
             />
           </>
         ) : (

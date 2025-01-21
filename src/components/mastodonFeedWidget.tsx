@@ -13,7 +13,7 @@ interface FeedWidgetProps {
   className?: string;
 }
 
-export function FeedWidget(props: FeedWidgetProps) {
+export function MastodonFeedWidget(props: FeedWidgetProps) {
   const { account } = props;
   const { client } = useMastodon();
   const [isLoading, setIsLoading] = useState(true);
