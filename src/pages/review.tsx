@@ -6,24 +6,19 @@ import { Block } from "../components/block";
 import { Button } from "../components/button";
 import { Finished } from "../components/finished";
 import { LinkButton } from "../components/linkButton";
+import { MastodonReviewer } from "../components/mastodonReviewer";
 import { Options } from "../components/options";
-import { Reviewer } from "../components/reviewer";
 import { MastodonProvider, useMastodon } from "../helpers/mastodonContext";
-import { resetStates } from "../store/mainStore";
+import { resetStates, useIsFinished } from "../store/mainStore";
 import {
   fetchMastodonFollowings,
   fetchMastodonLists,
   markAsFinished,
-} from "../store/mastodonStore";
-import { useIsFinished } from "../store/mainStore";
-import {
-  useMastodonFilteredFollowings,
-  useMastodonStartCount,
-} from "../store/mastodonStore";
-import {
   useMastodonAccountId,
   useMastodonAccountUsername,
+  useMastodonFilteredFollowings,
   useMastodonKeptIds,
+  useMastodonStartCount,
   useMastodonUnfollowedIds,
 } from "../store/mastodonStore";
 
@@ -98,7 +93,7 @@ const ReviewContent = () => {
         >
           Options
         </LinkButton>
-        <Reviewer
+        <MastodonReviewer
           onFinished={() => {
             markAsFinished();
           }}

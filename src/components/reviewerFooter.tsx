@@ -4,12 +4,6 @@ import type { Dispatch, SetStateAction } from "react";
 import { makeAccountName } from "../helpers/mastodonHelpers";
 import type { TokimekiAccount, TokimekiRelationship } from "../store/common";
 import { useSettings } from "../store/mainStore";
-import {
-  useMastodonCurrentIndex,
-  useMastodonFollowingIds,
-  useMastodonInstanceUrl,
-} from "../store/mastodonStore";
-import { useMastodonListById } from "../store/mastodonStore";
 import { SmallButton } from "./button";
 import { renderWithEmoji } from "./emojify";
 import { HtmlRenderer } from "./htmlRendered";
@@ -21,7 +15,10 @@ interface ReviewerFooterProps {
   setShowBio: Dispatch<SetStateAction<boolean>>;
   showNote: boolean;
   setShowNote: Dispatch<SetStateAction<boolean>>;
-  addedToListId: string | undefined;
+  followingIndex: number;
+  followings: string[];
+  makeAccountUrl: () => string;
+  listName: string | undefined;
 }
 export function ReviewerFooter(props: ReviewerFooterProps) {
   const {
@@ -31,12 +28,12 @@ export function ReviewerFooter(props: ReviewerFooterProps) {
     setShowBio,
     showNote,
     setShowNote,
+    followingIndex,
+    followings,
+    listName,
   } = props;
-  const followingIndex = useMastodonCurrentIndex();
-  const followings = useMastodonFollowingIds();
+
   const { showFollowLabel } = useSettings();
-  const instanceUrl = useMastodonInstanceUrl();
-  const list = useMastodonListById(props.addedToListId);
 
   const renderTitle = () => {
     if (followingIndex === followings.length - 1) {
@@ -53,9 +50,9 @@ export function ReviewerFooter(props: ReviewerFooterProps) {
     <>
       <div className="flex w-full items-center justify-between">
         <p className="custom-prose break-words text-left leading-normal">
-          {list && (
+          {listName && (
             <>
-              Added to <strong>{list.title}</strong>!
+              Added to <strong>{listName}</strong>!
               <br />
             </>
           )}
@@ -66,7 +63,7 @@ export function ReviewerFooter(props: ReviewerFooterProps) {
             </strong>
           )}{" "}
           <a
-            href={`${instanceUrl}/@${account.acct}`}
+            href={props.makeAccountUrl()}
             target="_blank"
             className="text-sm text-neutral-400 hover:underline"
             rel="noreferrer noopener"

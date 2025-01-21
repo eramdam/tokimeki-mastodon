@@ -1,22 +1,12 @@
 import clsx from "clsx";
-import { compact } from "lodash-es";
 import { useState } from "react";
 
 import { delayAsync } from "../helpers/asyncHelpers";
-import { useMastodon } from "../helpers/mastodonContext";
-import {
-  goToNextMastodonAccount,
-  keepMastodonAccount,
-  unfollowMastodonAccount,
-} from "../store/mastodonStore";
+import type { TokimekiAccount, TokimekiRelationship } from "../store/common";
 import { useSettings } from "../store/mainStore";
 import {
-  useMastodonFilteredFollowings,
-  useMastodonFollowingIds,
-} from "../store/mastodonStore";
-import {
-  useMastodonCurrentAccount,
-  useMastodonCurrentAccountRelationship,
+  keepMastodonAccount,
+  unfollowMastodonAccount,
 } from "../store/mastodonStore";
 import { Block } from "./block";
 import { FeedWidget } from "./feedWidget";
@@ -34,22 +24,38 @@ export enum AnimationState {
 
 interface ReviewerProps {
   onFinished: () => void;
+  currentAccount: TokimekiAccount | undefined;
+  currentAccountRelationship: TokimekiRelationship | undefined;
+  filteredFollowings: string[];
+  followings: string[];
+  followingIndex: number;
+  unfollowAccount: (accountId: string) => Promise<void>;
+  goToNextAccount: (account: TokimekiAccount) => Promise<void>;
+  addToList: (listId: string, account: TokimekiAccount) => Promise<void>;
+  makeAccountUrl: () => string;
+  setAddedToListId: (listId: string | undefined) => void;
+  listName: string | undefined;
 }
 
 export function Reviewer(props: ReviewerProps) {
-  const currentAccount = useMastodonCurrentAccount();
-  const currentAccountRelationship = useMastodonCurrentAccountRelationship();
-  const filteredFollowings = useMastodonFilteredFollowings();
-  const followings = useMastodonFollowingIds();
-  const { client } = useMastodon();
+  const {
+    filteredFollowings,
+    followings,
+    currentAccount,
+    currentAccountRelationship,
+    goToNextAccount,
+    addToList,
+    setAddedToListId,
+  } = props;
 
+  const {
+    showBio: initialShowBio,
+    showNote: initialShowNote,
+    skipConfirmation,
+  } = useSettings();
   const [animationState, setAnimated] = useState(AnimationState.Idle);
   const isVisible = animationState === AnimationState.Idle;
-  const { skipConfirmation } = useSettings();
   const [isFetching, setIsFetching] = useState(false);
-  const [addedToListId, setAddedToListId] = useState<string | undefined>(
-    undefined,
-  );
 
   const onNextClick = async ({
     forceUnfollow,
@@ -58,7 +64,7 @@ export function Reviewer(props: ReviewerProps) {
     forceUnfollow?: boolean;
     dontHide?: boolean;
   }) => {
-    if (!client || !currentAccount || isFetching) {
+    if (!currentAccount || isFetching) {
       return;
     }
 
@@ -70,7 +76,7 @@ export function Reviewer(props: ReviewerProps) {
       if (shouldUnfollow) {
         console.log("Will unfollow", currentAccount.acct);
         if (process.env.NODE_ENV !== "development") {
-          await client.v1.accounts.$select(currentAccount.id).unfollow();
+          props.unfollowAccount(currentAccount.id);
         }
         unfollowMastodonAccount(currentAccount.id);
       } else {
@@ -94,7 +100,7 @@ export function Reviewer(props: ReviewerProps) {
 
     setAddedToListId(undefined);
     setAnimated(AnimationState.Idle);
-    await goToNextMastodonAccount(client, currentAccount);
+    await goToNextAccount(currentAccount);
     setIsFetching(false);
   };
 
@@ -118,16 +124,12 @@ export function Reviewer(props: ReviewerProps) {
     }
   };
   const onAddToList = async (listId: string) => {
-    if (!client) {
-      return;
+    if (currentAccount) {
+      await addToList(listId, currentAccount);
+      setAddedToListId(listId);
     }
-    await client.v1.lists.$select(listId).accounts.create({
-      accountIds: compact([currentAccount?.id ?? ""]),
-    });
-    setAddedToListId(listId);
   };
 
-  const { showBio: initialShowBio, showNote: initialShowNote } = useSettings();
   const [showBio, setShowBio] = useState(initialShowBio);
   const [showNote, setShowNote] = useState(initialShowNote);
 
@@ -176,7 +178,10 @@ export function Reviewer(props: ReviewerProps) {
                 setShowNote={setShowNote}
                 account={currentAccount}
                 accountRelationship={currentAccountRelationship}
-                addedToListId={addedToListId}
+                listName={props.listName}
+                followings={props.followings}
+                followingIndex={props.followingIndex}
+                makeAccountUrl={props.makeAccountUrl}
               />
             )}
             <ReviewerPrompt
