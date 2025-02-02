@@ -1,8 +1,9 @@
 import { useState } from "react";
 
-import { SortOrders } from "../store";
-import { reorderFollowings, updateSettings } from "../store/actions";
-import { useSettings } from "../store/selectors";
+import { SortOrders } from "../store/mainStore";
+import { updateSettings } from "../store/mainStore";
+import { reorderMastodonFollowings } from "../store/mastodonStore";
+import { useSettings } from "../store/mainStore";
 import { LinkButton } from "./linkButton";
 import { Radio, RadioGroup } from "./radioGroup";
 
@@ -81,7 +82,7 @@ export function Options() {
           updateSettings({
             sortOrder: value as SortOrders,
           });
-          reorderFollowings(value as SortOrders);
+          reorderMastodonFollowings(value as SortOrders);
         }}
       >
         <Radio value={SortOrders.OLDEST}>

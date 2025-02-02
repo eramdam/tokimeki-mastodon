@@ -4,10 +4,10 @@ import type { PropsWithChildren } from "react";
 import { createContext, useContext, useEffect, useMemo, useState } from "react";
 
 import {
-  useAccessToken,
-  useAccountId,
-  useInstanceUrl,
-} from "../store/selectors";
+  useMastodonAccessToken,
+  useMastodonInstanceUrl,
+} from "../store/mastodonStore";
+import { useMastodonAccountId } from "../store/mastodonStore";
 
 const MastodonContext = createContext<{
   client: mastodon.rest.Client | undefined;
@@ -15,9 +15,9 @@ const MastodonContext = createContext<{
 }>({ client: undefined, accountId: null });
 
 export const MastodonProvider = (props: PropsWithChildren<object>) => {
-  const accessToken = useAccessToken();
-  const accountId = useAccountId();
-  const instanceUrl = useInstanceUrl();
+  const accessToken = useMastodonAccessToken();
+  const accountId = useMastodonAccountId();
+  const instanceUrl = useMastodonInstanceUrl();
   const [masto, setMasto] = useState<mastodon.rest.Client | undefined>();
 
   useEffect(() => {

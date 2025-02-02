@@ -1,23 +1,15 @@
 import clsx from "clsx";
-import { compact } from "lodash-es";
+import type { PropsWithChildren } from "react";
 import { useState } from "react";
 
 import { delayAsync } from "../helpers/asyncHelpers";
-import { useMastodon } from "../helpers/mastodonContext";
+import type { TokimekiAccount, TokimekiRelationship } from "../store/common";
+import { useSettings } from "../store/mainStore";
 import {
-  goToNextAccount,
-  keepAccount,
-  unfollowAccount,
-} from "../store/actions";
-import {
-  useCurrentAccount,
-  useCurrentAccountRelationship,
-  useFilteredFollowings,
-  useFollowingIds,
-  useSettings,
-} from "../store/selectors";
+  keepMastodonAccount,
+  unfollowMastodonAccount,
+} from "../store/mastodonStore";
 import { Block } from "./block";
-import { FeedWidget } from "./feedWidget";
 import { FollowingsLoadingIndicator } from "./followingsLoadingIndicator";
 import { ReviewerButtons } from "./reviewerButtons";
 import { ReviewerFooter } from "./reviewerFooter";
@@ -32,22 +24,44 @@ export enum AnimationState {
 
 interface ReviewerProps {
   onFinished: () => void;
+  currentAccount: TokimekiAccount | undefined;
+  currentAccountRelationship: TokimekiRelationship | undefined;
+  filteredFollowings: string[];
+  followings: string[];
+  followingIndex: number;
+  unfollowAccount: (accountId: string) => Promise<void>;
+  goToNextAccount: (account: TokimekiAccount) => Promise<void>;
+  addToList: (listId: string, account: TokimekiAccount) => Promise<void>;
+  makeAccountUrl: () => string;
+  setAddedToListId: (listId: string | undefined) => void;
+  listName: string | undefined;
+  lists: { id: string; title: string }[];
+  currentAccountListIds: string[] | undefined;
+  createList: (listName: string) => Promise<void>;
 }
 
-export function Reviewer(props: ReviewerProps) {
-  const currentAccount = useCurrentAccount();
-  const currentAccountRelationship = useCurrentAccountRelationship();
-  const filteredFollowings = useFilteredFollowings();
-  const followings = useFollowingIds();
-  const { client } = useMastodon();
+export function Reviewer(props: PropsWithChildren<ReviewerProps>) {
+  const {
+    filteredFollowings,
+    followings,
+    currentAccount,
+    currentAccountRelationship,
+    goToNextAccount,
+    addToList,
+    setAddedToListId,
+    lists,
+    currentAccountListIds,
+    createList,
+  } = props;
 
+  const {
+    showBio: initialShowBio,
+    showNote: initialShowNote,
+    skipConfirmation,
+  } = useSettings();
   const [animationState, setAnimated] = useState(AnimationState.Idle);
   const isVisible = animationState === AnimationState.Idle;
-  const { skipConfirmation } = useSettings();
   const [isFetching, setIsFetching] = useState(false);
-  const [addedToListId, setAddedToListId] = useState<string | undefined>(
-    undefined,
-  );
 
   const onNextClick = async ({
     forceUnfollow,
@@ -56,7 +70,7 @@ export function Reviewer(props: ReviewerProps) {
     forceUnfollow?: boolean;
     dontHide?: boolean;
   }) => {
-    if (!client || !currentAccount || isFetching) {
+    if (!currentAccount || isFetching) {
       return;
     }
 
@@ -68,11 +82,11 @@ export function Reviewer(props: ReviewerProps) {
       if (shouldUnfollow) {
         console.log("Will unfollow", currentAccount.acct);
         if (process.env.NODE_ENV !== "development") {
-          await client.v1.accounts.$select(currentAccount.id).unfollow();
+          props.unfollowAccount(currentAccount.id);
         }
-        unfollowAccount(currentAccount.id);
+        unfollowMastodonAccount(currentAccount.id);
       } else {
-        keepAccount(currentAccount.id);
+        keepMastodonAccount(currentAccount.id);
       }
     }
 
@@ -92,7 +106,7 @@ export function Reviewer(props: ReviewerProps) {
 
     setAddedToListId(undefined);
     setAnimated(AnimationState.Idle);
-    await goToNextAccount(client, currentAccount);
+    await goToNextAccount(currentAccount);
     setIsFetching(false);
   };
 
@@ -116,16 +130,12 @@ export function Reviewer(props: ReviewerProps) {
     }
   };
   const onAddToList = async (listId: string) => {
-    if (!client) {
-      return;
+    if (currentAccount) {
+      await addToList(listId, currentAccount);
+      setAddedToListId(listId);
     }
-    await client.v1.lists.$select(listId).accounts.create({
-      accountIds: compact([currentAccount?.id ?? ""]),
-    });
-    setAddedToListId(listId);
   };
 
-  const { showBio: initialShowBio, showNote: initialShowNote } = useSettings();
   const [showBio, setShowBio] = useState(initialShowBio);
   const [showNote, setShowNote] = useState(initialShowNote);
 
@@ -153,10 +163,7 @@ export function Reviewer(props: ReviewerProps) {
             "translate-x-[-20%] translate-y-[200px] rotate-[-10deg] scale-0 opacity-0",
         )}
       >
-        <FeedWidget
-          key={currentAccount?.id}
-          account={currentAccount}
-        ></FeedWidget>
+        {props.children}
       </Block>
 
       <Block
@@ -174,7 +181,10 @@ export function Reviewer(props: ReviewerProps) {
                 setShowNote={setShowNote}
                 account={currentAccount}
                 accountRelationship={currentAccountRelationship}
-                addedToListId={addedToListId}
+                listName={props.listName}
+                followings={props.followings}
+                followingIndex={props.followingIndex}
+                makeAccountUrl={props.makeAccountUrl}
               />
             )}
             <ReviewerPrompt
@@ -191,6 +201,9 @@ export function Reviewer(props: ReviewerProps) {
               isVisible={isVisible}
               shouldSkipConfirmation={skipConfirmation}
               isFetching={isFetching}
+              lists={lists}
+              currentAccountListIds={currentAccountListIds}
+              createList={createList}
             />
           </>
         ) : (

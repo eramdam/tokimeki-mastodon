@@ -1,32 +1,33 @@
 import type { NextPage } from "next";
 import { useRouter } from "next/router";
-import { useEffect, useMemo, useState } from "react";
+import type { PropsWithChildren } from "react";
+import { useCallback, useEffect, useMemo, useState } from "react";
 
 import { Block } from "../components/block";
 import { Button } from "../components/button";
 import { Finished } from "../components/finished";
 import { LinkButton } from "../components/linkButton";
+import { MastodonReviewer } from "../components/mastodonReviewer";
 import { Options } from "../components/options";
-import { Reviewer } from "../components/reviewer";
 import { MastodonProvider, useMastodon } from "../helpers/mastodonContext";
+import { resetStates, useIsFinished } from "../store/mainStore";
 import {
-  fetchFollowings,
-  fetchLists,
+  fetchMastodonFollowings,
+  fetchMastodonLists,
   markAsFinished,
-  resetState,
-} from "../store/actions";
-import {
-  useAccountId,
-  useAccountUsername,
-  useFilteredFollowings,
-  useIsFinished,
-  useKeptIds,
-  useStartCount,
-  useUnfollowedIds,
-} from "../store/selectors";
+  useMastodonAccountId,
+  useMastodonAccountUsername,
+  useMastodonFilteredFollowings,
+  useMastodonInstanceUrl,
+  useMastodonKeptIds,
+  useMastodonStartCount,
+  useMastodonUnfollowedIds,
+} from "../store/mastodonStore";
+import { pick } from "lodash-es";
 
 const Review: NextPage = () => {
   const [hasMounted, setHasMounted] = useState(false);
+  const [isReviewing, setIsReviewing] = useState(false);
 
   useEffect(() => {
     setHasMounted(true);
@@ -38,21 +39,107 @@ const Review: NextPage = () => {
 
   return (
     <MastodonProvider>
-      <ReviewContent />
+      <MastodonReviewContent
+        isReviewing={isReviewing}
+        setIsReviewing={setIsReviewing}
+      />
     </MastodonProvider>
   );
 };
 
-const ReviewContent = () => {
-  const [isReviewing, setIsReviewing] = useState(false);
-  const router = useRouter();
+interface ReviewContentWrapperProps {
+  isReviewing: boolean;
+  setIsReviewing: (b: boolean) => void;
+}
 
+const MastodonReviewContent = (props: ReviewContentWrapperProps) => {
+  const { isReviewing, setIsReviewing } = props;
   const { client } = useMastodon();
-  const accountId = useAccountId();
-  const accountUsername = useAccountUsername();
-  const keptIds = useKeptIds();
-  const unfollowedIds = useUnfollowedIds();
-  const startCount = useStartCount();
+  const accountId = useMastodonAccountId();
+  const accountUsername = useMastodonAccountUsername();
+  const keptIds = useMastodonKeptIds();
+  const unfollowedIds = useMastodonUnfollowedIds();
+  const startCount = useMastodonStartCount();
+  const filteredFollowings = useMastodonFilteredFollowings();
+  const instanceUrl = useMastodonInstanceUrl();
+
+  useEffect(() => {
+    if (!isReviewing || !client || !accountId) {
+      return;
+    }
+
+    fetchMastodonFollowings(accountId, client);
+    fetchMastodonLists(client);
+  }, [accountId, client, isReviewing]);
+
+  const getFollowingsForAvatars = useCallback(async () => {
+    if (!client || !accountId) {
+      return [];
+    }
+
+    const accounts = await client.v1.accounts
+      .$select(accountId)
+      .following.list({
+        limit: 80,
+      });
+    return accounts.map((a) => pick(a, ["id", "avatar", "displayName"]));
+  }, []);
+
+  return (
+    <ReviewContent
+      accountId={accountId}
+      accountUsername={accountUsername}
+      keptIds={keptIds}
+      unfollowedIds={unfollowedIds}
+      startCount={startCount}
+      filteredFollowings={filteredFollowings}
+      isReviewing={isReviewing}
+      setIsReviewing={setIsReviewing}
+      instanceUrl={instanceUrl}
+      getFollowingsForAvatars={getFollowingsForAvatars}
+    >
+      <MastodonReviewer
+        onFinished={() => {
+          markAsFinished();
+        }}
+      />
+    </ReviewContent>
+  );
+};
+
+interface ReviewContentProps {
+  accountId: string | undefined;
+  accountUsername: string | undefined;
+  keptIds: string[];
+  unfollowedIds: string[];
+  startCount: number;
+  filteredFollowings: string[];
+  isReviewing: boolean;
+  setIsReviewing: (b: boolean) => void;
+  instanceUrl: string | undefined;
+  getFollowingsForAvatars: () => Promise<
+    {
+      id: string;
+      avatar: string;
+      displayName: string;
+    }[]
+  >;
+}
+
+const ReviewContent = (props: PropsWithChildren<ReviewContentProps>) => {
+  const {
+    accountId,
+    accountUsername,
+    keptIds,
+    startCount,
+    unfollowedIds,
+    filteredFollowings,
+    isReviewing,
+    setIsReviewing,
+    instanceUrl,
+    getFollowingsForAvatars,
+  } = props;
+  const router = useRouter();
 
   const hasProgress = useMemo(
     () =>
@@ -62,19 +149,17 @@ const ReviewContent = () => {
     [keptIds, unfollowedIds],
   );
   const isFinished = useIsFinished();
-  const filteredFollowings = useFilteredFollowings();
-
-  useEffect(() => {
-    if (!isReviewing || !client || !accountId) {
-      return;
-    }
-
-    fetchFollowings(accountId, client);
-    fetchLists(client);
-  }, [accountId, client, isReviewing]);
 
   if (isFinished) {
-    return <Finished />;
+    return (
+      <Finished
+        startCount={startCount}
+        keptIds={keptIds}
+        accountId={accountId}
+        instanceUrl={instanceUrl}
+        getFollowingsForAvatars={getFollowingsForAvatars}
+      />
+    );
   }
 
   if (!accountUsername || !accountId) {
@@ -96,11 +181,7 @@ const ReviewContent = () => {
         >
           Options
         </LinkButton>
-        <Reviewer
-          onFinished={() => {
-            markAsFinished();
-          }}
-        />
+        {props.children}
       </>
     );
   }
@@ -110,7 +191,7 @@ const ReviewContent = () => {
       <LinkButton
         position="southeast"
         onPress={() => {
-          resetState();
+          resetStates();
           router.push("/");
         }}
       >

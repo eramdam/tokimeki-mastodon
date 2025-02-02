@@ -2,9 +2,6 @@ import { isString } from "lodash-es";
 import { useState } from "react";
 import { Item, Section } from "react-stately";
 
-import { useMastodon } from "../helpers/mastodonContext";
-import { createList } from "../store/actions";
-import { useCurrentAccountListIds, useLists } from "../store/selectors";
 import { Button, SmallButton } from "./button";
 import { MenuButton } from "./menu";
 import { PopoverButton } from "./popover";
@@ -24,6 +21,9 @@ interface ReviewerButtonsProps {
   isVisible: boolean;
   shouldSkipConfirmation: boolean;
   isFetching: boolean;
+  lists: { id: string; title: string }[];
+  currentAccountListIds: string[] | undefined;
+  createList: (listName: string) => Promise<void>;
 }
 export function ReviewerButtons(props: ReviewerButtonsProps) {
   const {
@@ -35,13 +35,13 @@ export function ReviewerButtons(props: ReviewerButtonsProps) {
     onAddToList,
     shouldSkipConfirmation,
     isFetching,
+    lists,
+    currentAccountListIds,
+    createList,
   } = props;
-  const lists = useLists();
-  const currentAccountListIds = useCurrentAccountListIds();
   const [isCreatingList, setIsCreatingList] = useState(false);
   const [isAddingToList, setIsAddingTolist] = useState(false);
   const [listName, setListName] = useState("");
-  const { client } = useMastodon();
 
   const renderMenuButton = () => {
     if (isCreatingList) {
@@ -58,10 +58,7 @@ export function ReviewerButtons(props: ReviewerButtonsProps) {
               isStatic
               variant="primary"
               onPress={async () => {
-                if (!client) {
-                  return;
-                }
-                await createList(client, listName);
+                await createList(listName);
                 setIsCreatingList(false);
                 setIsAddingTolist(true);
                 setListName("");

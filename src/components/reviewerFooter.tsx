@@ -2,14 +2,8 @@ import clsx from "clsx";
 import type { Dispatch, SetStateAction } from "react";
 
 import { makeAccountName } from "../helpers/mastodonHelpers";
-import type { TokimekiAccount, TokimekiRelationship } from "../store";
-import {
-  useCurrentIndex,
-  useFollowingIds,
-  useInstanceUrl,
-  useListById,
-  useSettings,
-} from "../store/selectors";
+import type { TokimekiAccount, TokimekiRelationship } from "../store/common";
+import { useSettings } from "../store/mainStore";
 import { SmallButton } from "./button";
 import { renderWithEmoji } from "./emojify";
 import { HtmlRenderer } from "./htmlRendered";
@@ -21,7 +15,10 @@ interface ReviewerFooterProps {
   setShowBio: Dispatch<SetStateAction<boolean>>;
   showNote: boolean;
   setShowNote: Dispatch<SetStateAction<boolean>>;
-  addedToListId: string | undefined;
+  followingIndex: number;
+  followings: string[];
+  makeAccountUrl: () => string;
+  listName: string | undefined;
 }
 export function ReviewerFooter(props: ReviewerFooterProps) {
   const {
@@ -31,12 +28,12 @@ export function ReviewerFooter(props: ReviewerFooterProps) {
     setShowBio,
     showNote,
     setShowNote,
+    followingIndex,
+    followings,
+    listName,
   } = props;
-  const followingIndex = useCurrentIndex();
-  const followings = useFollowingIds();
+
   const { showFollowLabel } = useSettings();
-  const instanceUrl = useInstanceUrl();
-  const list = useListById(props.addedToListId);
 
   const renderTitle = () => {
     if (followingIndex === followings.length - 1) {
@@ -53,9 +50,9 @@ export function ReviewerFooter(props: ReviewerFooterProps) {
     <>
       <div className="flex w-full items-center justify-between">
         <p className="custom-prose break-words text-left leading-normal">
-          {list && (
+          {listName && (
             <>
-              Added to <strong>{list.title}</strong>!
+              Added to <strong>{listName}</strong>!
               <br />
             </>
           )}
@@ -66,7 +63,7 @@ export function ReviewerFooter(props: ReviewerFooterProps) {
             </strong>
           )}{" "}
           <a
-            href={`${instanceUrl}/@${account.acct}`}
+            href={props.makeAccountUrl()}
             target="_blank"
             className="text-sm text-neutral-400 hover:underline"
             rel="noreferrer noopener"
@@ -75,7 +72,7 @@ export function ReviewerFooter(props: ReviewerFooterProps) {
           </a>
           !{" "}
           {showFollowLabel && accountRelationship?.followedBy && (
-            <span className="inline-block rounded-md bg-violet-500 py-[2px] px-2 align-middle text-[10px] uppercase text-white dark:bg-violet-800">
+            <span className="inline-block rounded-md bg-violet-500 px-2 py-[2px] align-middle text-[10px] uppercase text-white dark:bg-violet-800">
               Follows you
             </span>
           )}

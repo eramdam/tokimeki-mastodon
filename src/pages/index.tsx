@@ -1,137 +1,25 @@
-import type { ValidationState } from "@react-types/shared";
-import { createRestAPIClient } from "masto";
 import { type NextPage } from "next";
 import Head from "next/head";
-import { useRouter } from "next/router";
-import { useCallback, useEffect, useMemo, useState } from "react";
 
 import packageJson from "../../package.json";
 import { Block } from "../components/block";
-import { Button } from "../components/button";
-import { TextInput } from "../components/textField";
-import {
-  getAccessToken,
-  getAuthURL,
-  registerApplication,
-} from "../helpers/authHelpers";
-import { saveAfterOAuthCode, saveLoginCredentials } from "../store/actions";
-import { useAccountId, useOAuthCodeDependencies } from "../store/selectors";
+import { MastodonAuthForm } from "../components/mastodonAuth";
+import { APP_NAME } from "../helpers/common";
+import { Radio, RadioGroup } from "../components/radioGroup";
+import { Services, setService, useMainStore } from "../store/mainStore";
 
 const Home: NextPage = () => {
-  const [localInstanceUrl, setInstanceDomain] = useState("");
-  const [isLoading, setIsLoading] = useState(false);
-  const router = useRouter();
-  const {
-    clientId,
-    clientSecret,
-    instanceUrl: storedInstanceUrl,
-  } = useOAuthCodeDependencies();
-
-  const isInstanceValid: ValidationState | undefined = useMemo(() => {
-    try {
-      new URL(localInstanceUrl);
-      return "valid";
-    } catch (_e) {
-      return "invalid";
-    }
-  }, [localInstanceUrl]);
-
-  const onCode = useCallback(
-    async (code: string) => {
-      setIsLoading(true);
-
-      if (!clientId || !clientSecret || !storedInstanceUrl) {
-        return;
-      }
-
-      const accessTokenResponse = await getAccessToken({
-        clientId,
-        clientSecret,
-        code,
-        instanceUrl: storedInstanceUrl,
-      });
-
-      if (!accessTokenResponse) {
-        return;
-      }
-
-      const { access_token } = accessTokenResponse;
-
-      if (!access_token) {
-        return;
-      }
-
-      const masto = createRestAPIClient({
-        url: storedInstanceUrl,
-        accessToken: access_token,
-        timeout: 30_000,
-      });
-      const account = await masto.v1.accounts.verifyCredentials();
-      saveAfterOAuthCode({
-        accessToken: access_token,
-        account,
-      });
-      router.push("/review");
-    },
-    [clientId, clientSecret, router, storedInstanceUrl],
-  );
-
-  const account = useAccountId();
-
-  useEffect(() => {
-    if (account) {
-      router.push("/review");
-      return;
-    }
-    const code = new URLSearchParams(window.location.search).get("code");
-
-    if (!code) {
-      return;
-    }
-
-    onCode(code);
-  }, [account, onCode, router]);
-
-  const onLogin = async () => {
-    if (!isInstanceValid || isLoading) {
-      return;
-    }
-
-    setIsLoading(true);
-
-    try {
-      const { clientId, clientSecret } = await registerApplication(
-        localInstanceUrl.replace(/\/$/, ""),
-        window.location.origin,
-      );
-
-      if (clientId && clientSecret) {
-        saveLoginCredentials({
-          instanceUrl: localInstanceUrl.replace(/\/$/, ""),
-          clientId,
-          clientSecret,
-        });
-
-        location.href = getAuthURL({
-          instanceUrl: localInstanceUrl.replace(/\/$/, ""),
-          clientId,
-        });
-      }
-    } catch (e) {
-      console.error(e);
-    }
-  };
-
+  const service = useMainStore((state) => state.service);
   return (
     <>
       <Block className="flex flex-col items-center justify-center">
         <Head>
-          <title>Tokimeki Mastodon</title>
+          <title>{APP_NAME}</title>
           <meta name="description" content="" />
           <link rel="icon" href="/favicon.png" />
         </Head>
         <h1 className="text-accentColor text-center">
-          ✨ Welcome to Tokimeki Mastodon ✨
+          ✨ Welcome to {APP_NAME} ✨
         </h1>
         <p className="custom-prose">
           Following too many accounts? You&apos;re in the right place!
@@ -143,44 +31,17 @@ const Home: NextPage = () => {
           following, and others you may have outgrown, but you never had the
           energy to clean up your follows.
         </p>
-        <form
-          onSubmit={(e) => {
-            e.preventDefault();
-            onLogin();
-          }}
-          className="my-10 mb-2 flex w-full max-w-lg flex-col gap-5"
-        >
-          <TextInput
-            label="Instance domain"
-            placeholder="https://"
-            type={"url"}
-            className="custom-prose flex flex-col gap-2 text-center"
-            value={localInstanceUrl}
-            onChange={(value) => {
-              setInstanceDomain(
-                value.startsWith("https://") ? value : `https://${value}`,
-              );
-            }}
-            validationState={isInstanceValid || "valid"}
-            isDisabled={isLoading}
-          ></TextInput>
-          <div className="flex justify-center">
-            <Button
-              variant="primary"
-              type="submit"
-              onPress={() => {
-                onLogin();
-              }}
-              isDisabled={isInstanceValid === "invalid" || isLoading}
-            >
-              {(isLoading && "Loading...") || "Login"}
-            </Button>
-          </div>
-        </form>
-        <p className="custom-prose !w-full !max-w-full !text-sm opacity-60">
-          This tool uses your Mastodon&apos;s account authorization to fetch
-          your followings, their toots and unfollow accounts.
-        </p>
+        <div className="custom-prose w-full">
+          <RadioGroup
+            label={"Which timeline do you want to clean today?"}
+            value={service}
+            onChange={(value) => setService(value as Services, false)}
+          >
+            <Radio value={Services.MASTODON}>Mastodon</Radio>
+            <Radio value={Services.BLUESKY}>Bluesky</Radio>
+          </RadioGroup>
+        </div>
+        {service === Services.MASTODON && <MastodonAuthForm />}
       </Block>
       <Block className="lg:py-0">
         <div className="custom-prose !max-w-full !text-sm !leading-relaxed opacity-60">

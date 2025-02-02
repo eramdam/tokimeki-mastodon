@@ -3,12 +3,13 @@ import "../styles/globals.css";
 import { type AppType } from "next/dist/shared/lib/utils";
 import Head from "next/head";
 import Script from "next/script";
+import { APP_NAME } from "../helpers/common";
 
 const MyApp: AppType = ({ Component, pageProps }) => {
   return (
     <>
       <Head>
-        <title>Tokimeki Mastodon</title>
+        <title>{APP_NAME}</title>
       </Head>
       <Script
         defer

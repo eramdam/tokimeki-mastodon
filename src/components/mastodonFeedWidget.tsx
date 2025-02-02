@@ -3,11 +3,9 @@ import type { mastodon } from "masto";
 import { useEffect, useMemo, useState } from "react";
 
 import { useMastodon } from "../helpers/mastodonContext";
-import type { TokimekiAccount } from "../store";
-import {
-  useCurrentAccountRelationship,
-  useInstanceUrl,
-} from "../store/selectors";
+import type { TokimekiAccount } from "../store/common";
+import { useMastodonInstanceUrl } from "../store/mastodonStore";
+import { useMastodonCurrentAccountRelationship } from "../store/mastodonStore";
 import { Status } from "./status";
 
 interface FeedWidgetProps {
@@ -15,13 +13,13 @@ interface FeedWidgetProps {
   className?: string;
 }
 
-export function FeedWidget(props: FeedWidgetProps) {
+export function MastodonFeedWidget(props: FeedWidgetProps) {
   const { account } = props;
   const { client } = useMastodon();
   const [isLoading, setIsLoading] = useState(true);
-  const currentAccountRelationship = useCurrentAccountRelationship();
+  const currentAccountRelationship = useMastodonCurrentAccountRelationship();
   const [statuses, setStatuses] = useState<mastodon.v1.Status[]>([]);
-  const instanceUrl = useInstanceUrl();
+  const instanceUrl = useMastodonInstanceUrl();
   const isRemote = useMemo(() => {
     return !(instanceUrl && account?.url.startsWith(instanceUrl));
   }, [account?.url, instanceUrl]);

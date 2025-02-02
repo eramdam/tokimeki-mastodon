@@ -1,40 +1,42 @@
-import { pick } from "lodash-es";
 import { useRouter } from "next/router";
 import { useMemo, useState } from "react";
 import useSWR from "swr";
 
-import { useMastodon } from "../helpers/mastodonContext";
-import { resetState } from "../store/actions";
-import {
-  useAccountId,
-  useInstanceUrl,
-  useKeptIds,
-  useStartCount,
-} from "../store/selectors";
+import { resetStates } from "../store/mainStore";
 import { Block } from "./block";
 import { Button } from "./button";
 
-export function Finished() {
+interface FinishedProps {
+  keptIds: string[];
+  startCount: number;
+  instanceUrl: string | undefined;
+  accountId: string | undefined;
+  getFollowingsForAvatars: () => Promise<
+    {
+      id: string;
+      avatar: string;
+      displayName: string;
+    }[]
+  >;
+}
+
+export function Finished(props: FinishedProps) {
+  const {
+    keptIds,
+    startCount,
+    instanceUrl,
+    accountId,
+    getFollowingsForAvatars,
+  } = props;
   const [maybeReset, setMaybeReset] = useState(false);
   const router = useRouter();
-  const keptIdsFromStorage = useKeptIds();
-  const keptIds = useMemo(() => keptIdsFromStorage || [], [keptIdsFromStorage]);
-  const startCount = useStartCount();
-  const instanceUrl = useInstanceUrl();
-  const accountId = useAccountId();
 
-  const { client } = useMastodon();
   const { data: avatarsData } = useSWR("pics", async () => {
-    if (!client || !accountId) {
+    if (!accountId) {
       return [];
     }
 
-    const accounts = await client.v1.accounts
-      .$select(accountId)
-      .following.list({
-        limit: 80,
-      });
-    return accounts.map((a) => pick(a, ["id", "avatar", "displayName"]));
+    return getFollowingsForAvatars();
   });
 
   const keptPicsRenders = useMemo(() => {
@@ -80,7 +82,7 @@ export function Finished() {
             </Button>
             <Button
               onPress={() => {
-                resetState();
+                resetStates();
                 router.push("/");
               }}
               variant="secondary"

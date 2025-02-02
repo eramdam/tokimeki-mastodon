@@ -1,4 +1,4 @@
-import type { PropsWithChildren } from "react";
+import type { JSX, PropsWithChildren } from "react";
 
 export type PropsWithHtmlProps<
   E extends keyof JSX.IntrinsicElements,
