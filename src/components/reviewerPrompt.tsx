@@ -45,6 +45,33 @@ export const ReviewerPrompt = (
       );
     }
 
+    if (reviewType === ReviewTypes.FOLLOWERS) {
+      if (animationState === AnimationState.Keep) {
+        return (
+          <>
+            <strong>{renderWithEmoji(account.emojis, accountName)}</strong>{" "}
+            still follows you!
+          </>
+        );
+      } else if (animationState === AnimationState.Remove) {
+        return (
+          <>
+            You removed{" "}
+            <strong>{renderWithEmoji(account.emojis, accountName)}</strong> from
+            your followers!
+          </>
+        );
+      }
+
+      return (
+        <>
+          Do you want to keep{" "}
+          <strong>{renderWithEmoji(account.emojis, accountName)}</strong> as a
+          follower?
+        </>
+      );
+    }
+
     if (animationState === AnimationState.Keep) {
       return (
         <>

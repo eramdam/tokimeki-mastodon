@@ -7,6 +7,10 @@ export function AccountsLoadingIndicator(props: { reviewType: ReviewTypes }) {
       return <p className="custom-prose">Loading your followings</p>;
     }
 
+    if (props.reviewType === ReviewTypes.FOLLOWERS) {
+      return <p className="custom-prose">Loading your followers</p>;
+    }
+
     return <p className="custom-prose">Loading your follow requests</p>;
   };
   return (

@@ -10,6 +10,7 @@ import { ReviewOptions } from "../components/options";
 import { Reviewer } from "../components/reviewer";
 import { MastodonProvider, useMastodon } from "../helpers/mastodonContext";
 import {
+  fetchFollowers,
   fetchFollowings,
   fetchFollowRequesters,
   fetchLists,
@@ -57,15 +58,13 @@ const ReviewContent = () => {
   const userAccountId = useUserAccountId();
   const userAccountUsername = useUserAccountUsername();
   const keptIds = useKeptIds();
-  const unfollowedIds = useRemoveAccountIds();
+  const removedIds = useRemoveAccountIds();
   const startCount = useStartCount();
 
   const hasProgress = useMemo(
     () =>
-      Boolean(
-        (unfollowedIds && unfollowedIds.length) || (keptIds && keptIds.length),
-      ),
-    [keptIds, unfollowedIds],
+      Boolean((removedIds && removedIds.length) || (keptIds && keptIds.length)),
+    [keptIds, removedIds],
   );
   const isFinished = useIsFinished();
   const filteredFollowings = useFilteredFollowings();
@@ -84,6 +83,10 @@ const ReviewContent = () => {
       }
       case ReviewTypes.FOLLOW_REQUESTS: {
         fetchFollowRequesters(userAccountId, client);
+        break;
+      }
+      case ReviewTypes.FOLLOWERS: {
+        fetchFollowers(userAccountId, client);
         break;
       }
     }
@@ -134,43 +137,32 @@ const ReviewContent = () => {
       </LinkButton>
       <Block className="inline-flex flex-col items-center justify-center gap-6">
         <h1 className="text-accentColor text-center">
-          Hello @{userAccountUsername}!
-          {/* {hasProgress ? "Hello again," : "Hello"} @{userAccountUsername}!
-          Let&apos;s go through those {startCount} accounts you are following 😤
-          {hasProgress && (
-            <>
-              <br />
-              {filteredFollowings.length} to go!
-            </>
-          )} */}
+          {hasProgress ? "Hello again," : "Hello"} @{userAccountUsername}!
         </h1>
-        <p className="custom-prose">
-          You can&apos;t be expected to do this all at once, do not feel bad if
-          you need to take a break. Progress will be saved as you go!
-        </p>
-        <div className="custom-prose w-full">
-          <RadioGroup
-            className="mb-5 mt-5"
-            label={<strong>What would you like to review today?</strong>}
-            value={reviewType || ReviewTypes.FOLLOWINGS}
-            onChange={(value) => {
-              setReviewType(value as ReviewTypes);
-            }}
-          >
-            <Radio value={ReviewTypes.FOLLOWINGS}>
-              Followings{" "}
-              {hasProgress &&
-                reviewType === ReviewTypes.FOLLOWINGS &&
-                "(current)"}
-            </Radio>
-            <Radio value={ReviewTypes.FOLLOW_REQUESTS}>
-              Follow requests{" "}
-              {hasProgress &&
-                reviewType === ReviewTypes.FOLLOW_REQUESTS &&
-                "(current)"}
-            </Radio>
-          </RadioGroup>
-        </div>
+        {!hasProgress && (
+          <p className="custom-prose">
+            You can&apos;t be expected to do this all at once, do not feel bad
+            if you need to take a break. Progress will be saved as you go!
+          </p>
+        )}
+        {!hasProgress && (
+          <div className="custom-prose w-full">
+            <RadioGroup
+              className="mb-5 mt-5"
+              label={<strong>What would you like to review today?</strong>}
+              value={reviewType || ReviewTypes.FOLLOWINGS}
+              onChange={(value) => {
+                setReviewType(value as ReviewTypes);
+              }}
+            >
+              <Radio value={ReviewTypes.FOLLOWINGS}>Followings </Radio>
+              <Radio value={ReviewTypes.FOLLOW_REQUESTS}>
+                Follow requests{" "}
+              </Radio>
+              <Radio value={ReviewTypes.FOLLOWERS}>Followers </Radio>
+            </RadioGroup>
+          </div>
+        )}
 
         {hasProgress && (
           <p className="custom-prose">

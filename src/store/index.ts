@@ -12,7 +12,7 @@ export enum SortOrders {
 export enum ReviewTypes {
   FOLLOWINGS = "FOLLOWINGS",
   FOLLOW_REQUESTS = "FOLLOW_REQUESTS",
-  // FOLLOWERS = "FOLLOWERS",
+  FOLLOWERS = "FOLLOWERS",
 }
 
 export interface TokimekiAccount {

@@ -61,12 +61,11 @@ export function Reviewer(props: ReviewerProps) {
       return;
     }
 
+    setIsFetching(true);
     const shouldRemove =
       forceRemove ?? animationState === AnimationState.Remove;
 
     if (reviewType === ReviewTypes.FOLLOWINGS) {
-      setIsFetching(true);
-
       if (currentAccount) {
         if (shouldRemove) {
           console.log("Will unfollow", currentAccount.acct);
@@ -79,8 +78,6 @@ export function Reviewer(props: ReviewerProps) {
         }
       }
     } else if (reviewType === ReviewTypes.FOLLOW_REQUESTS) {
-      setIsFetching(true);
-
       if (currentAccount) {
         if (shouldRemove) {
           console.log("Will reject request from", currentAccount.acct);
@@ -98,9 +95,19 @@ export function Reviewer(props: ReviewerProps) {
           keepAccount(currentAccount.id);
         }
       }
-
-      if (!dontHide) {
-        setAnimated(AnimationState.Hidden);
+    } else if (reviewType === ReviewTypes.FOLLOWERS) {
+      if (currentAccount) {
+        if (shouldRemove) {
+          console.log("Will softblock", currentAccount.acct);
+          if (process.env.NODE_ENV !== "development") {
+            await client.v1.accounts
+              .$select(currentAccount.id)
+              .removeFromFollowers();
+          }
+          removeAccount(currentAccount.id);
+        } else {
+          keepAccount(currentAccount.id);
+        }
       }
     }
 

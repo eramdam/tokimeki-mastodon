@@ -54,19 +54,6 @@ export function setReviewType(payload: ReviewTypes | undefined): void {
     return {
       ...state,
       reviewType: payload,
-      keptIds: initialPersistedState.keptIds,
-      removedAccountIds: initialPersistedState.removedAccountIds,
-      isFinished: initialPersistedState.isFinished,
-      isFetching: initialPersistedState.isFetching,
-      baseAccountIds: initialPersistedState.baseAccountIds,
-      accountIds: initialPersistedState.accountIds,
-      lists: initialPersistedState.lists,
-      currentAccount: undefined,
-      currentAccountListIds: undefined,
-      currentRelationship: undefined,
-      nextAccount: undefined,
-      nextAccountListIds: undefined,
-      nextRelationship: undefined,
     };
   });
 }
@@ -142,6 +129,7 @@ export async function fetchFollowings(
       nextRelationship,
       nextAccountListIds,
       startCount: sortedFollowings.length,
+      isFetching: false,
     });
 
     return;
@@ -179,6 +167,116 @@ export async function fetchFollowings(
   usePersistedStore.setState({
     baseAccountIds: accountIds,
     accountIds: sortedFollowings,
+    currentAccount:
+      (firstAccount && pickTokimekiAccount(firstAccount)) || undefined,
+    currentAccountListIds,
+    nextAccount:
+      (secondAccount && pickTokimekiAccount(secondAccount)) || undefined,
+    nextAccountListIds,
+  });
+
+  const relationships = await client.v1.accounts.relationships.fetch({
+    id: compact([firstAccount?.id]),
+  });
+  const currentRelationship = relationships[0]
+    ? pick(relationships[0], ["followedBy", "note", "showingReblogs"])
+    : undefined;
+
+  usePersistedStore.setState({
+    isFetching: false,
+    currentRelationship,
+  });
+}
+
+export async function fetchFollowers(
+  accountId: string,
+  client: mastodon.rest.Client,
+) {
+  usePersistedStore.setState({ isFetching: true });
+  const persistedState = usePersistedStore.getState();
+
+  if (persistedState.baseAccountIds.length) {
+    const sortedFollowings = sortAccounts(
+      filterFollowingIds(
+        persistedState.baseAccountIds,
+        persistedState.keptIds,
+        persistedState.removedAccountIds,
+      ),
+      usePersistedStore.getState().settings.sortOrder,
+    );
+    usePersistedStore.setState({
+      currentAccount: undefined,
+      currentAccountListIds: undefined,
+      currentRelationship: undefined,
+      nextAccount: undefined,
+      nextRelationship: undefined,
+      nextAccountListIds: undefined,
+      accountIds: sortedFollowings,
+    });
+
+    const [firstAccountId, secondAccountId] = sortedFollowings;
+    const accountIdsToFetch = compact([firstAccountId, secondAccountId]);
+    const accountPromises = accountIdsToFetch.map((id) => {
+      return client.v1.accounts.$select(id).fetch();
+    });
+    const relationshipsPromises = client.v1.accounts.relationships.fetch({
+      id: accountIdsToFetch,
+    });
+    const [currentAccount, nextAccount] = await Promise.all(accountPromises);
+    const [currentRelationship, nextRelationship] = await relationshipsPromises;
+    const listPromises = accountIdsToFetch.map((id) => {
+      return client.v1.accounts.$select(id).lists.list();
+    });
+    const [currentAccountListIds, nextAccountListIds] = (
+      await Promise.all(listPromises)
+    ).map((listsList) => listsList.map((l) => l.id));
+
+    usePersistedStore.setState({
+      currentAccount,
+      currentRelationship,
+      currentAccountListIds,
+      nextAccount,
+      nextRelationship,
+      nextAccountListIds,
+      startCount: sortedFollowings.length,
+      isFetching: false,
+    });
+
+    return;
+  }
+
+  const accounts: mastodon.v1.Account[] = [];
+
+  if (accounts.length === 0) {
+    for await (const followers of client.v1.accounts
+      .$select(accountId)
+      .followers.list({
+        limit: 80,
+      })) {
+      accounts.push(...followers);
+    }
+  }
+
+  const accountIds = accounts.map((a) => a.id);
+  const sortedFollowers = sortAccounts(
+    accountIds,
+    usePersistedStore.getState().settings.sortOrder,
+  );
+
+  const firstId = sortedFollowers[0] || "";
+  const firstAccount = accounts.find((a) => a.id === firstId);
+  const secondId = sortedFollowers[1] || "";
+  const secondAccount = accounts.find((a) => a.id === secondId);
+  const listPromises = [firstId, secondId].map((id) => {
+    return client.v1.accounts.$select(id).lists.list();
+  });
+  const [currentAccountListIds, nextAccountListIds] = (
+    await Promise.all(listPromises)
+  ).map((listsList) => listsList.map((l) => l.id));
+
+  usePersistedStore.setState({
+    baseAccountIds: accountIds,
+    accountIds: sortedFollowers,
     currentAccount:
       (firstAccount && pickTokimekiAccount(firstAccount)) || undefined,
     currentAccountListIds,
@@ -244,6 +342,7 @@ export async function fetchFollowRequesters(
       nextAccount,
       nextRelationship,
       startCount: sortedFollowRequesters.length,
+      isFetching: false,
     });
 
     return;

@@ -149,24 +149,49 @@ export function ReviewerButtons(props: ReviewerButtonsProps) {
         );
       }
 
-      return (
-        <>
-          <Button
-            variant="secondary"
-            onPress={() => onRemoveClick()}
-            isDisabled={isFetching}
-          >
-            Reject request
-          </Button>
-          <Button
-            onPress={() => onKeepClick()}
-            variant="secondary"
-            isDisabled={isFetching}
-          >
-            Accept request
-          </Button>
-        </>
-      );
+      if (reviewType === ReviewTypes.FOLLOW_REQUESTS) {
+        return (
+          <>
+            <Button
+              variant="secondary"
+              onPress={() => onRemoveClick()}
+              isDisabled={isFetching}
+            >
+              Reject request
+            </Button>
+            <Button
+              onPress={() => onKeepClick()}
+              variant="secondary"
+              isDisabled={isFetching}
+            >
+              Accept request
+            </Button>
+          </>
+        );
+      }
+
+      if (reviewType === ReviewTypes.FOLLOWERS) {
+        return (
+          <>
+            <Button
+              variant="secondary"
+              onPress={() => onRemoveClick()}
+              isDisabled={isFetching}
+            >
+              Remove
+            </Button>
+            <Button
+              onPress={() => onKeepClick()}
+              variant="secondary"
+              isDisabled={isFetching}
+            >
+              Keep
+            </Button>
+          </>
+        );
+      }
+
+      return null;
     }
 
     return (
