@@ -29,14 +29,23 @@ export function saveLoginCredentials(payload: {
   });
 }
 
-export function saveAfterOAuthCode(payload: {
+export async function saveAfterOAuthCode(payload: {
   accessToken: string;
   account: mastodon.v1.AccountCredentials;
-}): void {
+  client: mastodon.rest.Client;
+}): Promise<void> {
+  const followRequests = await payload.client.v1.followRequests.list({
+    limit: 1,
+  });
   usePersistedStore.setState({
     accessToken: payload.accessToken,
     userAccountId: payload.account.id,
     userAccountUsername: payload.account.username,
+    accountStats: {
+      hasFollowers: payload.account.followersCount > 0,
+      hasFollowings: payload.account.followingCount > 0,
+      hasFollowRequests: followRequests.length > 0,
+    },
   });
 }
 
@@ -72,7 +81,7 @@ export function updateSettings(
     },
   }));
 }
-export function unfollowAccount(accountId: string): void {
+export function removeAccount(accountId: string): void {
   usePersistedStore.setState((state) => ({
     removedAccountIds: uniq([...(state.removedAccountIds || []), accountId]),
   }));
@@ -268,6 +277,7 @@ export async function fetchFollowRequesters(
       (firstAccount && pickTokimekiAccount(firstAccount)) || undefined,
     nextAccount:
       (secondAccount && pickTokimekiAccount(secondAccount)) || undefined,
+    startCount: sortedFollowRequesters.length,
   });
 
   const relationships = await client.v1.accounts.relationships.fetch({

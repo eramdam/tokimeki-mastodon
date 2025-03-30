@@ -68,9 +68,10 @@ const Home: NextPage = () => {
         timeout: 30_000,
       });
       const account = await masto.v1.accounts.verifyCredentials();
-      saveAfterOAuthCode({
+      await saveAfterOAuthCode({
         accessToken: access_token,
         account,
+        client: masto,
       });
       router.push("/review");
     },

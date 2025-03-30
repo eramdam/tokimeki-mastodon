@@ -74,6 +74,11 @@ export interface TokimekiState {
   accountIds: string[];
   isFinished: boolean;
   lists: mastodon.v1.List[];
+  accountStats: {
+    hasFollowings: boolean;
+    hasFollowers: boolean;
+    hasFollowRequests: boolean;
+  };
 }
 
 export const initialPersistedState: TokimekiState = {
@@ -92,6 +97,11 @@ export const initialPersistedState: TokimekiState = {
   baseAccountIds: [],
   accountIds: [],
   lists: [],
+  accountStats: {
+    hasFollowers: false,
+    hasFollowings: false,
+    hasFollowRequests: false,
+  },
 };
 
 export const usePersistedStore = createWithEqualityFn<TokimekiState>()(

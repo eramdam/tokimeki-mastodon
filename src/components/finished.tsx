@@ -10,9 +10,11 @@ import {
   useInstanceUrl,
   useKeptIds,
   useStartCount,
+  useReviewType,
 } from "../store/selectors";
 import { Block } from "./block";
 import { Button } from "./button";
+import { ReviewTypes } from "../store";
 
 export function Finished() {
   const [maybeReset, setMaybeReset] = useState(false);
@@ -22,6 +24,7 @@ export function Finished() {
   const startCount = useStartCount();
   const instanceUrl = useInstanceUrl();
   const accountId = useUserAccountId();
+  const reviewType = useReviewType();
 
   const { client } = useMastodon();
   const { data: avatarsData } = useSWR("pics", async () => {
@@ -29,9 +32,18 @@ export function Finished() {
       return [];
     }
 
+    if (reviewType === ReviewTypes.FOLLOWINGS) {
+      const accounts = await client.v1.accounts
+        .$select(accountId)
+        .following.list({
+          limit: 80,
+        });
+      return accounts.map((a) => pick(a, ["id", "avatar", "displayName"]));
+    }
+
     const accounts = await client.v1.accounts
       .$select(accountId)
-      .following.list({
+      .followers.list({
         limit: 80,
       });
     return accounts.map((a) => pick(a, ["id", "avatar", "displayName"]));
@@ -92,13 +104,37 @@ export function Finished() {
       );
     }
 
+    if (reviewType === ReviewTypes.FOLLOW_REQUESTS) {
+      return (
+        <Block className="mt-0 flex flex-shrink-0 flex-col items-start lg:w-3/4">
+          <p className="custom-prose leading-normal">
+            Hooray! You've went through all your follow requests. Come back if
+            you ever feel like cleaning your followings or if you get more
+            requests.
+            <br />
+            <br />— <a href="https://social.erambert.me/@eramdam">@Eramdam</a>
+          </p>
+          <div className="mt-2 inline-flex w-full justify-center gap-4 lg:-mb-8">
+            <Button
+              onPress={() => {
+                setMaybeReset(true);
+              }}
+              variant="secondary"
+            >
+              Start over?
+            </Button>
+          </div>
+        </Block>
+      );
+    }
+
     return (
       <Block className="mt-0 flex flex-shrink-0 flex-col items-start lg:w-3/4">
         <p className="custom-prose leading-normal">
           Wow, you&apos;ve done it — amazing! Hope you enjoy your new feed. Come
           back if you ever feel like it&apos;s getting out of control again.{" "}
           <br />
-          <br />— <a href="https://octodon.social/@eramdam">@Eramdam</a>
+          <br />— <a href="https://social.erambert.me/@eramdam">@Eramdam</a>
         </p>
         <div className="mt-2 inline-flex w-full justify-center gap-4 lg:-mb-8">
           <Button
@@ -131,6 +167,50 @@ export function Finished() {
     );
   };
 
+  const renderFinishedContent = () => {
+    if (reviewType === ReviewTypes.FOLLOWINGS) {
+      return (
+        <div className="flex flex-col gap-2">
+          <div className="opacity-60">Results</div>
+          <div className="flex">
+            <span className="flex-1">Starting follows</span>
+            <span>{startCount}</span>
+          </div>
+          <div className="flex">
+            <span className="flex-1">Unfollowed</span>
+            <span className="text-red-500">{keptIds.length - startCount}</span>
+          </div>
+          <hr className="my-4" />
+          <div className="flex">
+            <span className="flex-1">Now following</span>
+            <span className="text-accentColor">{keptIds.length}</span>
+          </div>
+        </div>
+      );
+    }
+
+    return (
+      <div className="flex flex-col gap-2">
+        <div className="opacity-60">Results</div>
+        <div className="flex">
+          <span className="flex-1">Follow requests</span>
+          <span>{startCount}</span>
+        </div>
+        <div className="flex">
+          <span className="flex-1">Rejected</span>
+          <span className="text-red-500">
+            {Math.abs(keptIds.length - startCount)}
+          </span>
+        </div>
+        <hr className="my-4" />
+        <div className="flex">
+          <span className="flex-1">New followers</span>
+          <span className="text-accentColor">{keptIds.length}</span>
+        </div>
+      </div>
+    );
+  };
+
   return (
     <div className="flex max-h-full flex-1 flex-shrink flex-col items-center">
       {keptPicsRenders}
@@ -138,24 +218,7 @@ export function Finished() {
         <Block className="custom-prose">
           <h1 className="text-accentColor text-center">Tokimeki Complete!</h1>
 
-          <div className="flex flex-col gap-2">
-            <div className="opacity-60">Results</div>
-            <div className="flex">
-              <span className="flex-1">Starting follows</span>
-              <span>{startCount}</span>
-            </div>
-            <div className="flex">
-              <span className="flex-1">Unfollowed</span>
-              <span className="text-red-500">
-                {keptIds.length - startCount}
-              </span>
-            </div>
-            <hr className="my-4" />
-            <div className="flex">
-              <span className="flex-1">Now following</span>
-              <span className="text-accentColor">{keptIds.length}</span>
-            </div>
-          </div>
+          {renderFinishedContent()}
         </Block>
       </div>
       {renderFinishedFooter()}

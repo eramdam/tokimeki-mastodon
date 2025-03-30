@@ -1,9 +1,17 @@
+import { ReviewTypes } from "../store";
 import { Block } from "./block";
 
-export function FollowingsLoadingIndicator() {
+export function AccountsLoadingIndicator(props: { reviewType: ReviewTypes }) {
+  const renderText = () => {
+    if (props.reviewType === ReviewTypes.FOLLOWINGS) {
+      return <p className="custom-prose">Loading your followings</p>;
+    }
+
+    return <p className="custom-prose">Loading your follow requests</p>;
+  };
   return (
     <Block className="text-center lg:max-w-md">
-      <p className="custom-prose">Loading your followings</p>
+      {renderText()}
       <div className="mt-4 flex justify-center gap-2">
         {Array.from({ length: 6 }).map((_, i) => {
           return (
