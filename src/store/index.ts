@@ -111,7 +111,7 @@ export const usePersistedStore = createWithEqualityFn<TokimekiState>()(
       partialize(state) {
         return omit(state, ["actions", "nextAccount", "nextRelationship"]);
       },
-      version: 3,
+      version: 4,
     }),
     { name: "main-store" },
   ),
