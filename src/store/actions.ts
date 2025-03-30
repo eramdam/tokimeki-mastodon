@@ -196,7 +196,7 @@ export async function fetchFollowers(
   const persistedState = usePersistedStore.getState();
 
   if (persistedState.baseAccountIds.length) {
-    const sortedFollowings = sortAccounts(
+    const sortedFollowers = sortAccounts(
       filterFollowingIds(
         persistedState.baseAccountIds,
         persistedState.keptIds,
@@ -211,10 +211,10 @@ export async function fetchFollowers(
       nextAccount: undefined,
       nextRelationship: undefined,
       nextAccountListIds: undefined,
-      accountIds: sortedFollowings,
+      accountIds: sortedFollowers,
     });
 
-    const [firstAccountId, secondAccountId] = sortedFollowings;
+    const [firstAccountId, secondAccountId] = sortedFollowers;
     const accountIdsToFetch = compact([firstAccountId, secondAccountId]);
     const accountPromises = accountIdsToFetch.map((id) => {
       return client.v1.accounts.$select(id).fetch();
@@ -238,7 +238,7 @@ export async function fetchFollowers(
       nextAccount,
       nextRelationship,
       nextAccountListIds,
-      startCount: sortedFollowings.length,
+      startCount: sortedFollowers.length,
       isFetching: false,
     });
 
@@ -283,6 +283,7 @@ export async function fetchFollowers(
     nextAccount:
       (secondAccount && pickTokimekiAccount(secondAccount)) || undefined,
     nextAccountListIds,
+    startCount: sortedFollowers.length,
   });
 
   const relationships = await client.v1.accounts.relationships.fetch({

@@ -164,7 +164,7 @@ const ReviewContent = () => {
           </div>
         )}
 
-        {hasProgress && (
+        {hasProgress && reviewType === ReviewTypes.FOLLOWINGS && (
           <p className="custom-prose">
             Keep at it! You started with {startCount} follows. We loaded your
             progress from last time when you kept {(keptIds || []).length}{" "}
@@ -173,6 +173,32 @@ const ReviewContent = () => {
             <br />
             <strong>
               Let&apos;s get started on the {filteredFollowings.length} accounts
+              you have left!
+            </strong>
+          </p>
+        )}
+        {hasProgress && reviewType === ReviewTypes.FOLLOWERS && (
+          <p className="custom-prose">
+            Keep at it! You started with {startCount} followers. We loaded your
+            progress from last time when you kept {(keptIds || []).length}{" "}
+            followers.
+            <br />
+            <br />
+            <strong>
+              Let&apos;s get started on the {filteredFollowings.length}{" "}
+              followers you have left!
+            </strong>
+          </p>
+        )}
+        {hasProgress && reviewType === ReviewTypes.FOLLOW_REQUESTS && (
+          <p className="custom-prose">
+            Keep at it! You started with {startCount} follow requests. We loaded
+            your progress from last time when you accepts{" "}
+            {(keptIds || []).length} of them.
+            <br />
+            <br />
+            <strong>
+              Let&apos;s get started on the {filteredFollowings.length} requests
               you have left!
             </strong>
           </p>
