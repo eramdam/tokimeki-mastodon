@@ -6,24 +6,30 @@ import { Block } from "../components/block";
 import { Button } from "../components/button";
 import { Finished } from "../components/finished";
 import { LinkButton } from "../components/linkButton";
-import { Options } from "../components/options";
+import { ReviewOptions } from "../components/options";
 import { Reviewer } from "../components/reviewer";
 import { MastodonProvider, useMastodon } from "../helpers/mastodonContext";
 import {
   fetchFollowings,
+  fetchFollowRequesters,
   fetchLists,
   markAsFinished,
   resetState,
+  setReviewType,
 } from "../store/actions";
 import {
-  useAccountId,
-  useAccountUsername,
+  useUserAccountId,
+  useUserAccountUsername,
   useFilteredFollowings,
   useIsFinished,
   useKeptIds,
   useStartCount,
-  useUnfollowedIds,
+  useRemoveAccountIds,
+  useReviewType,
 } from "../store/selectors";
+import { Footer } from "../components/footer";
+import { Radio, RadioGroup } from "../components/radioGroup";
+import { ReviewTypes } from "../store";
 
 const Review: NextPage = () => {
   const [hasMounted, setHasMounted] = useState(false);
@@ -48,10 +54,10 @@ const ReviewContent = () => {
   const router = useRouter();
 
   const { client } = useMastodon();
-  const accountId = useAccountId();
-  const accountUsername = useAccountUsername();
+  const userAccountId = useUserAccountId();
+  const userAccountUsername = useUserAccountUsername();
   const keptIds = useKeptIds();
-  const unfollowedIds = useUnfollowedIds();
+  const unfollowedIds = useRemoveAccountIds();
   const startCount = useStartCount();
 
   const hasProgress = useMemo(
@@ -63,21 +69,31 @@ const ReviewContent = () => {
   );
   const isFinished = useIsFinished();
   const filteredFollowings = useFilteredFollowings();
+  const reviewType = useReviewType();
 
   useEffect(() => {
-    if (!isReviewing || !client || !accountId) {
+    if (!isReviewing || !client || !userAccountId) {
       return;
     }
 
-    fetchFollowings(accountId, client);
-    fetchLists(client);
-  }, [accountId, client, isReviewing]);
+    switch (reviewType) {
+      case ReviewTypes.FOLLOWINGS: {
+        fetchFollowings(userAccountId, client);
+        fetchLists(client);
+        break;
+      }
+      case ReviewTypes.FOLLOW_REQUESTS: {
+        fetchFollowRequesters(userAccountId, client);
+        break;
+      }
+    }
+  }, [userAccountId, client, isReviewing]);
 
   if (isFinished) {
     return <Finished />;
   }
 
-  if (!accountUsername || !accountId) {
+  if (!userAccountUsername || !userAccountId) {
     return (
       <Block>
         <p className="custom-prose">Loading...</p>
@@ -118,19 +134,44 @@ const ReviewContent = () => {
       </LinkButton>
       <Block className="inline-flex flex-col items-center justify-center gap-6">
         <h1 className="text-accentColor text-center">
-          {hasProgress ? "Hello again," : "Hello"} @{accountUsername}!
+          Hello @{userAccountUsername}!
+          {/* {hasProgress ? "Hello again," : "Hello"} @{userAccountUsername}!
           Let&apos;s go through those {startCount} accounts you are following 😤
           {hasProgress && (
             <>
               <br />
               {filteredFollowings.length} to go!
             </>
-          )}
+          )} */}
         </h1>
         <p className="custom-prose">
           You can&apos;t be expected to do this all at once, do not feel bad if
           you need to take a break. Progress will be saved as you go!
         </p>
+        <div className="custom-prose w-full">
+          <RadioGroup
+            className="mb-5 mt-5"
+            label={<strong>What would you like to review today?</strong>}
+            value={reviewType || ReviewTypes.FOLLOWINGS}
+            onChange={(value) => {
+              setReviewType(value as ReviewTypes);
+            }}
+          >
+            <Radio value={ReviewTypes.FOLLOWINGS}>
+              Followings{" "}
+              {hasProgress &&
+                reviewType === ReviewTypes.FOLLOWINGS &&
+                "(current)"}
+            </Radio>
+            <Radio value={ReviewTypes.FOLLOW_REQUESTS}>
+              Follow requests{" "}
+              {hasProgress &&
+                reviewType === ReviewTypes.FOLLOW_REQUESTS &&
+                "(current)"}
+            </Radio>
+          </RadioGroup>
+        </div>
+
         {hasProgress && (
           <p className="custom-prose">
             Keep at it! You started with {startCount} follows. We loaded your
@@ -145,7 +186,7 @@ const ReviewContent = () => {
           </p>
         )}
 
-        <Options />
+        <ReviewOptions />
 
         <Button
           variant="primary"
@@ -156,22 +197,7 @@ const ReviewContent = () => {
           Start
         </Button>
       </Block>
-      <Block className="w-full">
-        <div className="custom-prose opacity-60">
-          <p className="!m-0">
-            Based off{" "}
-            <a href="https://tokimeki-unfollow.glitch.me/">Tokimeki Unfollow</a>{" "}
-            by <a href="https://tarng.com/">Julius Tarng</a>.
-            <br />
-            Made by <a href="https://erambert.me">Damien Erambert</a>. Find me
-            at{" "}
-            <a href="https://social.erambert.me/@eramdam">
-              eramdam@erambert.me
-            </a>
-            !
-          </p>
-        </div>
-      </Block>
+      <Footer />
     </>
   );
 };

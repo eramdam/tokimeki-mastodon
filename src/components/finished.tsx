@@ -6,7 +6,7 @@ import useSWR from "swr";
 import { useMastodon } from "../helpers/mastodonContext";
 import { resetState } from "../store/actions";
 import {
-  useAccountId,
+  useUserAccountId,
   useInstanceUrl,
   useKeptIds,
   useStartCount,
@@ -21,7 +21,7 @@ export function Finished() {
   const keptIds = useMemo(() => keptIdsFromStorage || [], [keptIdsFromStorage]);
   const startCount = useStartCount();
   const instanceUrl = useInstanceUrl();
-  const accountId = useAccountId();
+  const accountId = useUserAccountId();
 
   const { client } = useMastodon();
   const { data: avatarsData } = useSWR("pics", async () => {

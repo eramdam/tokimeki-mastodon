@@ -1,12 +1,12 @@
 import { useState } from "react";
 
 import { SortOrders } from "../store";
-import { reorderFollowings, updateSettings } from "../store/actions";
+import { reorderAccounts, updateSettings } from "../store/actions";
 import { useSettings } from "../store/selectors";
 import { LinkButton } from "./linkButton";
 import { Radio, RadioGroup } from "./radioGroup";
 
-export function Options() {
+export function ReviewOptions() {
   const { showBio, sortOrder, showFollowLabel, showNote, skipConfirmation } =
     useSettings();
 
@@ -81,7 +81,7 @@ export function Options() {
           updateSettings({
             sortOrder: value as SortOrders,
           });
-          reorderFollowings(value as SortOrders);
+          reorderAccounts(value as SortOrders);
         }}
       >
         <Radio value={SortOrders.OLDEST}>

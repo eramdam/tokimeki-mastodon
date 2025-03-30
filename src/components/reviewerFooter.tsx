@@ -5,7 +5,7 @@ import { makeAccountName } from "../helpers/mastodonHelpers";
 import type { TokimekiAccount, TokimekiRelationship } from "../store";
 import {
   useCurrentIndex,
-  useFollowingIds,
+  useAccountIds,
   useInstanceUrl,
   useListById,
   useSettings,
@@ -33,7 +33,7 @@ export function ReviewerFooter(props: ReviewerFooterProps) {
     setShowNote,
   } = props;
   const followingIndex = useCurrentIndex();
-  const followings = useFollowingIds();
+  const followings = useAccountIds();
   const { showFollowLabel } = useSettings();
   const instanceUrl = useInstanceUrl();
   const list = useListById(props.addedToListId);
@@ -75,7 +75,7 @@ export function ReviewerFooter(props: ReviewerFooterProps) {
           </a>
           !{" "}
           {showFollowLabel && accountRelationship?.followedBy && (
-            <span className="inline-block rounded-md bg-violet-500 py-[2px] px-2 align-middle text-[10px] uppercase text-white dark:bg-violet-800">
+            <span className="inline-block rounded-md bg-violet-500 px-2 py-[2px] align-middle text-[10px] uppercase text-white dark:bg-violet-800">
               Follows you
             </span>
           )}

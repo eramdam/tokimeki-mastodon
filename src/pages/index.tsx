@@ -15,7 +15,8 @@ import {
   registerApplication,
 } from "../helpers/authHelpers";
 import { saveAfterOAuthCode, saveLoginCredentials } from "../store/actions";
-import { useAccountId, useOAuthCodeDependencies } from "../store/selectors";
+import { useUserAccountId, useOAuthCodeDependencies } from "../store/selectors";
+import { FooterParagraph } from "../components/footer";
 
 const Home: NextPage = () => {
   const [localInstanceUrl, setInstanceDomain] = useState("");
@@ -76,7 +77,7 @@ const Home: NextPage = () => {
     [clientId, clientSecret, router, storedInstanceUrl],
   );
 
-  const account = useAccountId();
+  const account = useUserAccountId();
 
   useEffect(() => {
     if (account) {
@@ -200,18 +201,7 @@ const Home: NextPage = () => {
               open source and hosted on GitHub.
             </a>
           </p>
-          <p className="!mb-2">
-            Based off{" "}
-            <a href="https://tokimeki-unfollow.glitch.me/">Tokimeki Unfollow</a>{" "}
-            by <a href="https://tarng.com/">Julius Tarng</a>.
-            <br />
-            Made by <a href="https://erambert.me">Damien Erambert</a>. Find me
-            at{" "}
-            <a href="https://social.erambert.me/@eramdam">
-              eramdam@erambert.me
-            </a>
-            !
-          </p>
+          <FooterParagraph />
           <small className="inline-block w-full pb-2 text-center">
             Version {packageJson.version}
           </small>

@@ -5,12 +5,13 @@ import { SortOrders, usePersistedStore } from "./index";
 
 export const useIsFinished = () =>
   usePersistedStore((state) => state.isFinished);
-export const useAccountId = () => usePersistedStore((state) => state.accountId);
-export const useAccountUsername = () =>
-  usePersistedStore((state) => state.accountUsername);
+export const useUserAccountId = () =>
+  usePersistedStore((state) => state.userAccountId);
+export const useUserAccountUsername = () =>
+  usePersistedStore((state) => state.userAccountUsername);
 export const useKeptIds = () => usePersistedStore((state) => state.keptIds);
-export const useUnfollowedIds = () =>
-  usePersistedStore((state) => state.unfollowedIds);
+export const useRemoveAccountIds = () =>
+  usePersistedStore((state) => state.removedAccountIds);
 export const useSettings = () => usePersistedStore((state) => state.settings);
 export const useStartCount = () =>
   usePersistedStore((state) => state.startCount || 0);
@@ -27,20 +28,23 @@ export const useOAuthCodeDependencies = () =>
     };
   });
 
-export const useFollowingIds = () =>
-  usePersistedStore((state) => state.followingIds);
+export const useAccountIds = () =>
+  usePersistedStore((state) => state.accountIds);
 export const useBaseFollowings = () =>
-  usePersistedStore((state) => state.baseFollowingIds);
+  usePersistedStore((state) => state.baseAccountIds);
 export const useFilteredFollowings = () => {
-  const baseFollowings = useFollowingIds();
+  const baseFollowings = useAccountIds();
   const keptIds = useKeptIds();
-  const unfollowedIds = useUnfollowedIds();
+  const unfollowedIds = useRemoveAccountIds();
 
   return useMemo(
     () => filterFollowingIds(baseFollowings, keptIds, unfollowedIds),
     [baseFollowings, keptIds, unfollowedIds],
   );
 };
+
+export const useReviewType = () =>
+  usePersistedStore((state) => state.reviewType);
 
 export const useCurrentAccountListIds = () =>
   usePersistedStore((state) => state.currentAccountListIds);
@@ -50,7 +54,7 @@ export const useCurrentAccount = () =>
   usePersistedStore((state) => state.currentAccount);
 export const useCurrentIndex = () => {
   const currentAccount = useCurrentAccount();
-  const followings = useFollowingIds();
+  const followings = useAccountIds();
 
   if (!currentAccount) {
     return 0;
@@ -61,7 +65,7 @@ export const useCurrentIndex = () => {
 export const useIsFetching = () =>
   usePersistedStore((state) => state.isFetching);
 export const useKeptAccounts = () => {
-  const baseFollowings = useFollowingIds();
+  const baseFollowings = useAccountIds();
   const keptIds = useKeptIds();
 
   return useMemo(
@@ -87,7 +91,7 @@ export function filterFollowingIds(
     return !keptIds?.includes(a) && !unfollowedIds?.includes(a);
   });
 }
-export function sortFollowings(array: string[], sortOrder: SortOrders) {
+export function sortAccounts(array: string[], sortOrder: SortOrders) {
   switch (sortOrder) {
     case SortOrders.NEWEST: {
       return array;

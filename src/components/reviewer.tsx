@@ -10,10 +10,10 @@ import {
   unfollowAccount,
 } from "../store/actions";
 import {
+  useAccountIds,
   useCurrentAccount,
   useCurrentAccountRelationship,
   useFilteredFollowings,
-  useFollowingIds,
   useSettings,
 } from "../store/selectors";
 import { Block } from "./block";
@@ -24,10 +24,10 @@ import { ReviewerFooter } from "./reviewerFooter";
 import { ReviewerPrompt } from "./reviewerPrompt";
 
 export enum AnimationState {
-  Idle,
-  Unfollow,
-  Keep,
-  Hidden,
+  Idle = "Idle",
+  Unfollow = "Unfollow",
+  Keep = "Keep",
+  Hidden = "Hidden",
 }
 
 interface ReviewerProps {
@@ -38,7 +38,7 @@ export function Reviewer(props: ReviewerProps) {
   const currentAccount = useCurrentAccount();
   const currentAccountRelationship = useCurrentAccountRelationship();
   const filteredFollowings = useFilteredFollowings();
-  const followings = useFollowingIds();
+  const followings = useAccountIds();
   const { client } = useMastodon();
 
   const [animationState, setAnimated] = useState(AnimationState.Idle);
@@ -48,6 +48,7 @@ export function Reviewer(props: ReviewerProps) {
   const [addedToListId, setAddedToListId] = useState<string | undefined>(
     undefined,
   );
+  // const reviewType = useReviewType();
 
   const onNextClick = async ({
     forceUnfollow,
