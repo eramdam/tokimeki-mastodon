@@ -13,7 +13,7 @@ const MyApp: AppType = ({ Component, pageProps }) => {
       <Script
         defer
         data-domain="tokimeki.erambert.me"
-        src="https://plausible.erambert.me/js/script.js"
+        src="https://p.erambert.me/js/script.js"
       ></Script>
       <Component {...pageProps} />
     </>
