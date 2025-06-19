@@ -10,6 +10,7 @@ import { ReviewOptions } from "../components/options";
 import { Reviewer } from "../components/reviewer";
 import { MastodonProvider, useMastodon } from "../helpers/mastodonContext";
 import {
+  clearReviewData,
   fetchFollowers,
   fetchFollowings,
   fetchFollowRequesters,
@@ -75,6 +76,8 @@ const ReviewContent = () => {
       return;
     }
 
+    clearReviewData();
+
     switch (reviewType) {
       case ReviewTypes.FOLLOWINGS: {
         fetchFollowings(userAccountId, client);
@@ -90,7 +93,7 @@ const ReviewContent = () => {
         break;
       }
     }
-  }, [userAccountId, client, isReviewing]);
+  }, [userAccountId, client, isReviewing, reviewType]);
 
   if (isFinished) {
     return <Finished />;

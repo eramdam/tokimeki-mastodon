@@ -17,6 +17,25 @@ export function resetState() {
   }, true);
 }
 
+export function clearReviewData() {
+  usePersistedStore.setState((state) => ({
+    ...state,
+    currentAccount: undefined,
+    currentAccountListIds: undefined,
+    currentRelationship: undefined,
+    nextAccount: undefined,
+    nextRelationship: undefined,
+    nextAccountListIds: undefined,
+    accountIds: [],
+    baseAccountIds: [],
+    keptIds: [],
+    removedAccountIds: [],
+    startCount: undefined,
+    isFinished: false,
+    isFetching: false,
+  }));
+}
+
 export function saveLoginCredentials(payload: {
   clientId: string;
   clientSecret: string;
