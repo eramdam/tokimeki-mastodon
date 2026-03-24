@@ -4,30 +4,29 @@ import { useState } from "react";
 
 import { delayAsync } from "../helpers/asyncHelpers";
 import { useMastodon } from "../helpers/mastodonContext";
+import { goToNextAccount, keepAccount, removeAccount } from "../store/actions";
 import {
-  goToNextAccount,
-  keepAccount,
-  unfollowAccount,
-} from "../store/actions";
-import {
+  useAccountIds,
   useCurrentAccount,
   useCurrentAccountRelationship,
   useFilteredFollowings,
-  useFollowingIds,
+  useIsFetching,
+  useReviewType,
   useSettings,
 } from "../store/selectors";
 import { Block } from "./block";
 import { FeedWidget } from "./feedWidget";
-import { FollowingsLoadingIndicator } from "./followingsLoadingIndicator";
+import { AccountsLoadingIndicator } from "./accountsLoadingIndicator";
 import { ReviewerButtons } from "./reviewerButtons";
 import { ReviewerFooter } from "./reviewerFooter";
 import { ReviewerPrompt } from "./reviewerPrompt";
+import { ReviewTypes } from "../store";
 
 export enum AnimationState {
-  Idle,
-  Unfollow,
-  Keep,
-  Hidden,
+  Idle = "Idle",
+  Remove = "Remove",
+  Keep = "Keep",
+  Hidden = "Hidden",
 }
 
 interface ReviewerProps {
@@ -38,8 +37,9 @@ export function Reviewer(props: ReviewerProps) {
   const currentAccount = useCurrentAccount();
   const currentAccountRelationship = useCurrentAccountRelationship();
   const filteredFollowings = useFilteredFollowings();
-  const followings = useFollowingIds();
+  const accountIds = useAccountIds();
   const { client } = useMastodon();
+  const isFetchingInStore = useIsFetching();
 
   const [animationState, setAnimated] = useState(AnimationState.Idle);
   const isVisible = animationState === AnimationState.Idle;
@@ -48,12 +48,13 @@ export function Reviewer(props: ReviewerProps) {
   const [addedToListId, setAddedToListId] = useState<string | undefined>(
     undefined,
   );
+  const reviewType = useReviewType();
 
   const onNextClick = async ({
-    forceUnfollow,
+    forceRemove,
     dontHide,
   }: {
-    forceUnfollow?: boolean;
+    forceRemove?: boolean;
     dontHide?: boolean;
   }) => {
     if (!client || !currentAccount || isFetching) {
@@ -61,18 +62,52 @@ export function Reviewer(props: ReviewerProps) {
     }
 
     setIsFetching(true);
+    const shouldRemove =
+      forceRemove ?? animationState === AnimationState.Remove;
 
-    const shouldUnfollow =
-      forceUnfollow ?? animationState === AnimationState.Unfollow;
-    if (currentAccount) {
-      if (shouldUnfollow) {
-        console.log("Will unfollow", currentAccount.acct);
-        if (process.env.NODE_ENV !== "development") {
-          await client.v1.accounts.$select(currentAccount.id).unfollow();
+    if (reviewType === ReviewTypes.FOLLOWINGS) {
+      if (currentAccount) {
+        if (shouldRemove) {
+          console.log("Will unfollow", currentAccount.acct);
+          if (process.env.NODE_ENV !== "development") {
+            await client.v1.accounts.$select(currentAccount.id).unfollow();
+          }
+          removeAccount(currentAccount.id);
+        } else {
+          keepAccount(currentAccount.id);
         }
-        unfollowAccount(currentAccount.id);
-      } else {
-        keepAccount(currentAccount.id);
+      }
+    } else if (reviewType === ReviewTypes.FOLLOW_REQUESTS) {
+      if (currentAccount) {
+        if (shouldRemove) {
+          console.log("Will reject request from", currentAccount.acct);
+          if (process.env.NODE_ENV !== "development") {
+            await client.v1.followRequests.$select(currentAccount.id).reject();
+          }
+          removeAccount(currentAccount.id);
+        } else {
+          console.log("Will accept request from", currentAccount.acct);
+          if (process.env.NODE_ENV !== "development") {
+            await client.v1.followRequests
+              .$select(currentAccount.id)
+              .authorize();
+          }
+          keepAccount(currentAccount.id);
+        }
+      }
+    } else if (reviewType === ReviewTypes.FOLLOWERS) {
+      if (currentAccount) {
+        if (shouldRemove) {
+          console.log("Will softblock", currentAccount.acct);
+          if (process.env.NODE_ENV !== "development") {
+            await client.v1.accounts
+              .$select(currentAccount.id)
+              .removeFromFollowers();
+          }
+          removeAccount(currentAccount.id);
+        } else {
+          keepAccount(currentAccount.id);
+        }
       }
     }
 
@@ -83,7 +118,7 @@ export function Reviewer(props: ReviewerProps) {
     if (
       filteredFollowings.length < 1 ||
       (currentAccount &&
-        currentAccount.id === followings[followings.length - 1])
+        currentAccount.id === accountIds[accountIds.length - 1])
     ) {
       setIsFetching(false);
       props.onFinished();
@@ -97,20 +132,20 @@ export function Reviewer(props: ReviewerProps) {
   };
 
   const onUndoClick = () => setAnimated(AnimationState.Idle);
-  const onUnfollowClick = async () => {
+  const onRemoveClick = async () => {
     if (skipConfirmation) {
       setAnimated(AnimationState.Hidden);
       await delayAsync(100);
-      onNextClick({ forceUnfollow: true, dontHide: true });
+      onNextClick({ forceRemove: true, dontHide: true });
     } else {
-      setAnimated(AnimationState.Unfollow);
+      setAnimated(AnimationState.Remove);
     }
   };
   const onKeepClick = async () => {
     if (skipConfirmation) {
       setAnimated(AnimationState.Hidden);
       await delayAsync(100);
-      onNextClick({ forceUnfollow: false, dontHide: true });
+      onNextClick({ forceRemove: false, dontHide: true });
     } else {
       setAnimated(AnimationState.Keep);
     }
@@ -129,8 +164,8 @@ export function Reviewer(props: ReviewerProps) {
   const [showBio, setShowBio] = useState(initialShowBio);
   const [showNote, setShowNote] = useState(initialShowNote);
 
-  if (followings?.length === 0) {
-    return <FollowingsLoadingIndicator />;
+  if (isFetchingInStore) {
+    return <AccountsLoadingIndicator reviewType={reviewType} />;
   }
 
   const loadingRender = (
@@ -149,7 +184,7 @@ export function Reviewer(props: ReviewerProps) {
           animationState === AnimationState.Idle && "scale-1 opacity-100",
           animationState === AnimationState.Keep &&
             "translate-x-[20%] translate-y-[200px] rotate-[10deg] scale-0 opacity-0",
-          animationState === AnimationState.Unfollow &&
+          animationState === AnimationState.Remove &&
             "translate-x-[-20%] translate-y-[200px] rotate-[-10deg] scale-0 opacity-0",
         )}
       >
@@ -181,16 +216,18 @@ export function Reviewer(props: ReviewerProps) {
               account={currentAccount}
               animationState={animationState}
               loadingRender={loadingRender}
+              reviewType={reviewType}
             />
             <ReviewerButtons
               onUndoClick={onUndoClick}
-              onUnfollowClick={onUnfollowClick}
+              onRemoveClick={onRemoveClick}
               onKeepClick={onKeepClick}
               onAddToList={onAddToList}
               onNextClick={() => onNextClick({})}
               isVisible={isVisible}
               shouldSkipConfirmation={skipConfirmation}
               isFetching={isFetching}
+              reviewType={reviewType}
             />
           </>
         ) : (

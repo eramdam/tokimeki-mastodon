@@ -1,15 +1,39 @@
 import { compact, pick, uniq } from "lodash-es";
 import type { mastodon } from "masto";
 
-import type { SortOrders, TokimekiAccount, TokimekiState } from ".";
+import type {
+  ReviewTypes,
+  SortOrders,
+  TokimekiAccount,
+  TokimekiState,
+} from ".";
 import { pickTokimekiAccount } from ".";
 import { initialPersistedState, usePersistedStore } from ".";
-import { filterFollowingIds, sortFollowings } from "./selectors";
+import { filterFollowingIds, sortAccounts } from "./selectors";
 
 export function resetState() {
   return usePersistedStore.setState(() => {
     return initialPersistedState;
   }, true);
+}
+
+export function clearReviewData() {
+  usePersistedStore.setState((state) => ({
+    ...state,
+    currentAccount: undefined,
+    currentAccountListIds: undefined,
+    currentRelationship: undefined,
+    nextAccount: undefined,
+    nextRelationship: undefined,
+    nextAccountListIds: undefined,
+    accountIds: [],
+    baseAccountIds: [],
+    keptIds: [],
+    removedAccountIds: [],
+    startCount: undefined,
+    isFinished: false,
+    isFetching: false,
+  }));
 }
 
 export function saveLoginCredentials(payload: {
@@ -24,15 +48,32 @@ export function saveLoginCredentials(payload: {
   });
 }
 
-export function saveAfterOAuthCode(payload: {
+export async function saveAfterOAuthCode(payload: {
   accessToken: string;
   account: mastodon.v1.AccountCredentials;
-}): void {
+  client: mastodon.rest.Client;
+}): Promise<void> {
+  const followRequests = await payload.client.v1.followRequests.list({
+    limit: 1,
+  });
   usePersistedStore.setState({
     accessToken: payload.accessToken,
-    accountId: payload.account.id,
-    accountUsername: payload.account.username,
-    startCount: payload.account.followingCount,
+    userAccountId: payload.account.id,
+    userAccountUsername: payload.account.username,
+    accountStats: {
+      hasFollowers: payload.account.followersCount > 0,
+      hasFollowings: payload.account.followingCount > 0,
+      hasFollowRequests: followRequests.length > 0,
+    },
+  });
+}
+
+export function setReviewType(payload: ReviewTypes | undefined): void {
+  usePersistedStore.setState((state) => {
+    return {
+      ...state,
+      reviewType: payload,
+    };
   });
 }
 
@@ -46,9 +87,9 @@ export function updateSettings(
     },
   }));
 }
-export function unfollowAccount(accountId: string): void {
+export function removeAccount(accountId: string): void {
   usePersistedStore.setState((state) => ({
-    unfollowedIds: uniq([...(state.unfollowedIds || []), accountId]),
+    removedAccountIds: uniq([...(state.removedAccountIds || []), accountId]),
   }));
 }
 export function keepAccount(accountId: string): void {
@@ -63,12 +104,12 @@ export async function fetchFollowings(
   usePersistedStore.setState({ isFetching: true });
   const persistedState = usePersistedStore.getState();
 
-  if (persistedState.baseFollowingIds.length) {
-    const sortedFollowings = sortFollowings(
+  if (persistedState.baseAccountIds.length) {
+    const sortedFollowings = sortAccounts(
       filterFollowingIds(
-        persistedState.baseFollowingIds,
+        persistedState.baseAccountIds,
         persistedState.keptIds,
-        persistedState.unfollowedIds,
+        persistedState.removedAccountIds,
       ),
       usePersistedStore.getState().settings.sortOrder,
     );
@@ -79,7 +120,7 @@ export async function fetchFollowings(
       nextAccount: undefined,
       nextRelationship: undefined,
       nextAccountListIds: undefined,
-      followingIds: sortedFollowings,
+      accountIds: sortedFollowings,
     });
 
     const [firstAccountId, secondAccountId] = sortedFollowings;
@@ -106,6 +147,8 @@ export async function fetchFollowings(
       nextAccount,
       nextRelationship,
       nextAccountListIds,
+      startCount: sortedFollowings.length,
+      isFetching: false,
     });
 
     return;
@@ -124,7 +167,7 @@ export async function fetchFollowings(
   }
 
   const accountIds = accounts.map((a) => a.id);
-  const sortedFollowings = sortFollowings(
+  const sortedFollowings = sortAccounts(
     accountIds,
     usePersistedStore.getState().settings.sortOrder,
   );
@@ -141,8 +184,8 @@ export async function fetchFollowings(
   ).map((listsList) => listsList.map((l) => l.id));
 
   usePersistedStore.setState({
-    baseFollowingIds: accountIds,
-    followingIds: sortedFollowings,
+    baseAccountIds: accountIds,
+    accountIds: sortedFollowings,
     currentAccount:
       (firstAccount && pickTokimekiAccount(firstAccount)) || undefined,
     currentAccountListIds,
@@ -163,9 +206,215 @@ export async function fetchFollowings(
     currentRelationship,
   });
 }
-export function reorderFollowings(order: SortOrders): void {
+
+export async function fetchFollowers(
+  accountId: string,
+  client: mastodon.rest.Client,
+) {
+  usePersistedStore.setState({ isFetching: true });
+  const persistedState = usePersistedStore.getState();
+
+  if (persistedState.baseAccountIds.length) {
+    const sortedFollowers = sortAccounts(
+      filterFollowingIds(
+        persistedState.baseAccountIds,
+        persistedState.keptIds,
+        persistedState.removedAccountIds,
+      ),
+      usePersistedStore.getState().settings.sortOrder,
+    );
+    usePersistedStore.setState({
+      currentAccount: undefined,
+      currentAccountListIds: undefined,
+      currentRelationship: undefined,
+      nextAccount: undefined,
+      nextRelationship: undefined,
+      nextAccountListIds: undefined,
+      accountIds: sortedFollowers,
+    });
+
+    const [firstAccountId, secondAccountId] = sortedFollowers;
+    const accountIdsToFetch = compact([firstAccountId, secondAccountId]);
+    const accountPromises = accountIdsToFetch.map((id) => {
+      return client.v1.accounts.$select(id).fetch();
+    });
+    const relationshipsPromises = client.v1.accounts.relationships.fetch({
+      id: accountIdsToFetch,
+    });
+    const [currentAccount, nextAccount] = await Promise.all(accountPromises);
+    const [currentRelationship, nextRelationship] = await relationshipsPromises;
+    const listPromises = accountIdsToFetch.map((id) => {
+      return client.v1.accounts.$select(id).lists.list();
+    });
+    const [currentAccountListIds, nextAccountListIds] = (
+      await Promise.all(listPromises)
+    ).map((listsList) => listsList.map((l) => l.id));
+
+    usePersistedStore.setState({
+      currentAccount,
+      currentRelationship,
+      currentAccountListIds,
+      nextAccount,
+      nextRelationship,
+      nextAccountListIds,
+      startCount: sortedFollowers.length,
+      isFetching: false,
+    });
+
+    return;
+  }
+
+  const accounts: mastodon.v1.Account[] = [];
+
+  if (accounts.length === 0) {
+    for await (const followers of client.v1.accounts
+      .$select(accountId)
+      .followers.list({
+        limit: 80,
+      })) {
+      accounts.push(...followers);
+    }
+  }
+
+  const accountIds = accounts.map((a) => a.id);
+  const sortedFollowers = sortAccounts(
+    accountIds,
+    usePersistedStore.getState().settings.sortOrder,
+  );
+
+  const firstId = sortedFollowers[0] || "";
+  const firstAccount = accounts.find((a) => a.id === firstId);
+  const secondId = sortedFollowers[1] || "";
+  const secondAccount = accounts.find((a) => a.id === secondId);
+  const listPromises = [firstId, secondId].map((id) => {
+    return client.v1.accounts.$select(id).lists.list();
+  });
+  const [currentAccountListIds, nextAccountListIds] = (
+    await Promise.all(listPromises)
+  ).map((listsList) => listsList.map((l) => l.id));
+
+  usePersistedStore.setState({
+    baseAccountIds: accountIds,
+    accountIds: sortedFollowers,
+    currentAccount:
+      (firstAccount && pickTokimekiAccount(firstAccount)) || undefined,
+    currentAccountListIds,
+    nextAccount:
+      (secondAccount && pickTokimekiAccount(secondAccount)) || undefined,
+    nextAccountListIds,
+    startCount: sortedFollowers.length,
+  });
+
+  const relationships = await client.v1.accounts.relationships.fetch({
+    id: compact([firstAccount?.id]),
+  });
+  const currentRelationship = relationships[0]
+    ? pick(relationships[0], ["followedBy", "note", "showingReblogs"])
+    : undefined;
+
+  usePersistedStore.setState({
+    isFetching: false,
+    currentRelationship,
+  });
+}
+
+export async function fetchFollowRequesters(
+  _accountId: string,
+  client: mastodon.rest.Client,
+) {
+  usePersistedStore.setState({ isFetching: true });
+  const persistedState = usePersistedStore.getState();
+
+  if (persistedState.baseAccountIds.length) {
+    const sortedFollowRequesters = sortAccounts(
+      filterFollowingIds(
+        persistedState.baseAccountIds,
+        persistedState.keptIds,
+        persistedState.removedAccountIds,
+      ),
+      usePersistedStore.getState().settings.sortOrder,
+    );
+    usePersistedStore.setState({
+      currentAccount: undefined,
+      currentAccountListIds: undefined,
+      currentRelationship: undefined,
+      nextAccount: undefined,
+      nextRelationship: undefined,
+      nextAccountListIds: undefined,
+      accountIds: sortedFollowRequesters,
+    });
+    const [firstAccountId, secondAccountId] = sortedFollowRequesters;
+    const accountIdsToFetch = compact([firstAccountId, secondAccountId]);
+    const accountPromises = accountIdsToFetch.map((id) => {
+      return client.v1.accounts.$select(id).fetch();
+    });
+
+    const relationshipsPromises = client.v1.accounts.relationships.fetch({
+      id: accountIdsToFetch,
+    });
+
+    const [currentAccount, nextAccount] = await Promise.all(accountPromises);
+    const [currentRelationship, nextRelationship] = await relationshipsPromises;
+
+    usePersistedStore.setState({
+      currentAccount,
+      currentRelationship,
+      nextAccount,
+      nextRelationship,
+      startCount: sortedFollowRequesters.length,
+      isFetching: false,
+    });
+
+    return;
+  }
+
+  const accounts: mastodon.v1.Account[] = [];
+
+  if (accounts.length === 0) {
+    for await (const followRequests of client.v1.followRequests.list({
+      limit: 80,
+    })) {
+      accounts.push(...followRequests);
+    }
+  }
+
+  const accountIds = accounts.map((a) => a.id);
+  const sortedFollowRequesters = sortAccounts(
+    accountIds,
+    usePersistedStore.getState().settings.sortOrder,
+  );
+
+  const firstId = sortedFollowRequesters[0] || "";
+  const firstAccount = accounts.find((a) => a.id === firstId);
+  const secondId = sortedFollowRequesters[1] || "";
+  const secondAccount = accounts.find((a) => a.id === secondId);
+
+  usePersistedStore.setState({
+    baseAccountIds: accountIds,
+    accountIds: sortedFollowRequesters,
+    currentAccount:
+      (firstAccount && pickTokimekiAccount(firstAccount)) || undefined,
+    nextAccount:
+      (secondAccount && pickTokimekiAccount(secondAccount)) || undefined,
+    startCount: sortedFollowRequesters.length,
+  });
+
+  const relationships = await client.v1.accounts.relationships.fetch({
+    id: compact([firstAccount?.id]),
+  });
+  const currentRelationship = relationships[0]
+    ? pick(relationships[0], ["followedBy", "note", "showingReblogs"])
+    : undefined;
+
+  usePersistedStore.setState({
+    isFetching: false,
+    currentRelationship,
+  });
+}
+
+export function reorderAccounts(order: SortOrders): void {
   usePersistedStore.setState((state) => ({
-    followingIds: sortFollowings(state.baseFollowingIds, order),
+    accountIds: sortAccounts(state.baseAccountIds, order),
   }));
 }
 export async function setCurrentAccountEmpty() {
@@ -177,12 +426,12 @@ export async function goToNextAccount(
   client: mastodon.rest.Client,
   currentAccount: TokimekiAccount,
 ) {
-  const { followingIds, nextAccount, nextRelationship } =
+  const { accountIds, nextAccount, nextRelationship } =
     usePersistedStore.getState();
 
-  const currentIndex = followingIds.indexOf(currentAccount.id);
+  const currentIndex = accountIds.indexOf(currentAccount.id);
   const newAccountId =
-    nextAccount?.id ?? (followingIds[currentIndex + 1] || followingIds[0]);
+    nextAccount?.id ?? (accountIds[currentIndex + 1] || accountIds[0]);
   const newAccount =
     nextAccount ??
     (await client.v1.accounts.$select(newAccountId || "").fetch());
@@ -205,7 +454,7 @@ export async function goToNextAccount(
     currentAccountListIds,
   });
 
-  const nextAccountId = followingIds[currentIndex + 2];
+  const nextAccountId = accountIds[currentIndex + 2];
 
   if (!nextAccountId) {
     return;

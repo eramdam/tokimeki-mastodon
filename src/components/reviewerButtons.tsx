@@ -9,6 +9,7 @@ import { Button, SmallButton } from "./button";
 import { MenuButton } from "./menu";
 import { PopoverButton } from "./popover";
 import { TextInput } from "./textField";
+import { ReviewTypes } from "../store";
 
 enum ItemKeysEnum {
   CREATE_LIST = "create-list",
@@ -16,7 +17,7 @@ enum ItemKeysEnum {
 }
 
 interface ReviewerButtonsProps {
-  onUnfollowClick: () => void;
+  onRemoveClick: () => void;
   onKeepClick: () => void;
   onUndoClick: () => void;
   onNextClick: () => void;
@@ -24,6 +25,7 @@ interface ReviewerButtonsProps {
   isVisible: boolean;
   shouldSkipConfirmation: boolean;
   isFetching: boolean;
+  reviewType: ReviewTypes;
 }
 export function ReviewerButtons(props: ReviewerButtonsProps) {
   const {
@@ -31,10 +33,11 @@ export function ReviewerButtons(props: ReviewerButtonsProps) {
     onKeepClick,
     onNextClick,
     onUndoClick,
-    onUnfollowClick,
+    onRemoveClick,
     onAddToList,
     shouldSkipConfirmation,
     isFetching,
+    reviewType,
   } = props;
   const lists = useLists();
   const currentAccountListIds = useCurrentAccountListIds();
@@ -43,7 +46,7 @@ export function ReviewerButtons(props: ReviewerButtonsProps) {
   const [listName, setListName] = useState("");
   const { client } = useMastodon();
 
-  const renderMenuButton = () => {
+  const renderListMenuButton = () => {
     if (isCreatingList) {
       return (
         <PopoverButton type="menu" label="Add to list" isOpen={isCreatingList}>
@@ -124,25 +127,71 @@ export function ReviewerButtons(props: ReviewerButtonsProps) {
 
   function renderContent() {
     if (isVisible) {
-      return (
-        <>
-          <Button
-            variant="secondary"
-            onPress={() => onUnfollowClick()}
-            isDisabled={isFetching}
-          >
-            Unfollow
-          </Button>
-          {renderMenuButton()}
-          <Button
-            onPress={() => onKeepClick()}
-            variant="secondary"
-            isDisabled={isFetching}
-          >
-            Keep
-          </Button>
-        </>
-      );
+      if (reviewType === ReviewTypes.FOLLOWINGS) {
+        return (
+          <>
+            <Button
+              variant="secondary"
+              onPress={() => onRemoveClick()}
+              isDisabled={isFetching}
+            >
+              Unfollow
+            </Button>
+            {renderListMenuButton()}
+            <Button
+              onPress={() => onKeepClick()}
+              variant="secondary"
+              isDisabled={isFetching}
+            >
+              Keep
+            </Button>
+          </>
+        );
+      }
+
+      if (reviewType === ReviewTypes.FOLLOW_REQUESTS) {
+        return (
+          <>
+            <Button
+              variant="secondary"
+              onPress={() => onRemoveClick()}
+              isDisabled={isFetching}
+            >
+              Reject request
+            </Button>
+            <Button
+              onPress={() => onKeepClick()}
+              variant="secondary"
+              isDisabled={isFetching}
+            >
+              Accept request
+            </Button>
+          </>
+        );
+      }
+
+      if (reviewType === ReviewTypes.FOLLOWERS) {
+        return (
+          <>
+            <Button
+              variant="secondary"
+              onPress={() => onRemoveClick()}
+              isDisabled={isFetching}
+            >
+              Remove
+            </Button>
+            <Button
+              onPress={() => onKeepClick()}
+              variant="secondary"
+              isDisabled={isFetching}
+            >
+              Keep
+            </Button>
+          </>
+        );
+      }
+
+      return null;
     }
 
     return (

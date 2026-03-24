@@ -9,6 +9,12 @@ export enum SortOrders {
   NEWEST = "newest",
 }
 
+export enum ReviewTypes {
+  FOLLOWINGS = "FOLLOWINGS",
+  FOLLOW_REQUESTS = "FOLLOW_REQUESTS",
+  FOLLOWERS = "FOLLOWERS",
+}
+
 export interface TokimekiAccount {
   id: string;
   acct: string;
@@ -44,10 +50,11 @@ export interface TokimekiState {
   clientSecret?: string;
   instanceUrl?: string;
   accessToken?: string;
-  accountId?: string;
-  accountUsername?: string;
+  userAccountId?: string;
+  userAccountUsername?: string;
   startCount?: number;
-  unfollowedIds: string[];
+  reviewType: ReviewTypes;
+  removedAccountIds: string[];
   keptIds: string[];
   settings: {
     showBio: boolean;
@@ -63,10 +70,15 @@ export interface TokimekiState {
   nextAccount?: TokimekiAccount;
   nextAccountListIds?: string[];
   nextRelationship?: TokimekiRelationship;
-  baseFollowingIds: string[];
-  followingIds: string[];
+  baseAccountIds: string[];
+  accountIds: string[];
   isFinished: boolean;
   lists: mastodon.v1.List[];
+  accountStats: {
+    hasFollowings: boolean;
+    hasFollowers: boolean;
+    hasFollowRequests: boolean;
+  };
 }
 
 export const initialPersistedState: TokimekiState = {
@@ -78,12 +90,18 @@ export const initialPersistedState: TokimekiState = {
     skipConfirmation: false,
   },
   keptIds: [],
-  unfollowedIds: [],
+  reviewType: ReviewTypes.FOLLOWINGS,
+  removedAccountIds: [],
   isFinished: false,
   isFetching: false,
-  baseFollowingIds: [],
-  followingIds: [],
+  baseAccountIds: [],
+  accountIds: [],
   lists: [],
+  accountStats: {
+    hasFollowers: false,
+    hasFollowings: false,
+    hasFollowRequests: false,
+  },
 };
 
 export const usePersistedStore = createWithEqualityFn<TokimekiState>()(
@@ -93,7 +111,7 @@ export const usePersistedStore = createWithEqualityFn<TokimekiState>()(
       partialize(state) {
         return omit(state, ["actions", "nextAccount", "nextRelationship"]);
       },
-      version: 3,
+      version: 4,
     }),
     { name: "main-store" },
   ),

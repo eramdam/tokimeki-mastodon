@@ -2,6 +2,7 @@ import type { PropsWithChildren, ReactNode } from "react";
 
 import { makeAccountName } from "../helpers/mastodonHelpers";
 import type { TokimekiAccount } from "../store";
+import { ReviewTypes } from "../store";
 import { renderWithEmoji } from "./emojify";
 import { AnimationState } from "./reviewer";
 
@@ -10,12 +11,67 @@ export const ReviewerPrompt = (
     animationState: AnimationState;
     account: TokimekiAccount;
     loadingRender: ReactNode;
+    reviewType: ReviewTypes;
   }>,
 ) => {
-  const { animationState, account } = props;
+  const { animationState, account, reviewType } = props;
   const accountName = makeAccountName(account);
 
   function renderContent() {
+    if (reviewType === ReviewTypes.FOLLOW_REQUESTS) {
+      if (animationState === AnimationState.Keep) {
+        return (
+          <>
+            <strong>{renderWithEmoji(account.emojis, accountName)}</strong> is
+            now following you!
+          </>
+        );
+      } else if (animationState === AnimationState.Remove) {
+        return (
+          <>
+            You rejected{" "}
+            <strong>{renderWithEmoji(account.emojis, accountName)}</strong>'s
+            follow request!
+          </>
+        );
+      }
+
+      return (
+        <>
+          Do you want{" "}
+          <strong>{renderWithEmoji(account.emojis, accountName)}</strong> to
+          follow you?
+        </>
+      );
+    }
+
+    if (reviewType === ReviewTypes.FOLLOWERS) {
+      if (animationState === AnimationState.Keep) {
+        return (
+          <>
+            <strong>{renderWithEmoji(account.emojis, accountName)}</strong>{" "}
+            still follows you!
+          </>
+        );
+      } else if (animationState === AnimationState.Remove) {
+        return (
+          <>
+            You removed{" "}
+            <strong>{renderWithEmoji(account.emojis, accountName)}</strong> from
+            your followers!
+          </>
+        );
+      }
+
+      return (
+        <>
+          Do you want to keep{" "}
+          <strong>{renderWithEmoji(account.emojis, accountName)}</strong> as a
+          follower?
+        </>
+      );
+    }
+
     if (animationState === AnimationState.Keep) {
       return (
         <>
@@ -24,7 +80,7 @@ export const ReviewerPrompt = (
           &apos;s toots are still important to you.
         </>
       );
-    } else if (animationState === AnimationState.Unfollow) {
+    } else if (animationState === AnimationState.Remove) {
       return (
         <>
           Great, unfollowed! Let&apos;s thank{" "}

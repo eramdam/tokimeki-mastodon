@@ -5,7 +5,7 @@ import { createContext, useContext, useEffect, useMemo, useState } from "react";
 
 import {
   useAccessToken,
-  useAccountId,
+  useUserAccountId,
   useInstanceUrl,
 } from "../store/selectors";
 
@@ -16,7 +16,7 @@ const MastodonContext = createContext<{
 
 export const MastodonProvider = (props: PropsWithChildren<object>) => {
   const accessToken = useAccessToken();
-  const accountId = useAccountId();
+  const accountId = useUserAccountId();
   const instanceUrl = useInstanceUrl();
   const [masto, setMasto] = useState<mastodon.rest.Client | undefined>();
 
