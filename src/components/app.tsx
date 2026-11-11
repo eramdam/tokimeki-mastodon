@@ -1,17 +1,15 @@
-import { signal } from "@preact/signals";
-import type { SubmitEventHandler } from "preact";
+import type { SubmitEventHandler } from "react";
 import { useState } from "preact/hooks";
 import { registerMastodonApplication } from "../helpers/mastodon";
 
-const instanceUrl = signal("");
-
 export function App() {
+  const [instanceUrl, setInstanceUrl] = useState("");
   const onSubmit: SubmitEventHandler<HTMLFormElement> = async (e) => {
     e.preventDefault();
 
     try {
       const { clientId, clientSecret } = await registerMastodonApplication(
-        instanceUrl.value,
+        instanceUrl,
         window.location.origin,
       );
       console.log({ clientId, clientSecret });
@@ -22,18 +20,18 @@ export function App() {
   return (
     <>
       <form onSubmit={onSubmit}>
-        <label for="">
+        <label>
           Instance domain
           <input
             type="text"
             name="instanceUrl"
             required
-            value={instanceUrl.value}
+            value={instanceUrl}
             onInput={(e) => {
               const val = e.currentTarget.value;
-              instanceUrl.value = val.startsWith("https://")
-                ? val
-                : `https://${val}`;
+              setInstanceUrl(
+                val.startsWith("https://") ? val : `https://${val}`,
+              );
             }}
           />
         </label>

@@ -1,2 +1,6 @@
 minimumReleaseAgeExclude:
   - astro@7.4.8
+  - '@astrojs/internal-helpers@0.13.2'
+  - '@astrojs/react-renderer@0.1.1'
+  - '@astrojs/react@7.1.7'
+  - '@astrojs/runtime@0.1.0'
