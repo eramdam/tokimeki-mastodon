@@ -13,8 +13,14 @@
   },
   "dependencies": {
     "@astrojs/check": "^0.9.12",
+    "@astrojs/preact": "^6.1.2",
     "@astrojs/ts-plugin": "^1.10.12",
+    "@preact/signals": "^2.11.4",
     "astro": "^7.4.8",
-    "typescript": "6.0.3"
+    "es-toolkit": "^1.53.2",
+    "masto": "^8.0.0",
+    "preact": "^11.2.0",
+    "typescript": "6.0.3",
+    "zustand": "^5.1.0"
   }
 }

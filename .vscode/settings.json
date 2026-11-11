@@ -2,5 +2,6 @@
   "editor.formatOnSave": true,
   "editor.codeActionsOnSave": {
     "source.fixAll.eslint": "explicit"
-  }
+  },
+  "js/ts.experimental.useTsgo": false
 }
