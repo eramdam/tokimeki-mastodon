@@ -1,5 +1,5 @@
 import type { SubmitEventHandler } from "react";
-import { useState } from "preact/hooks";
+import { useState } from "react";
 import { registerMastodonApplication } from "../helpers/mastodon";
 
 export function App() {
