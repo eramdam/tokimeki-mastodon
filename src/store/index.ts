@@ -1,3 +1,4 @@
+import type { DeepPartial } from "es-toolkit/types";
 import { create } from "zustand";
 import { persist } from "zustand/middleware";
 
@@ -32,6 +33,7 @@ type FediState = {
     clientId: string;
     instanceUrl: string;
     clientSecret: string;
+    accessToken: string;
   };
 };
 
@@ -55,6 +57,7 @@ export const useStore = create<Store>()(
           clientId: "",
           instanceUrl: "",
           clientSecret: "",
+          accessToken: "",
         },
       };
     },
@@ -64,3 +67,34 @@ export const useStore = create<Store>()(
     },
   ),
 );
+
+export const setStore = (s: DeepPartial<Store>) => {
+  const store = useStore.getState();
+  return useStore.setState(Object.assign(store, s), true);
+};
+
+export const storeActions = {
+  saveFediCredentials(creds: {
+    clientId: string;
+    instanceUrl: string;
+    clientSecret: string;
+  }) {
+    const store = useStore.getState();
+
+    if (store.service === "fedi") {
+      setStore({
+        credentials: creds,
+      });
+    }
+  },
+  saveFediAccessToken(accessToken: string) {
+    const store = useStore.getState();
+    if (store.service === "fedi") {
+      setStore({
+        credentials: {
+          accessToken: accessToken,
+        },
+      });
+    }
+  },
+};

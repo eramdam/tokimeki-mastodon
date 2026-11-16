@@ -9,7 +9,9 @@
     "dev": "astro dev",
     "build": "astro build",
     "preview": "astro preview",
-    "astro": "astro"
+    "astro": "astro",
+    "typecheck": "tsc -p .",
+    "typecheck:watch": "pnpm run typecheck --watch"
   },
   "dependencies": {
     "@astrojs/check": "^0.9.12",

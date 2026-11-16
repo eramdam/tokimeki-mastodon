@@ -1,6 +1,7 @@
 import type { SubmitEventHandler } from "react";
-import { useState } from "react";
-import { registerMastodonApplication } from "../helpers/mastodon";
+import { useEffect, useState } from "react";
+import { mastodonHelpers } from "../helpers/mastodon";
+import { storeActions } from "../store";
 
 export function App() {
   const [instanceUrl, setInstanceUrl] = useState("");
@@ -8,15 +9,40 @@ export function App() {
     e.preventDefault();
 
     try {
-      const { clientId, clientSecret } = await registerMastodonApplication(
-        instanceUrl,
-        window.location.origin,
-      );
+      const { clientId, clientSecret } =
+        await mastodonHelpers.registerMastodonApplication(
+          instanceUrl,
+          window.location.origin,
+        );
       console.log({ clientId, clientSecret });
+
+      if (clientId && clientSecret) {
+        const savedInstanceUrl = instanceUrl.replace(/\/$/, "");
+        storeActions.saveFediCredentials({
+          instanceUrl: savedInstanceUrl,
+          clientId,
+          clientSecret,
+        });
+
+        location.href = mastodonHelpers.getAuthURL({
+          instanceUrl: savedInstanceUrl,
+          clientId,
+        });
+      }
     } catch (e) {
       console.error(e);
     }
   };
+
+  const onMastodonCode = (code: string) => {};
+
+  useEffect(() => {
+    const codeFromURL = new URLSearchParams(window.location.search).get("code");
+    if (codeFromURL) {
+      onMastodonCode(codeFromURL);
+    }
+  });
+
   return (
     <>
       <form onSubmit={onSubmit}>
